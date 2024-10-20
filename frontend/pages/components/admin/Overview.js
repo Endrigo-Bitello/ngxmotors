@@ -7,7 +7,7 @@ import CountUp from 'react-countup';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { addDays } from 'date-fns';
-const NavbarButtons = dynamic(() => import('./NavbarButtons'));
+
 
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -317,7 +317,6 @@ const Overview = () => {
         </svg>
         <span>Baixar Relatório CSV</span>
       </button>
-      <NavbarButtons />
     </div>
   );
 };

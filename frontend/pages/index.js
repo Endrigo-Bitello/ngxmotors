@@ -8,11 +8,12 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { setSEO } from './../utils/seo';
 
-const Footer = dynamic(() => import('./components/Footer'));
+import Footer from './components/Footer';
 const Loading = dynamic(() => import('./components/Loading'), { ssr: false });
-const Medias = dynamic(() => import('./components/Medias'));
-const Navbar = dynamic(() => import('./components/Navbar'));
-const Banner = dynamic(() => import('./components/Banner'));
+import Navbar from './components/Navbar';
+import Banner from './components/Banner';
+import Image from 'next/image';
+
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 
@@ -90,7 +91,6 @@ const Home = () => {
             {/* Navbar */}
             <Navbar />
             <Banner />
-            <Medias />
 
             {/* Conteúdo principal */}
             <main className="container mx-auto p-6 flex-grow">
@@ -233,12 +233,15 @@ const Home = () => {
                                             ) : null}
                                             {/* Imagem do veículo */}
                                             {vehicle.imagens && vehicle.imagens.length > 0 ? (
-                                                <img
-                                                    srcSet={getImagePath(vehicle)}
-                                                    loading="lazy"
-                                                    alt={vehicle.modelo}
-                                                    className="z-1 relative object-cover h-64 w-full rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
-                                                />
+                                                <div className="relative h-64 w-full">
+                                                    <Image
+                                                        src={getImagePath(vehicle)}
+                                                        alt={vehicle.modelo}
+                                                        layout="fill"
+                                                        objectFit="cover"
+                                                        className="rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
+                                                    />
+                                                </div>
                                             ) : (
                                                 <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
                                                     Sem imagem
@@ -279,10 +282,12 @@ const Home = () => {
                                         <div className="flex items-center gap-2 h-[35px]">
                                             <div className="grow">
                                                 <figure>
-                                                    <img
+                                                    <Image
                                                         src={`/icons/${vehicle.marca.toLowerCase().replace(/ /g, '-')}.png`}
-                                                        alt={`Marca ${vehicle.marca}`}
-                                                        className="object-contain max-w-full h-[40px]"
+                                                        alt={vehicle.marca}
+                                                        width={40}
+                                                        height={40}
+                                                        className="mr-2"
                                                     />
                                                 </figure>
                                             </div>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import {
     faBars,
     faHome,
@@ -18,12 +17,13 @@ import { useRouter } from 'next/router';
 import { setSEO } from '../../utils/seo';
 import withAuth from '../../utils/withAuth';
 
-const Stock = dynamic(() => import('../components/admin/Stock'));
-const Mensagens = dynamic(() => import('../components/admin/Mensagens'));
-const Financiamentos = dynamic(() => import('../components/admin/Financiamentos'));
-const Overview = dynamic(() => import('../components/admin/Overview'));
-const ConsultaFipe = dynamic(() => import('../components/admin/ConsultaFipe'));
-const AddVehicle = dynamic(() => import('../components/admin/AddVehicle'));
+import Stock from '../components/admin/Stock';
+import Mensagens from '../components/admin/Mensagens';
+import Financiamentos from '../components/admin/Financiamentos';
+import Overview from '../components/admin/Overview';
+import ConsultaFipe from '../components/admin/ConsultaFipe';
+import AddVehicle from '../components/admin/AddVehicle';
+
 
 function Dashboard() {
     const [view, setView] = useState('overview');

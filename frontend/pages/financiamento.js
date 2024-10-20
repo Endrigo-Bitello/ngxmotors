@@ -9,11 +9,10 @@ import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { setSEO } from './../utils/seo';
 import Image from 'next/image';
 
-const Navbar = dynamic(() => import('./components/Navbar'));
-const Footer = dynamic(() => import('./components/Footer'));
-const Loading = dynamic(() => import('./components/Loading'), { ssr: false });
-const Medias = dynamic(() => import('./components/Medias'));
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+const Loading = dynamic(() => import('./components/Loading'), { ssr: false });
 
 
 export default function FinanciamentoPage() {
@@ -26,7 +25,9 @@ export default function FinanciamentoPage() {
   const [entrada, setEntrada] = useState(0); // Valor da entrada
   const [parcelas, setParcelas] = useState(48); // Parcelas selecionadas
   const [parcelaEstimada, setParcelaEstimada] = useState(0); // Estimativa da parcela
-
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState('');
+  
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
@@ -50,6 +51,25 @@ export default function FinanciamentoPage() {
       setLoading(false);
     }
   };
+  
+      // Função para ordenar os veículos
+      const handleSortOrder = (order) => {
+        setSortOrder(order);
+
+        // Clona a lista de veículos antes de ordenar
+        let sortedVehicles = [...vehicles];
+
+        if (order === 'menor') {
+            // Ordena por menor preço
+            sortedVehicles.sort((a, b) => a.valorVenda - b.valorVenda);
+        } else if (order === 'maior') {
+            // Ordena por maior preço
+            sortedVehicles.sort((a, b) => b.valorVenda - a.valorVenda);
+        }
+
+        // Atualiza o estado com a lista ordenada
+        setVehicles(sortedVehicles);
+    };
 
   const getImagePath = (vehicle) => {
     if (vehicle.imagens && vehicle.imagens.length > 0) {
@@ -201,7 +221,6 @@ export default function FinanciamentoPage() {
             </div>
           </section>
 
-          <Medias />
 
           {/* Conteúdo principal */}
           <main className="container mx-auto p-6 flex-grow">
@@ -212,19 +231,113 @@ export default function FinanciamentoPage() {
                   {vehicles.length} {vehicles.length === 1 ? 'veículo disponível' : 'veículos disponíveis'}
                 </p>
               </div>
-              <button className="border border-gray-400 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
-                  <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                  <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <path d="M21.63 14.75C21.63 15.64 21.38 16.48 20.94 17.2C20.12 18.58 18.61 19.5 16.88 19.5C15.15 19.5 13.64 18.57 12.82 17.2C12.38 16.49 12.13 15.64 12.13 14.75C12.13 12.13 14.26 10 16.88 10C19.5 10 21.63 12.13 21.63 14.75Z" stroke="#000000" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M18.66 14.73H15.11" stroke="#000000" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M16.88 13V16.55" stroke="#000000" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"></path>
-                    <path d="M20.6901 4.02002V6.23999C20.6901 7.04999 20.1801 8.06001 19.6801 8.57001L17.9201 10.12C17.5901 10.04 17.2401 10 16.8801 10C14.2601 10 12.1301 12.13 12.1301 14.75C12.1301 15.64 12.3801 16.48 12.8201 17.2C13.1901 17.82 13.7001 18.35 14.3201 18.73V19.07C14.3201 19.68 13.9201 20.49 13.4101 20.79L12.0001 21.7C10.6901 22.51 8.87006 21.6 8.87006 19.98V14.63C8.87006 13.92 8.46006 13.01 8.06006 12.51L4.22006 8.46997C3.72006 7.95997 3.31006 7.05001 3.31006 6.45001V4.12C3.31006 2.91 4.22006 2 5.33006 2H18.6701C19.7801 2 20.6901 2.91002 20.6901 4.02002Z" stroke="#000000" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"></path>
-                  </g>
-                </svg>
-                Filtrar
-              </button>
+              {/* Colocar o botão de ordenar aqui */}
+              <div className="relative inline-block text-left">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="border border-gray-400 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
+                >
+                  Ordenar por
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <path
+                        d="M21.63 14.75C21.63 15.64 21.38 16.48 20.94 17.2C20.12 18.58 18.61 19.5 16.88 19.5C15.15 19.5 13.64 18.57 12.82 17.2C12.38 16.49 12.13 15.64 12.13 14.75C12.13 12.13 14.26 10 16.88 10C19.5 10 21.63 12.13 21.63 14.75Z"
+                        stroke="#000000"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                      <path
+                        d="M18.66 14.73H15.11"
+                        stroke="#000000"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                      <path
+                        d="M16.88 13V16.55"
+                        stroke="#000000"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                      <path
+                        d="M20.6901 4.02002V6.23999C20.6901 7.04999 20.1801 8.06001 19.6801 8.57001L17.9201 10.12C17.5901 10.04 17.2401 10 16.8801 10C14.2601 10 12.1301 12.13 12.1301 14.75C12.1301 15.64 12.3801 16.48 12.8201 17.2C13.1901 17.82 13.7001 18.35 14.3201 18.73V19.07C14.3201 19.68 13.9201 20.49 13.4101 20.79L12.0001 21.7C10.6901 22.51 8.87006 21.6 8.87006 19.98V14.63C8.87006 13.92 8.46006 13.01 8.06006 12.51L4.22006 8.46997C3.72006 7.95997 3.31006 7.05001 3.31006 6.45001V4.12C3.31006 2.91 4.22006 2 5.33006 2H18.6701C19.7801 2 20.6901 2.91002 20.6901 4.02002Z"
+                        stroke="#000000"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                    </g>
+                  </svg>
+                </button>
+
+                {/* Dropdown de opções */}
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                      <button
+                        onClick={() => handleSortOrder('menor')}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+                          <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                          <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                          <g id="SVGRepo_iconCarrier">
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M17 3.25C17.4142 3.25 17.75 3.58579 17.75 4V17.75L19.4 15.55C19.6485 15.2186 20.1186 15.1515 20.45 15.4C20.7814 15.6485 20.8485 16.1186 20.6 16.45L17.6 20.45C17.4063 20.7083 17.0691 20.8136 16.7628 20.7115C16.4566 20.6094 16.25 20.3228 16.25 20V4C16.25 3.58579 16.5858 3.25 17 3.25Z"
+                              fill="#1C274C"
+                            ></path>
+                            <path d="M3.25 16C3.25 15.5858 3.58579 15.25 4 15.25H13C13.4142 15.25 13.75 15.5858 13.75 16C13.75 16.4142 13.4142 16.75 13 16.75H4C3.58579 16.75 3.25 16.4142 3.25 16Z" fill="#1C274C"></path>
+                            <path
+                              opacity="0.7"
+                              d="M5.25 11C5.25 10.5858 5.58579 10.25 6 10.25H13C13.4142 10.25 13.75 10.5858 13.75 11C13.75 11.4142 13.4142 11.75 13 11.75H6C5.58579 11.75 5.25 11.4142 5.25 11Z"
+                              fill="#1C274C"
+                            ></path>
+                            <path
+                              opacity="0.4"
+                              d="M7.25 6C7.25 5.58579 7.58579 5.25 8 5.25H13C13.4142 5.25 13.75 5.58579 13.75 6C13.75 6.41421 13.4142 6.75 13 6.75H8C7.58579 6.75 7.25 6.41421 7.25 6Z"
+                              fill="#1C274C"
+                            ></path>
+                          </g>
+                        </svg>
+                        Menor preço
+                      </button>
+
+                      <button
+                        onClick={() => handleSortOrder('maior')}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+                          <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                          <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                          <g id="SVGRepo_iconCarrier">
+                            <path d="M4 8H13" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round"></path>
+                            <path opacity="0.7" d="M6 13H13" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round"></path>
+                            <path opacity="0.4" d="M8 18H13" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round"></path>
+                            <path
+                              d="M17 20V4L20 8"
+                              stroke="#1C274C"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            ></path>
+                          </g>
+                        </svg>
+                        Maior preço
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {loading && <Loading />}
@@ -410,8 +523,8 @@ export default function FinanciamentoPage() {
                   <Image
                     src={getImagePath(vehicleData)}
                     alt={`${vehicleData.marca} ${vehicleData.modelo}`}
-                    layout="fill" 
-                    objectFit="cover" 
+                    layout="fill"
+                    objectFit="cover"
                     className="transition-transform duration-300 ease-in-out hover:scale-105"
                   />
                 </div>

@@ -3,8 +3,9 @@ import React from 'react';
 import { setSEO } from './../utils/seo';
 import { useEffect } from 'react';
 
-const Navbar = dynamic(() => import('./components/Navbar'));
-const Footer = dynamic(() => import('./components/Footer'));
+
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 

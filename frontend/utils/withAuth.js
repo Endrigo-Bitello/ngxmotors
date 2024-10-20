@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import Loading from '@/pages/components/Loading';
+const Loading = dynamic(() => import('../../frontend/pages/components/Loading'), { ssr: false });
 
 const withAuth = (Component) => {
   return function AuthProtected(props) {

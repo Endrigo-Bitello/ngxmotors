@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import dynamic from 'next/dynamic';
 import { generateFinanciamentoPDF } from '../../../utils/pdfGenerator';
-import {
-  faFilePdf,
-  faCar,
-  faUser,
-  faMoneyBillAlt,
-} from '@fortawesome/free-regular-svg-icons';
+import { faFilePdf, faUser, faMoneyBillAlt } from '@fortawesome/free-regular-svg-icons';
+import { faCar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-const NavbarButtons = dynamic(() => import('./NavbarButtons'));
 
 const Financiamentos = () => {
   const [financiamentos, setFinanciamentos] = useState([]);
@@ -115,9 +109,13 @@ const Financiamentos = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-full md:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col">
+      <div
+        className={`${
+          selectedFinanciamento ? 'hidden' : 'flex'
+        } md:flex flex-col w-full md:w-1/3 lg:w-1/4 bg-white border-r border-gray-200`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h1 className="text-2xl font-semibold text-gray-800">Simulações</h1>
@@ -168,11 +166,12 @@ const Financiamentos = () => {
               {filteredFinanciamentos.map((financiamento) => (
                 <li
                   key={financiamento._id}
-                  className={`flex items-center px-4 py-3 cursor-pointer hover:bg-blue-50 transition ${selectedFinanciamento &&
+                  className={`flex items-center px-4 py-3 cursor-pointer hover:bg-blue-50 transition ${
+                    selectedFinanciamento &&
                     selectedFinanciamento._id === financiamento._id
-                    ? 'bg-blue-100'
-                    : ''
-                    }`}
+                      ? 'bg-blue-100'
+                      : ''
+                  }`}
                   onClick={() => {
                     setSelectedFinanciamento(financiamento);
                   }}
@@ -214,9 +213,23 @@ const Financiamentos = () => {
       </div>
 
       {/* Detalhes da Simulação */}
-      <div className="hidden md:flex flex-col flex-1">
+      <div
+        className={`${
+          selectedFinanciamento ? 'flex' : 'hidden'
+        } md:flex flex-col flex-1`}
+      >
         {selectedFinanciamento ? (
           <>
+            {/* Botão Voltar (Mobile) */}
+            <div className="md:hidden p-4">
+              <button
+                onClick={() => setSelectedFinanciamento(null)}
+                className="text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                &larr; Voltar
+              </button>
+            </div>
+
             {/* Cabeçalho da Simulação */}
             <div className="bg-white shadow p-6 flex items-center justify-between">
               <div>
@@ -230,11 +243,19 @@ const Financiamentos = () => {
               {/* Gerar PDF */}
               <button
                 onClick={() => generatePDF(selectedFinanciamento)}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none transition"
+                className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none transition"
                 title="Download PDF"
               >
                 <FontAwesomeIcon icon={faFilePdf} size="lg" />
                 Download PDF
+              </button>
+              {/* Botão de PDF (Mobile) */}
+              <button
+                onClick={() => generatePDF(selectedFinanciamento)}
+                className="sm:hidden flex items-center gap-2 text-blue-600 hover:text-blue-800 focus:outline-none transition"
+                title="Download PDF"
+              >
+                <FontAwesomeIcon icon={faFilePdf} size="lg" />
               </button>
             </div>
 
@@ -244,34 +265,47 @@ const Financiamentos = () => {
                 {/* Informações Pessoais */}
                 <section className="bg-white rounded-xl shadow-md p-6">
                   <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <FontAwesomeIcon icon={faUser} className="mr-2 text-blue-600" />
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="mr-2 text-blue-600"
+                    />
                     Informações Pessoais
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <p className="text-gray-700 mb-2">
                         <span className="font-medium">Nome:</span>{' '}
-                        <span className="font-bold">{selectedFinanciamento.nome}</span>
+                        <span className="font-bold">
+                          {selectedFinanciamento.nome}
+                        </span>
                       </p>
                       <p className="text-gray-700 mb-2">
                         <span className="font-medium">Email:</span>{' '}
-                        <span className="font-bold">{selectedFinanciamento.email}</span>
+                        <span className="font-bold">
+                          {selectedFinanciamento.email}
+                        </span>
                       </p>
                       <p className="text-gray-700">
                         <span className="font-medium">Telefone:</span>{' '}
-                        <span className="font-bold">{selectedFinanciamento.telefone}</span>
+                        <span className="font-bold">
+                          {selectedFinanciamento.telefone}
+                        </span>
                       </p>
                     </div>
                     <div>
                       <p className="text-gray-700 mb-2">
                         <span className="font-medium">CPF:</span>{' '}
-                        <span className="font-bold">{selectedFinanciamento.cpf}</span>
+                        <span className="font-bold">
+                          {selectedFinanciamento.cpf}
+                        </span>
                       </p>
                       <p className="text-gray-700">
                         <span className="font-medium">Data da Simulação:</span>{' '}
-                        <span className="font-bold">{new Date(
-                          selectedFinanciamento.createdAt
-                        ).toLocaleDateString('pt-BR')}</span>
+                        <span className="font-bold">
+                          {new Date(
+                            selectedFinanciamento.createdAt
+                          ).toLocaleDateString('pt-BR')}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -280,7 +314,10 @@ const Financiamentos = () => {
                 {/* Detalhes do Veículo */}
                 <section className="bg-white rounded-xl shadow-md p-6">
                   <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <FontAwesomeIcon icon={faCar} className="mr-2 text-blue-600" />
+                    <FontAwesomeIcon
+                      icon={faCar}
+                      className="mr-2 text-blue-600"
+                    />
                     Detalhes do Veículo
                   </h3>
                   {veiculos[selectedFinanciamento.customId] ? (
@@ -288,15 +325,21 @@ const Financiamentos = () => {
                       <div>
                         <p className="text-gray-700 mb-2">
                           <span className="font-medium">Marca:</span>{' '}
-                          <span className="font-bold">{veiculos[selectedFinanciamento.customId].marca}</span>
+                          <span className="font-bold">
+                            {veiculos[selectedFinanciamento.customId].marca}
+                          </span>
                         </p>
                         <p className="text-gray-700 mb-2">
                           <span className="font-medium">Modelo:</span>{' '}
-                          <span className="font-bold">{veiculos[selectedFinanciamento.customId].modelo}</span>
+                          <span className="font-bold">
+                            {veiculos[selectedFinanciamento.customId].modelo}
+                          </span>
                         </p>
                         <p className="text-gray-700">
                           <span className="font-medium">Ano:</span>{' '}
-                          <span className="font-bold">{veiculos[selectedFinanciamento.customId].anoModelo}</span>
+                          <span className="font-bold">
+                            {veiculos[selectedFinanciamento.customId].anoModelo}
+                          </span>
                         </p>
                       </div>
                       <div>
@@ -304,9 +347,12 @@ const Financiamentos = () => {
                           .valorVenda !== undefined ? (
                           <p className="text-gray-700 mb-2">
                             <span className="font-medium">Preço:</span>{' '}
-                            <span className="font-bold">{formatCurrency(
-                              veiculos[selectedFinanciamento.customId].valorVenda
-                            )}</span>
+                            <span className="font-bold">
+                              {formatCurrency(
+                                veiculos[selectedFinanciamento.customId]
+                                  .valorVenda
+                              )}
+                            </span>
                           </p>
                         ) : (
                           <p className="text-gray-700">Preço: N/A</p>
@@ -334,17 +380,27 @@ const Financiamentos = () => {
                     <div>
                       <p className="text-gray-700 mb-2">
                         <span className="font-medium">Entrada:</span>{' '}
-                        <span className="font-bold">{formatCurrency(selectedFinanciamento.entrada)}</span>
+                        <span className="font-bold">
+                          {formatCurrency(selectedFinanciamento.entrada)}
+                        </span>
                       </p>
                       <p className="text-gray-700">
                         <span className="font-medium">Parcelas:</span>{' '}
-                        <span className="font-bold">{selectedFinanciamento.parcelas}x</span>
+                        <span className="font-bold">
+                          {selectedFinanciamento.parcelas}x
+                        </span>
                       </p>
                     </div>
-                    <p className="text-gray-700">
-                        <span className="font-medium">Valor Estimado da Parcela:</span>{' '}
-                        <span className="font-bold">{formatCurrency(selectedFinanciamento.parcelaEstimada)}</span>
+                    <div>
+                      <p className="text-gray-700">
+                        <span className="font-medium">
+                          Valor Estimado da Parcela:
+                        </span>{' '}
+                        <span className="font-bold">
+                          {formatCurrency(selectedFinanciamento.parcelaEstimada)}
+                        </span>
                       </p>
+                    </div>
                   </div>
                 </section>
               </div>
@@ -357,9 +413,7 @@ const Financiamentos = () => {
             </p>
           </div>
         )}
-
       </div>
-      <NavbarButtons />
     </div>
   );
 };

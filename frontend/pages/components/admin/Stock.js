@@ -1,19 +1,62 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaBolt, FaCarAlt, FaCheck, FaMotorcycle, FaPencilAlt, FaRocket, FaSearch, FaTrash } from 'react-icons/fa';
+import { FaBolt, FaCarAlt, FaCheck, FaMotorcycle, FaPencilAlt, FaSearch, FaTrash } from 'react-icons/fa';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 const Details = dynamic(() => import('./Details'));
-const NavbarButtons = dynamic(() => import('./NavbarButtons'));
 
 export default function Stock() {
-    const [vehicles, setVehicles] = useState([]); // Estado para armazenar os veículos
+    const [vehicles, setVehicles] = useState([]);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
-    const [filter, setFilter] = useState('todos'); // Estado para o filtro (carros, motos, ou todos)
-    const [searchTerm, setSearchTerm] = useState(''); // Estado para o termo de pesquisa
+    const [filter, setFilter] = useState('todos');
+    const [searchTerm, setSearchTerm] = useState('');
     const [isBoostModalOpen, setBoostModalOpen] = useState(false);
     const [isUnboostModalOpen, setUnboostModalOpen] = useState(false);
     const [vehicleToBoost, setVehicleToBoost] = useState(null);
+    const [vehicleToDelete, setVehicleToDelete] = useState(null);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
+    // Função para abrir o modal de confirmação de remoção
+    const handleDeleteClick = (vehicle) => {
+        setVehicleToDelete(vehicle); // Define o veículo que será deletado
+        setDeleteModalOpen(true); // Abre o modal de confirmação
+    };
+
+    // Função para cancelar a remoção
+    const cancelDelete = () => {
+        setDeleteModalOpen(false); // Fecha o modal de confirmação
+        setVehicleToDelete(null); // Limpa o veículo a ser deletado
+    };
+
+    const confirmDelete = async () => {
+        if (vehicleToDelete) {
+            try {
+                const { customId, tipo } = vehicleToDelete;
+                const deleteResponse = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/${tipo === 'carro' ? 'carros' : 'motos'}/customId/${customId}`);
+
+                if (deleteResponse.status === 200) {
+                    setVehicles((prevVehicles) => prevVehicles.filter((vehicle) => vehicle.customId !== customId));
+                    alert('Veículo removido com sucesso!');
+                    setDeleteModalOpen(false);
+                } else {
+                    alert('Erro ao remover o veículo. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro ao remover veículo:', error);
+                alert('Erro ao remover o veículo. Tente novamente.');
+            }
+        }
+    };
+
+    const handleViewDetails = (vehicle) => {
+        setSelectedVehicle(vehicle);  // Set the vehicle to display its details
+    };
+
+
+    const handleCloseDetails = () => {
+        setSelectedVehicle(null);  // Close the modal by setting it to null
+    };
+
 
     const handleBoostClick = (vehicle) => {
         setVehicleToBoost(vehicle);
@@ -36,74 +79,6 @@ export default function Stock() {
         setUnboostModalOpen(false);
     };
 
-
-    // Função para buscar os veículos do backend
-    const fetchVehicles = async () => {
-        try {
-            // Buscando carros e motos
-            const [carRes, motoRes] = await Promise.all([
-                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/carros`),
-                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/motos`),   // Rota para buscar motos
-            ]);
-
-            // Combinando carros e motos em um único array
-            const allVehicles = [
-                ...carRes.data.map((car) => ({ ...car, tipo: 'carro' })),  // Adiciona um tipo "carro"
-                ...motoRes.data.map((moto) => ({ ...moto, tipo: 'moto' })), // Adiciona um tipo "moto"
-            ];
-
-            setVehicles(allVehicles);
-        } catch (error) {
-            console.error('Erro ao buscar veículos:', error);
-        }
-    };
-
-    // Hook para buscar os veículos ao carregar o componente
-    useEffect(() => {
-        fetchVehicles();
-    }, []);
-
-    // Função para filtrar os veículos com base na seleção do filtro e termo de pesquisa
-    const filteredVehicles = vehicles.filter((vehicle) => {
-        const matchesFilter =
-            filter === 'todos' ||
-            (filter === 'carro' && vehicle.customId && vehicle.customId.startsWith('c')) ||
-            (filter === 'moto' && vehicle.customId && vehicle.customId.startsWith('m'));
-
-        const matchesSearch =
-            vehicle.marca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            vehicle.modelo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            vehicle.customId?.toString().toLowerCase().includes(searchTerm.toLowerCase());
-
-
-        return matchesFilter && matchesSearch;
-    });
-
-    const handleViewDetails = (vehicle) => {
-        setSelectedVehicle(vehicle);  // Set the vehicle to display its details
-    };
-
-    const handleCloseDetails = () => {
-        setSelectedVehicle(null);  // Close the modal by setting it to null
-    };
-
-
-    // Função para remover o veículo baseado no ID
-    const removeVehicle = async (customId, tipo) => {
-        try {
-            if (tipo === 'carro') {
-                // Remover da collection carros
-                await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/carros/${customId}`);
-                setVehicles(vehicles.filter((vehicle) => vehicle.customId !== customId));
-            } else if (tipo === 'moto') {
-                // Remover da collection motos
-                await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/motos/${customId}`);
-                setVehicles(vehicles.filter((vehicle) => vehicle.customId !== customId));
-            }
-        } catch (error) {
-            console.error('Erro ao remover veículo:', error);
-        }
-    };
 
     const confirmBoost = async () => {
         try {
@@ -142,12 +117,44 @@ export default function Stock() {
         }
     };
 
-    // Função para obter a rota correta da imagem com a URL completa
-    const getImagePath = (vehicle) => {
-        if (vehicle.imagens && vehicle.imagens.length > 0) {
-            return vehicle.imagens[0]; // Supondo que seja a URL completa
+    const fetchVehicles = async () => {
+        try {
+            const [carRes, motoRes] = await Promise.all([
+                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/carros`),
+                axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/motos`),
+            ]);
+
+            const allVehicles = [
+                ...carRes.data.map((car) => ({ ...car, tipo: 'carro' })),
+                ...motoRes.data.map((moto) => ({ ...moto, tipo: 'moto' })),
+            ];
+
+            setVehicles(allVehicles);
+        } catch (error) {
+            console.error('Erro ao buscar veículos:', error);
         }
-        return ''; // Caso não haja fotos ou ocorra algum erro
+    };
+
+    useEffect(() => {
+        fetchVehicles();
+    }, []);
+
+    const filteredVehicles = vehicles.filter((vehicle) => {
+        const matchesFilter =
+            filter === 'todos' ||
+            (filter === 'carro' && vehicle.customId.startsWith('c')) ||
+            (filter === 'moto' && vehicle.customId.startsWith('m'));
+
+        const matchesSearch =
+            vehicle.marca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            vehicle.modelo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            vehicle.customId?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+
+        return matchesFilter && matchesSearch;
+    });
+
+    const getImagePath = (vehicle) => {
+        return vehicle.imagens && vehicle.imagens.length > 0 ? vehicle.imagens[0] : '';
     };
 
     return (
@@ -209,12 +216,12 @@ export default function Stock() {
                         key={vehicle._id}
                         className="relative bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
                     >
-                        {/* Etiqueta com o tipo do veículo (Carro: azul / Moto: vermelho) */}
+                        {/* Etiqueta com o tipo do veículo */}
                         <span
-                            className={`absolute top-0 left-0 m-2 px-2 py-1 rounded-full text-white text-xs font-semibold uppercase ${vehicle.customId.startsWith('c') ? 'bg-blue-600' : 'bg-red-600'
+                            className={`absolute top-0 left-0 m-2 px-2 py-1 rounded-full text-white text-xs font-semibold uppercase ${vehicle.tipo === 'carro' ? 'bg-blue-600' : 'bg-red-600'
                                 }`}
                         >
-                            {vehicle.customId.startsWith('c') ? 'Carro' : 'Moto'}
+                            {vehicle.tipo === 'carro' ? 'Carro' : 'Moto'}
                         </span>
 
                         {/* Imagem do veículo */}
@@ -223,8 +230,8 @@ export default function Stock() {
                                 <Image
                                     src={getImagePath(vehicle)}
                                     alt={vehicle.modelo}
-                                    layout="fill" 
-                                    objectFit="cover" 
+                                    layout="fill"
+                                    objectFit="cover"
                                     className="z-1 relative rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
                                 />
                             </div>
@@ -241,7 +248,7 @@ export default function Stock() {
                                     src={`/icons/${vehicle.marca.toLowerCase().replace(/ /g, '-')}.png`}
                                     alt={vehicle.marca}
                                     width={24}
-                                    height={24} 
+                                    height={24}
                                     className="mr-2"
                                 />
                                 <h2 className="text-xl font-bold text-gray-800">
@@ -294,7 +301,7 @@ export default function Stock() {
 
                                 {/* Botão Remover com Ícone */}
                                 <button
-                                    onClick={() => removeVehicle(vehicle._id, vehicle.tipo)}
+                                    onClick={() => handleDeleteClick(vehicle)}
                                     className="ml-4 text-gray-500 hover:text-red-500 transition-all focus:outline-none focus:ring focus:ring-red-300"
                                 >
                                     <FaTrash />
@@ -315,10 +322,43 @@ export default function Stock() {
 
             {/* Modal de Detalhes do Veículo */}
             {selectedVehicle && (
-                <Details vehicle={selectedVehicle} onClose={handleCloseDetails} />
+                <Details
+                    vehicle={selectedVehicle}
+                    onClose={handleCloseDetails}
+                    onSave={fetchVehicles} // Pass the callback function to refresh the vehicles
+                />
             )}
 
-            {/* Pop-up de Confirmação de Impulso */}
+            {/* Pop-up de Confirmação de Remoção */}
+            {isDeleteModalOpen && vehicleToDelete && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black bg-opacity-50"></div>
+                    <div className="bg-white rounded-lg shadow-lg p-6 z-50 max-w-sm w-full">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                            Deseja remover este veículo?
+                        </h2>
+                        <p className="text-gray-600 mb-6">
+                            Esta ação não pode ser desfeita.
+                        </p>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={cancelDelete}
+                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                            >
+                                Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Outros Modais (Impulsionar e Remover Impulso) */}
             {isBoostModalOpen && vehicleToBoost && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="fixed inset-0 bg-black bg-opacity-50"></div>
@@ -347,7 +387,6 @@ export default function Stock() {
                 </div>
             )}
 
-            {/* Pop-up de Confirmação de Remoção de Impulso */}
             {isUnboostModalOpen && vehicleToBoost && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="fixed inset-0 bg-black bg-opacity-50"></div>
@@ -374,10 +413,8 @@ export default function Stock() {
                         </div>
                     </div>
                 </div>
-
             )}
-            <NavbarButtons />
+
         </div>
     );
-}
-
+}    

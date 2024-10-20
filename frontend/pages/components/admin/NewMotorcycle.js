@@ -2,7 +2,6 @@ import { useState } from 'react';
 import axios from 'axios';
 import { FaChevronDown, FaCouch, FaImages, FaLock, FaMotorcycle, FaStepBackward, FaStepForward, FaTimes, FaWrench } from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi';
-import NavbarButtons from './NavbarButtons';
 import Image from 'next/image';
 
 const NewMotorcycle = () => {
@@ -280,15 +279,17 @@ const NewMotorcycle = () => {
                                 >
                                     {formData.marca ? (
                                         <div className="flex items-center">
+                                        <div className="w-6 h-6 mr-3 relative">
                                             <Image
-                                                src={`/icons/${vehicle.marca.toLowerCase().replace(/ /g, '-')}.png`}
-                                                alt={vehicle.marca}
-                                                width={40}
-                                                height={40}
-                                                className="mr-2"
+                                                src={`/icons/${formData.marca.toLowerCase().replace(/ /g, '-')}.png`}
+                                                alt={formData.marca}
+                                                layout="fill" // Preenche o contêiner pai
+                                                objectFit="contain" // Garante que a imagem mantenha seu conteúdo
+                                                className="mr-3"
                                             />
-                                            {formData.marca}
                                         </div>
+                                        {formData.marca}
+                                    </div>
                                     ) : (
                                         <span className="text-gray-500">Selecione a marca</span>
                                     )}
@@ -1219,7 +1220,6 @@ const NewMotorcycle = () => {
                             </button>
                         </div>
                     </form>
-                    <NavbarButtons />
                 </div>
             );
 

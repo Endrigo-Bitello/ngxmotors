@@ -43,6 +43,7 @@ mongoose
 
 // Importar modelos
 const Carros = require('./models/Carros');
+const Motos = require('./models/Motos');
 
 // Função para carregar os carros do banco de dados
 async function carregarCarros() {
@@ -56,6 +57,19 @@ async function carregarCarros() {
     console.error('Erro ao carregar os carros:', error);
   }
 }
+
+async function carregarMotos() {
+  try {
+    const motos = await Motos.find();
+    console.log(`Motos carregadas: ${motos.length}`);
+    motos.forEach(moto => {
+      console.log(`Moto: ${moto.marca} ${moto.modelo} - ID: ${moto.customId}`);
+    });
+  } catch (error) {
+    console.error('Erro ao carregar as motos', error);
+  }
+}
+
 
 // Middleware de autenticação
 const authMiddleware = (req, res, next) => {
@@ -81,7 +95,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const authRoutes = require('./routes/authRoutes');
 const financiamentoRoutes = require('./routes/financiamentoRoutes');
 const mensagensRoutes = require('./routes/mensagensRoutes');
-const protectedRoutes = require ('./routes/protectedRoutes');
+const protectedRoutes = require('./routes/protectedRoutes');
 const vehiclesRoutes = require('./routes/vehiclesRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 
@@ -103,9 +117,10 @@ app.get('/', (req, res) => {
 
 // Iniciar o servidor
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Sistema iniciado com sucesso!`);
-  console.log(`Desenvolvido por Endrigo Bitello`);
-  console.log(`[Smart Auto] Servidor rodando na porta: ${PORT}!`);
+  console.log(`[EMX Tecnologia] Sistema iniciado com sucesso`);
+  console.log(`[EMX Tecnologia] Desenvolvido por Endrigo Bitello`);
+  console.log(`[EMX Tecnologia] Servidor rodando na porta: ${PORT}`);
 
-  carregarCarros(); // Chama a função para carregar os carros ao iniciar o servidor
+  carregarCarros(); 
+  carregarMotos()
 });

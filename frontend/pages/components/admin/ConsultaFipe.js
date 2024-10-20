@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-const NavbarButtons = dynamic(() => import('./NavbarButtons'));
+
 
 const ConsultaFipe = () => {
     const [marcas, setMarcas] = useState([]);
@@ -36,7 +35,7 @@ const ConsultaFipe = () => {
     }, [marcaSelecionada]);
 
     useEffect(() => {
-        if (modeloSelecionado) {
+        if (modeloSelecionado && marcaSelecionada) {
             const fetchAnos = async () => {
                 const response = await fetch(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${marcaSelecionada}/modelos/${modeloSelecionado}/anos`);
                 const data = await response.json();
@@ -44,7 +43,7 @@ const ConsultaFipe = () => {
             };
             fetchAnos();
         }
-    }, [modeloSelecionado]);
+    }, [modeloSelecionado, marcaSelecionada]);
 
     const handleConsultarFipe = async () => {
         if (!marcaSelecionada || !modeloSelecionado || !anoSelecionado) return;
@@ -113,6 +112,9 @@ const ConsultaFipe = () => {
                 </ol>
                 <p className="mt-4 text-base sm:text-lg">
                     Os resultados incluem o valor médio do veículo, o ano de fabricação, o tipo de combustível e o código FIPE.
+                </p>
+                <p className="mt-4 text-red-600 text-base sm:text-sm">
+                    * No momento as consultas estção disponíveis apenas para carros.
                 </p>
             </div>
 
@@ -237,7 +239,6 @@ const ConsultaFipe = () => {
                 </div>
             )}
 
-            <NavbarButtons />
         </div>
     );
 };

@@ -3,15 +3,15 @@ import React from 'react';
 import { setSEO } from './../utils/seo';
 import dynamic from 'next/dynamic';
 
-const Navbar = dynamic(() => import('./components/Navbar'));
-const Footer = dynamic(() => import('./components/Footer'));
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 const TermosDeUso = () => {
     useEffect(() => {
         setSEO(
-          { title: `${process.env.NEXT_PUBLIC_NAME} - Termos de Uso` });
-      }, []);
+            { title: `${process.env.NEXT_PUBLIC_NAME} - Termos de Uso` });
+    }, []);
     return (
         <>
             <Navbar />

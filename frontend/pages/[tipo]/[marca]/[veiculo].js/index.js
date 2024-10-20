@@ -8,10 +8,11 @@ import { facebookIcon, xIcon, gmailIcon, whatsappNewIcon } from '../../../../uti
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { setSEO } from '../../../../utils/seo';
 
-const Navbar = dynamic(() => import('../../../components/Navbar'));
-const Footer = dynamic(() => import('../../../components/Footer'));
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
 const Loading = dynamic(() => import('../../../components/Loading'), { ssr: false }); 
 const GoogleMaps = dynamic(() => import('@/pages/components/GoogleMaps'), { ssr: false }); 
+
 
 
 export default function VehiclePage() {

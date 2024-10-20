@@ -1,12 +1,12 @@
+import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from 'react';
 import { FaPhoneAlt, FaWhatsapp, FaInstagram, FaFacebookF } from 'react-icons/fa';
-import dynamic from 'next/dynamic';
 import { setSEO } from './../utils/seo';
 import axios from 'axios';
 
-const Navbar = dynamic(() => import('./components/Navbar'));
-const Footer = dynamic(() => import('./components/Footer'));
-const GoogleMaps = dynamic(() => import('./components/GoogleMaps'));
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 const Contato = () => {
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 const NewCar = dynamic(() => import('../../components/admin/NewCar'));
 const NewMotorcycle = dynamic(() => import('../../components/admin/NewMotorcycle'));
-const NavbarButtons = dynamic(() => import('./NavbarButtons'));
+
 
 export default function AddVehicle() {
   const [vehicleType, setVehicleType] = useState(null);
@@ -53,7 +53,6 @@ export default function AddVehicle() {
           {vehicleType === 'motorcycle' && <NewMotorcycle />}
         </div>
       )}
-      <NavbarButtons />
     </div>
   );
 }

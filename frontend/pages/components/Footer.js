@@ -1,5 +1,6 @@
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin, FaTiktok } from 'react-icons/fa';
 import Image from 'next/image';
+import Link from 'next/link'; // Importe Link
 
 const formatPhoneNumber = (phoneNumber) => {
   const ddd = phoneNumber.slice(0, 2);
@@ -31,46 +32,41 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Ajuda</h3>
             <ul className="space-y-3">
               <li>
-                <a href="/" className="text-sm text-gray-400 hover:text-white transition">
-                  Início
-                </a>
+                <Link href="/" legacyBehavior passHref>
+                  <a className="text-sm text-gray-400 hover:text-white transition">Início</a>
+                </Link>
               </li>
               <li>
-                <a href="/estoque" className="text-sm text-gray-400 hover:text-white transition">
-                  Estoque
-                </a>
+                <Link href="/estoque" legacyBehavior passHref>
+                  <a className="text-sm text-gray-400 hover:text-white transition">Estoque</a>
+                </Link>
               </li>
               <li>
-                <a href="/contato" className="text-sm text-gray-400 hover:text-white transition">
-                  Contato
-                </a>
+                <Link href="/contato" legacyBehavior passHref>
+                  <a className="text-sm text-gray-400 hover:text-white transition">Contato</a>
+                </Link>
               </li>
               <li>
-                <a href="/sobre" className="text-sm text-gray-400 hover:text-white transition">
-                  Sobre Nós
-                </a>
+                <Link href="/sobre" legacyBehavior passHref>
+                  <a className="text-sm text-gray-400 hover:text-white transition">Sobre Nós</a>
+                </Link>
               </li>
             </ul>
           </div>
+
 
           <div>
             <h3 className="text-lg font-semibold mb-4">Termos & Privacidade</h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="/politica-de-privacidade"
-                  className="text-sm text-gray-400 hover:text-white transition"
-                >
-                  Políticas de Privacidade
-                </a>
+                <Link href="/politica-de-privacidade" legacyBehavior passHref>
+                  <a className="text-sm text-gray-400 hover:text-white transition">Políticas de Privacidade</a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/termos-de-uso"
-                  className="text-sm text-gray-400 hover:text-white transition"
-                >
-                  Termos de Uso
-                </a>
+                <Link href="/termos-de-uso" legacyBehavior passHref>
+                  <a className="text-sm text-gray-400 hover:text-white transition">Termos de Uso</a>
+                </Link>
               </li>
             </ul>
           </div>
