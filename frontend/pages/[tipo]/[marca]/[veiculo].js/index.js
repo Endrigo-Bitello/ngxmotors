@@ -190,13 +190,13 @@ export default function VehiclePage() {
 
         };
 
-        return labelMap[key] || key; // Retorna o rótulo formatado, ou a chave caso não esteja no mapa
+        return labelMap[key] || key; 
     };
 
 
     const images = vehicleData.imagens.map((imagem) => ({
-        original: imagem, // Use a URL da imagem diretamente
-        thumbnail: imagem, // Exibe as miniaturas
+        original: imagem, 
+        thumbnail: imagem, 
     }));
 
 

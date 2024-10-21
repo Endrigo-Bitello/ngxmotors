@@ -28,7 +28,7 @@ const Contato = () => {
             });
 
             // Exibe uma mensagem de sucesso
-            alert('Formulário enviado com sucesso!');
+            alert('Mensagem enviada com sucesso!');
             console.log('Resposta do servidor:', res.data);
 
             setNome('');

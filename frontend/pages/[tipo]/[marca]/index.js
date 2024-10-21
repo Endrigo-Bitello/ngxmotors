@@ -120,7 +120,7 @@ export default function VehiclesByBrandPage() {
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             className="border border-gray-400 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
                         >
-                            Ordenar por
+                            Ordenar
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
                                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                                 <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
@@ -365,7 +365,8 @@ export default function VehiclesByBrandPage() {
                                         })}
                                     </div>
                                     <button
-                                        title={`Chame no WhatsApp para saber mais sobre ${vehicle.marca} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
+                                        title={`Chame no WhatsApp para saber mais sobre ${vehicle.modelo} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
+                                        onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                                         className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                                     >
                                         <FontAwesomeIcon icon={faWhatsapp} className="text-[22px]" />

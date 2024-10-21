@@ -27,7 +27,7 @@ export default function FinanciamentoPage() {
   const [parcelaEstimada, setParcelaEstimada] = useState(0); // Estimativa da parcela
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('');
-  
+
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
@@ -51,25 +51,25 @@ export default function FinanciamentoPage() {
       setLoading(false);
     }
   };
-  
-      // Função para ordenar os veículos
-      const handleSortOrder = (order) => {
-        setSortOrder(order);
 
-        // Clona a lista de veículos antes de ordenar
-        let sortedVehicles = [...vehicles];
+  // Função para ordenar os veículos
+  const handleSortOrder = (order) => {
+    setSortOrder(order);
 
-        if (order === 'menor') {
-            // Ordena por menor preço
-            sortedVehicles.sort((a, b) => a.valorVenda - b.valorVenda);
-        } else if (order === 'maior') {
-            // Ordena por maior preço
-            sortedVehicles.sort((a, b) => b.valorVenda - a.valorVenda);
-        }
+    // Clona a lista de veículos antes de ordenar
+    let sortedVehicles = [...vehicles];
 
-        // Atualiza o estado com a lista ordenada
-        setVehicles(sortedVehicles);
-    };
+    if (order === 'menor') {
+      // Ordena por menor preço
+      sortedVehicles.sort((a, b) => a.valorVenda - b.valorVenda);
+    } else if (order === 'maior') {
+      // Ordena por maior preço
+      sortedVehicles.sort((a, b) => b.valorVenda - a.valorVenda);
+    }
+
+    // Atualiza o estado com a lista ordenada
+    setVehicles(sortedVehicles);
+  };
 
   const getImagePath = (vehicle) => {
     if (vehicle.imagens && vehicle.imagens.length > 0) {
@@ -197,29 +197,33 @@ export default function FinanciamentoPage() {
         <div className="bg-gray-100 min-h-screen flex flex-col">
           {/* Navbar */}
           <Navbar />
-          <section className="text-center mb-10">
-            <h1 className="text-4xl font-extrabold text-gray-800 mb-4">Simule o Financiamento do Seu Próximo Veículo!</h1>
-            <p className="text-lg text-gray-600">
+          <section className="text-center mb-10 px-4 lg:px-16 py-8">
+            <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-800 mb-4">
+              Simule o Financiamento do Seu Próximo Veículo!
+            </h1>
+            <p className="text-base lg:text-lg text-gray-600 mb-2">
               Aqui na nossa empresa, oferecemos as melhores soluções de financiamento para você adquirir seu veículo de forma rápida e fácil.
             </p>
-            <p className="text-lg text-gray-600 mb-4">
+            <p className="text-base lg:text-lg text-gray-600 mb-4">
               Escolha um veículo abaixo e descubra como é simples simular seu financiamento. Garantimos uma experiência sem complicações, com as melhores condições do mercado.
             </p>
-            <div className="flex justify-center gap-6 mb-6">
+            <div className="flex flex-col sm:flex-row justify-center items-start gap-4 sm:gap-6 mb-6">
               <div className="flex items-center text-green-600">
-                <FontAwesomeIcon icon={faCheckCircle} className="text-2xl mr-2" />
-                <span className="text-lg">Soluções rápidas</span>
+                <FontAwesomeIcon icon={faCheckCircle} className="text-2xl mr-2 align-middle" />
+                <span className="text-base lg:text-lg">Soluções rápidas</span>
               </div>
               <div className="flex items-center text-green-600">
-                <FontAwesomeIcon icon={faCheckCircle} className="text-2xl mr-2" />
-                <span className="text-lg">Sem burocracia</span>
+                <FontAwesomeIcon icon={faCheckCircle} className="text-2xl mr-2 align-middle" />
+                <span className="text-base lg:text-lg">Sem burocracia</span>
               </div>
               <div className="flex items-center text-green-600">
-                <FontAwesomeIcon icon={faCheckCircle} className="text-2xl mr-2" />
-                <span className="text-lg">Condições especiais</span>
+                <FontAwesomeIcon icon={faCheckCircle} className="text-2xl mr-2 align-middle" />
+                <span className="text-base lg:text-lg">Condições especiais</span>
               </div>
             </div>
+
           </section>
+
 
 
           {/* Conteúdo principal */}
@@ -237,7 +241,7 @@ export default function FinanciamentoPage() {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="border border-gray-400 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
-                  Ordenar por
+                  Ordenar
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
                     <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
@@ -480,7 +484,8 @@ export default function FinanciamentoPage() {
                         })}
                       </div>
                       <button
-                        title={`Chame no WhatsApp para saber mais sobre ${vehicle.marca} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
+                        title={`Chame no WhatsApp para saber mais sobre ${vehicle.modelo} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
+                        onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                         className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                       >
                         <FontAwesomeIcon icon={faWhatsapp} className="text-[22px]" />
