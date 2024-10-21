@@ -69,7 +69,6 @@ const Home = () => {
             // Faz a requisição para obter todos os veículos, independente do tipo
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/vehicles`);
             setVehicles(res.data);
-            console.log(`Número de veículos: ${res.data.length}`);
         } catch (error) {
             console.error('Erro ao buscar os veículos:', error);
         } finally {

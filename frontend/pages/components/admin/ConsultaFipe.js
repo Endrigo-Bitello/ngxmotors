@@ -47,7 +47,7 @@ const ConsultaFipe = () => {
 
     const handleConsultarFipe = async () => {
         if (!marcaSelecionada || !modeloSelecionado || !anoSelecionado) return;
-        const response = await fetch(`/api/fipeAPI?marca=${marcaSelecionada}&modelo=${modeloSelecionado}&ano=${anoSelecionado}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/fipeAPI?marca=${marcaSelecionada}&modelo=${modeloSelecionado}&ano=${anoSelecionado}`);
         const data = await response.json();
         setFipeResult(data);
     };

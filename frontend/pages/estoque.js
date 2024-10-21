@@ -71,7 +71,6 @@ export default function VehicleTypePage() {
 
       setVehicles(res.data);
       setSearched(!!search); // Define o estado de searched como verdadeiro se houver uma busca
-      console.log(`Número de veículos: ${res.data.length}`);
     } catch (error) {
       console.error('Erro ao buscar os veículos:', error);
     } finally {

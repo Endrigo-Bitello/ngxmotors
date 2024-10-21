@@ -243,7 +243,7 @@ const Financiamentos = () => {
               {/* Gerar PDF */}
               <button
                 onClick={() => generatePDF(selectedFinanciamento)}
-                className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none transition"
+                className="hidden sm:flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded focus:outline-none transition"
                 title="Download PDF"
               >
                 <FontAwesomeIcon icon={faFilePdf} size="lg" />
@@ -252,7 +252,7 @@ const Financiamentos = () => {
               {/* Botão de PDF (Mobile) */}
               <button
                 onClick={() => generatePDF(selectedFinanciamento)}
-                className="sm:hidden flex items-center gap-2 text-blue-600 hover:text-blue-800 focus:outline-none transition"
+                className="sm:hidden flex items-center gap-2 text-red-600 hover:text-red-800 focus:outline-none transition"
                 title="Download PDF"
               >
                 <FontAwesomeIcon icon={faFilePdf} size="lg" />

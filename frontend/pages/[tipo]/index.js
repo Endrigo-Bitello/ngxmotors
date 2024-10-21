@@ -62,11 +62,9 @@ export default function VehicleTypePage() {
       if (tipo === 'carros') {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/carros`);
         setVehicles(res.data);
-        console.log(`Número de veículos do tipo carro: ${res.data.length}`);
       } else if (tipo === 'motos') {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/motos`);
         setVehicles(res.data);
-        console.log(`Número de veículos do tipo moto: ${res.data.length}`);
       }
     } catch (error) {
       console.error('Erro ao buscar os veículos:', error);

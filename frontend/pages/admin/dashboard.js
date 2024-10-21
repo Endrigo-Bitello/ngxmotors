@@ -10,6 +10,7 @@ import {
     faSearch,
     faSignOutAlt,
     faChevronDown,
+    faBank,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -29,7 +30,7 @@ function Dashboard() {
     const [view, setView] = useState('overview');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
-    const router = useRouter(); 
+    const router = useRouter();
 
 
     useEffect(() => {
@@ -58,7 +59,7 @@ function Dashboard() {
             icon: faUsers,
             items: [
                 { name: 'Mensagens', view: 'mensagens', icon: faMessage },
-                { name: 'Simulações', view: 'financiamentos', icon: faMoneyBill },
+                { name: 'Simulações', view: 'financiamentos', icon: faBank },
             ],
         },
         { name: 'Consulta Fipe', view: 'consultafipe', icon: faSearch },
@@ -111,7 +112,7 @@ function Dashboard() {
                                                     <li key={subItem.name}>
                                                         <button
                                                             onClick={() => setView(subItem.view)}
-                                                            className={`block w-full text-left px-4 py-2 rounded-lg transition-all duration-300 hover:bg-gray-700 ${view === subItem.view ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white' : 'text-gray-300'
+                                                            className={`block w-full text-left px-4 py-2 rounded-lg transition-all duration-300 hover:bg-gray-700 ${view === subItem.view ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' : 'text-gray-300'
                                                                 }`}
                                                         >
                                                             <FontAwesomeIcon icon={subItem.icon} className="mr-2 h-4 w-4" />
@@ -125,7 +126,7 @@ function Dashboard() {
                                 ) : (
                                     <button
                                         onClick={() => setView(item.view)}
-                                        className={`flex items-center w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 ${view === item.view ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white' : 'text-gray-300'
+                                        className={`flex items-center w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 ${view === item.view ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' : 'text-gray-300'
                                             }`}
                                     >
                                         <FontAwesomeIcon icon={item.icon} className="h-5 w-5 mr-3" />
@@ -154,6 +155,32 @@ function Dashboard() {
                     {view === 'financiamentos' && <Financiamentos />}
                     {view === 'consultafipe' && <ConsultaFipe />}
                 </main>
+
+                {/* Navbar inferior para dispositivos móveis */}
+                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-gray-700 shadow-lg flex justify-around py-2">
+                    <button onClick={() => setView('overview')} className={`text-center transition-transform transform hover:scale-110 ${view === 'overview' ? 'text-blue-500' : 'text-gray-400'}`}>
+                        <FontAwesomeIcon icon={faHome} className="h-6 w-6" />
+                        <p className="text-xs">Visão Geral</p>
+                    </button>
+                    <button onClick={() => setView('stock')} className={`text-center transition-transform transform hover:scale-110 ${view === 'stock' ? 'text-blue-500' : 'text-gray-400'}`}>
+                        <FontAwesomeIcon icon={faClipboardList} className="h-6 w-6" />
+                        <p className="text-xs">Estoque</p>
+                    </button>
+                    <button onClick={() => setView('financiamentos')} className={`text-center transition-transform transform hover:scale-110 ${view === 'financiamentos' ? 'text-blue-500' : 'text-gray-400'}`}>
+                        <FontAwesomeIcon icon={faBank} className="h-6 w-6" />
+                        <p className="text-xs">Simulações</p>
+                    </button>
+                    <button onClick={() => setView('mensagens')} className={`text-center transition-transform transform hover:scale-110 ${view === 'mensagens' ? 'text-blue-500' : 'text-gray-400'}`}>
+                        <FontAwesomeIcon icon={faMessage} className="h-6 w-6" />
+                        <p className="text-xs">Mensagens</p>
+                    </button>
+                    <button onClick={() => setView('consultafipe')} className={`text-center transition-transform transform hover:scale-110 ${view === 'consultafipe' ? 'text-blue-500' : 'text-gray-400'}`}>
+                        <FontAwesomeIcon icon={faSearch} className="h-6 w-6" />
+                        <p className="text-xs">Consulta FIPE</p>
+                    </button>
+                </div>
+
+
             </div>
         </div>
     );

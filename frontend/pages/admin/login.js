@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setSEO({ title: 'Login - Acesse sua conta' });
+    setSEO({ title: `${process.env.NEXT_PUBLIC_NAME} - Acesse sua conta` });
   }, []);
 
   const handleLogin = async (e) => {
