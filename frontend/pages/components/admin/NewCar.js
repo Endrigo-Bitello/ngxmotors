@@ -121,16 +121,17 @@ const NewCar = () => {
     const motorOptions = ['1.0', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '2.0 - 2.9', '3.0 - 3.9', '4.0 ou mais'];
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [tipoDeCarroOpen, setTipoDeCarroOpen] = useState(false); 
+    const [tipoDeCarroOpen, setTipoDeCarroOpen] = useState(false);
     const [motorOpen, setMotorOpen] = useState(false);
-    const [transmissaoOpen, setTransmissaoOpen] = useState(false); 
+    const [transmissaoOpen, setTransmissaoOpen] = useState(false);
     const [combustivelOpen, setCombustivelOpen] = useState(false);
-    const [direcaoOpen, setDirecaoOpen] = useState(false); 
-    const [tracaoOpen, setTracaoOpen] = useState(false); 
-    const [freiosOpen, setFreiosOpen] = useState(false); 
-    const [ipvaOpen, setIpvaOpen] = useState(false); 
-    const [dpvatOpen, setDpvatOpen] = useState(false); 
+    const [direcaoOpen, setDirecaoOpen] = useState(false);
+    const [tracaoOpen, setTracaoOpen] = useState(false);
+    const [freiosOpen, setFreiosOpen] = useState(false);
+    const [ipvaOpen, setIpvaOpen] = useState(false);
+    const [dpvatOpen, setDpvatOpen] = useState(false);
     const [showStock, setShowStock] = useState(false);
+
 
     const handleMotorSelect = (option) => {
         setFormData({ ...formData, motor: option });
@@ -249,7 +250,6 @@ const NewCar = () => {
                 console.log('Imagens enviadas com sucesso:', uploadResponse.data);
             }
 
-            // Alterar o estado para exibir o componente Stock após o sucesso
             setShowStock(true);
 
         } catch (error) {
@@ -258,7 +258,6 @@ const NewCar = () => {
     };
 
     if (showStock) {
-        // Renderizar o componente Stock quando o estado showStock for verdadeiro
         return <Stock />;
     }
 
@@ -1165,170 +1164,170 @@ const NewCar = () => {
         case 5:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
-                <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Valores e Imagens</h2>
-                <form className="space-y-6" onSubmit={handleSubmit}>
-    
-                    {/* Valor de Compra */}
-                    <div className="flex flex-col relative">
-                        <label className="text-gray-700 font-medium mb-2 flex items-center">
-                            Valor de Compra (R$)
-                            <span className="ml-2 text-gray-500 relative group">
-                                <HiOutlineQuestionMarkCircle className="text-xl" />
-                                <div className="absolute left-0 -top-12 w-56 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Este é o valor pelo qual o veículo foi adquirido.
-                                </div>
-                            </span>
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-3 text-gray-500">R$</span>
-                            <input
-                                type="text"
-                                name="valorCompra"
-                                value={formData.valorCompra !== '' ?
-                                    new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(formData.valorCompra)
-                                    : ''}
-                                onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
-                                    setFormData({
-                                        ...formData,
-                                        valorCompra: isNaN(numericValue) ? '' : numericValue.toFixed(2)
-                                    });
-                                }}
-                                placeholder="0,00"
-                                className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                            />
-                        </div>
-                    </div>
-    
-                    {/* Valor de Venda */}
-                    <div className="flex flex-col relative">
-                        <label className="text-gray-700 font-medium mb-2 flex items-center">
-                            Valor de Venda (R$)
-                            <span className="ml-2 text-gray-500 relative group">
-                                <HiOutlineQuestionMarkCircle className="text-xl" />
-                                <div className="absolute left-0 -top-12 w-56 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    Este é o valor pelo qual o veículo será vendido.
-                                </div>
-                            </span>
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-3 text-gray-500">R$</span>
-                            <input
-                                type="text"
-                                name="valorVenda"
-                                value={formData.valorVenda !== '' ?
-                                    new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(formData.valorVenda)
-                                    : ''}
-                                onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
-                                    setFormData({
-                                        ...formData,
-                                        valorVenda: isNaN(numericValue) ? '' : numericValue.toFixed(2)
-                                    });
-                                }}
-                                placeholder="0,00"
-                                className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                            />
-                        </div>
-                    </div>
-    
-                    {/* Valor FIPE */}
-                    <div className="flex flex-col">
-                        <label className="text-gray-700 font-medium mb-2">Valor FIPE (R$)</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-3 text-gray-500">R$</span>
-                            <input
-                                type="text"
-                                name="valorFIPE"
-                                value={formData.valorFIPE !== '' ?
-                                    new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(formData.valorFIPE)
-                                    : ''}
-                                onChange={(e) => {
-                                    const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
-                                    setFormData({
-                                        ...formData,
-                                        valorFIPE: isNaN(numericValue) ? '' : numericValue.toFixed(2)
-                                    });
-                                }}
-                                placeholder="0,00"
-                                className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                            />
-                        </div>
-                    </div>
-    
-                    {/* Upload de Imagens */}
-                    <div className="flex flex-col">
-                        <label className="text-gray-700 font-medium mb-2">Imagens do Veículo</label>
-                        <div
-                            className="flex items-center justify-center w-full bg-white border-2 border-dashed border-gray-300 rounded-lg h-48 cursor-pointer hover:bg-gray-50"
-                            onDrop={(e) => {
-                                e.preventDefault();
-                                const files = Array.from(e.dataTransfer.files);
-                                setFormData({ ...formData, imagens: [...formData.imagens, ...files] });
-                            }}
-                            onDragOver={(e) => e.preventDefault()}
-                        >
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={(e) => setFormData({ ...formData, imagens: [...formData.imagens, ...e.target.files] })}
-                                className="hidden"
-                                id="upload"
-                            />
-                            <label htmlFor="upload" className="text-gray-500 flex flex-col items-center justify-center">
-                                <FaImages className="text-4xl mb-2" />
-                                <span className="text-center">Arraste as imagens ou clique para enviar</span>
-                            </label>
-                        </div>
-    
-                        {/* Preview das Imagens */}
-                        {formData.imagens.length > 0 && (
-                            <div className="grid grid-cols-3 gap-4 mt-4">
-                                {formData.imagens.map((image, index) => (
-                                    <div key={index} className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
-                                        <img
-                                            src={URL.createObjectURL(image)}
-                                            alt={`Imagem ${index + 1}`}
-                                            className="object-cover w-full h-full"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const updatedImages = formData.imagens.filter((_, i) => i !== index);
-                                                setFormData({ ...formData, imagens: updatedImages });
-                                            }}
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-sm hover:bg-red-600"
-                                        >
-                                            <FaTimes />
-                                        </button>
+                    <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Valores e Imagens</h2>
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+
+                        {/* Valor de Compra */}
+                        <div className="flex flex-col relative">
+                            <label className="text-gray-700 font-medium mb-2 flex items-center">
+                                Valor de Compra (R$)
+                                <span className="ml-2 text-gray-500 relative group">
+                                    <HiOutlineQuestionMarkCircle className="text-xl" />
+                                    <div className="absolute left-0 -top-12 w-56 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Este é o valor pelo qual o veículo foi adquirido.
                                     </div>
-                                ))}
+                                </span>
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-3 text-gray-500">R$</span>
+                                <input
+                                    type="text"
+                                    name="valorCompra"
+                                    value={formData.valorCompra !== '' ?
+                                        new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(formData.valorCompra)
+                                        : ''}
+                                    onChange={(e) => {
+                                        const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
+                                        setFormData({
+                                            ...formData,
+                                            valorCompra: isNaN(numericValue) ? '' : numericValue.toFixed(2)
+                                        });
+                                    }}
+                                    placeholder="0,00"
+                                    className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+                                />
                             </div>
-                        )}
-                    </div>
-    
-                    {/* Botões de Envio e Voltar */}
-                    <div className="flex justify-between mt-6">
-                        <button
-                            type="button"
-                            onClick={prevStep}
-                            className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-all"
-                        >
-                            <FaStepBackward className="inline-block mr-2" /> Voltar
-                        </button>
-                        <button
-                            type="submit"
-                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
-                        >
-                            Enviar
-                        </button>
-                    </div>
-    
-                </form>
-            </div>
-        );
+                        </div>
+
+                        {/* Valor de Venda */}
+                        <div className="flex flex-col relative">
+                            <label className="text-gray-700 font-medium mb-2 flex items-center">
+                                Valor de Venda (R$)
+                                <span className="ml-2 text-gray-500 relative group">
+                                    <HiOutlineQuestionMarkCircle className="text-xl" />
+                                    <div className="absolute left-0 -top-12 w-56 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Este é o valor pelo qual o veículo será vendido.
+                                    </div>
+                                </span>
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-3 text-gray-500">R$</span>
+                                <input
+                                    type="text"
+                                    name="valorVenda"
+                                    value={formData.valorVenda !== '' ?
+                                        new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(formData.valorVenda)
+                                        : ''}
+                                    onChange={(e) => {
+                                        const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
+                                        setFormData({
+                                            ...formData,
+                                            valorVenda: isNaN(numericValue) ? '' : numericValue.toFixed(2)
+                                        });
+                                    }}
+                                    placeholder="0,00"
+                                    className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Valor FIPE */}
+                        <div className="flex flex-col">
+                            <label className="text-gray-700 font-medium mb-2">Valor FIPE (R$)</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-3 text-gray-500">R$</span>
+                                <input
+                                    type="text"
+                                    name="valorFIPE"
+                                    value={formData.valorFIPE !== '' ?
+                                        new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(formData.valorFIPE)
+                                        : ''}
+                                    onChange={(e) => {
+                                        const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
+                                        setFormData({
+                                            ...formData,
+                                            valorFIPE: isNaN(numericValue) ? '' : numericValue.toFixed(2)
+                                        });
+                                    }}
+                                    placeholder="0,00"
+                                    className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Upload de Imagens */}
+                        <div className="flex flex-col">
+                            <label className="text-gray-700 font-medium mb-2">Imagens do Veículo</label>
+                            <div
+                                className="flex items-center justify-center w-full bg-white border-2 border-dashed border-gray-300 rounded-lg h-48 cursor-pointer hover:bg-gray-50"
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    const files = Array.from(e.dataTransfer.files);
+                                    setFormData({ ...formData, imagens: [...formData.imagens, ...files] });
+                                }}
+                                onDragOver={(e) => e.preventDefault()}
+                            >
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => setFormData({ ...formData, imagens: [...formData.imagens, ...e.target.files] })}
+                                    className="hidden"
+                                    id="upload"
+                                />
+                                <label htmlFor="upload" className="text-gray-500 flex flex-col items-center justify-center">
+                                    <FaImages className="text-4xl mb-2" />
+                                    <span className="text-center">Arraste as imagens ou clique para enviar</span>
+                                </label>
+                            </div>
+
+                            {/* Preview das Imagens */}
+                            {formData.imagens.length > 0 && (
+                                <div className="grid grid-cols-3 gap-4 mt-4">
+                                    {formData.imagens.map((image, index) => (
+                                        <div key={index} className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                                            <img
+                                                src={URL.createObjectURL(image)}
+                                                alt={`Imagem ${index + 1}`}
+                                                className="object-cover w-full h-full"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const updatedImages = formData.imagens.filter((_, i) => i !== index);
+                                                    setFormData({ ...formData, imagens: updatedImages });
+                                                }}
+                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-sm hover:bg-red-600"
+                                            >
+                                                <FaTimes />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Botões de Envio e Voltar */}
+                        <div className="flex justify-between mt-6">
+                            <button
+                                type="button"
+                                onClick={prevStep}
+                                className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-all"
+                            >
+                                <FaStepBackward className="inline-block mr-2" /> Voltar
+                            </button>
+                            <button
+                                type="submit"
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+                            >
+                                Enviar
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            );
     };
 }
-    
-    export default NewCar;
+
+export default NewCar;

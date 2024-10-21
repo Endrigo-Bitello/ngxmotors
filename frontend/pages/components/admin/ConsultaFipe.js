@@ -46,10 +46,20 @@ const ConsultaFipe = () => {
     }, [modeloSelecionado, marcaSelecionada]);
 
     const handleConsultarFipe = async () => {
-        if (!marcaSelecionada || !modeloSelecionado || !anoSelecionado) return;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/fipeAPI?marca=${marcaSelecionada}&modelo=${modeloSelecionado}&ano=${anoSelecionado}`);
-        const data = await response.json();
-        setFipeResult(data);
+        try {
+            if (!marcaSelecionada || !modeloSelecionado || !anoSelecionado) return;
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/fipeAPI?marca=${marcaSelecionada}&modelo=${modeloSelecionado}&ano=${anoSelecionado}`);
+
+            if (!response.ok) {
+                throw new Error('Erro ao buscar dados da FIPE.');
+            }
+
+            const data = await response.json();
+            setFipeResult(data);
+        } catch (error) {
+            console.error('Erro na consulta FIPE:', error.message);
+            // Exiba um alerta ou mensagem para o usuário
+        }
     };
 
     const toggleDropdown = (dropdown) => {
@@ -114,7 +124,7 @@ const ConsultaFipe = () => {
                     Os resultados incluem o valor médio do veículo, o ano de fabricação, o tipo de combustível e o código FIPE.
                 </p>
                 <p className="mt-4 text-red-600 text-base sm:text-sm">
-                    * No momento as consultas estção disponíveis apenas para carros.
+                    * No momento as consultas estão disponíveis apenas para carros.
                 </p>
             </div>
 

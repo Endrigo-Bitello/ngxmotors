@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -110,6 +111,15 @@ app.use('/api', contactRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api', searchRoutes);
 
+app.get('/api/fipeAPI', (req, res) => {
+  const { marca, modelo, ano } = req.query;
+
+  // Chamada para API externa da FIPE
+  const url = `https://parallelum.com.br/fipe/api/v1/carros/marcas/${marca}/modelos/${modelo}/anos/${ano}`;
+  axios.get(url)
+      .then(response => res.json(response.data))
+      .catch(error => res.status(500).json({ error: 'Erro ao buscar dados da FIPE' }));
+});
 
 app.get('/', (req, res) => {
   res.send('Bem-vindo à API de Simulações de Financiamento!');

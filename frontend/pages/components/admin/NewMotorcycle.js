@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FaChevronDown, FaCouch, FaImages, FaLock, FaMotorcycle, FaStepBackward, FaStepForward, FaTimes, FaWrench } from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi';
 import Image from 'next/image';
+import Stock from './Stock';
 
 const NewMotorcycle = () => {
     const [step, setStep] = useState(1);
@@ -103,19 +104,20 @@ const NewMotorcycle = () => {
 
 
     // Estados para os dropdowns
-    const [dropdownOpen, setDropdownOpen] = useState(false); // Controle para dropdown de marcas
-    const [tipoDeMotoOpen, setTipoDeMotoOpen] = useState(false); // Controle para dropdown de tipo de moto
-    const [cilindradaOpen, setCilindradaOpen] = useState(false); // Controle para dropdown de cilindrada (em vez de motor)
-    const [transmissaoOpen, setTransmissaoOpen] = useState(false); // Controle para dropdown de transmissão
-    const [combustivelOpen, setCombustivelOpen] = useState(false); // Controle para dropdown de combustível
-    const [direcaoOpen, setDirecaoOpen] = useState(false); // Controle para dropdown de direção
-    const [freiosOpen, setFreiosOpen] = useState(false); // Controle para dropdown de freios
-    const [ipvaOpen, setIpvaOpen] = useState(false); // Controle para dropdown de IPVA
-    const [dpvatOpen, setDpvatOpen] = useState(false); // Controle para dropdown de DPVAT
+    const [dropdownOpen, setDropdownOpen] = useState(false); 
+    const [tipoDeMotoOpen, setTipoDeMotoOpen] = useState(false); 
+    const [cilindradaOpen, setCilindradaOpen] = useState(false); 
+    const [transmissaoOpen, setTransmissaoOpen] = useState(false); 
+    const [combustivelOpen, setCombustivelOpen] = useState(false); 
+    const [direcaoOpen, setDirecaoOpen] = useState(false); 
+    const [freiosOpen, setFreiosOpen] = useState(false);
+    const [ipvaOpen, setIpvaOpen] = useState(false); 
+    const [dpvatOpen, setDpvatOpen] = useState(false); 
+    const [showStock, setShowStock] = useState(false);
 
 
     const handleKilometragemChange = (e) => {
-        const value = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+        const value = e.target.value.replace(/\D/g, '');
         setFormData({
             ...formData,
             quilometragem: value
@@ -232,10 +234,16 @@ const NewMotorcycle = () => {
                 console.log('Imagens enviadas com sucesso:', uploadResponse.data);
             }
 
+            setShowStock(true);
+
         } catch (error) {
             console.error('Erro ao adicionar moto ou enviar imagens:', error.response ? error.response.data : error.message);
         }
     };
+
+    if (showStock) {
+        return <Stock />;
+    }
 
     const renderButton = () => (
         <div className="flex justify-between mt-6">
