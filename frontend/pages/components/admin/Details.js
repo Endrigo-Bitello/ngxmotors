@@ -17,7 +17,7 @@ export default function Details({ vehicle, onClose }) {
     const carBrands = [
         'Fiat', 'Chevrolet', 'Volkswagen', 'Toyota', 'Hyundai', 'Jeep', 'Renault',
         'Honda', 'Nissan', 'Ford', 'Dodge', 'Peugeot', 'Citroën', 'Mitsubishi', 'Kia',
-        'BMW', 'Mercedes-Benz', 'Mini', 'Audi', 'Volvo', 'Land Rover', 'Suzuki', 'Subaru',
+        'BMW', 'RAM', 'Mercedes-Benz', 'Mini', 'Audi', 'Volvo', 'Land Rover', 'Suzuki', 'Subaru',
         'Lexus', 'Porsche', 'Jaguar', 'Caoa Chery', 'BYD', 'Troller', 'Ferrari',
         'Lamborghini', 'Bentley'
     ];

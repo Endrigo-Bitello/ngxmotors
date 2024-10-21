@@ -319,7 +319,7 @@ const Home = () => {
                                                         <path d="M9 21.5422C4.94289 20.2679 2 16.4776 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 16.4776 19.0571 20.2679 15 21.5422" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
                                                     </g>
                                                 </svg>
-                                                {vehicle.quilometragem} Km
+                                                {vehicle.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km
                                             </div>
                                             <div className="text-gray-600 text-sm flex gap-1">
                                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">

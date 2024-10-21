@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
-import {
-  faTrashAlt,
-  faEnvelope,
-  faSyncAlt,
-  faCar,
-} from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faEnvelope, faSyncAlt, faCar, faPerson, faIdBadge } from '@fortawesome/free-solid-svg-icons';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const Loading = dynamic(() => import('../Loading'));
@@ -32,9 +27,7 @@ export default function Mensagens() {
   const fetchMensagens = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`
-      );
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`);
       setMensagens(res.data);
       setSelectedMensagem(null);
     } catch (error) {
@@ -55,9 +48,7 @@ export default function Mensagens() {
   const handleDelete = async (id) => {
     if (!confirm('Tem certeza que deseja excluir esta mensagem?')) return;
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/mensagens/${id}`
-      );
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens/${id}`);
       setMensagens(mensagens.filter((mensagem) => mensagem._id !== id));
       if (selectedMensagem && selectedMensagem._id === id) {
         setSelectedMensagem(null);
@@ -68,19 +59,14 @@ export default function Mensagens() {
   };
 
   const handleStatusToggle = async (mensagem) => {
-    const newStatus =
-      mensagem.status === 'Não respondido' ? 'Respondido' : 'Não respondido';
+    const newStatus = mensagem.status === 'Não respondido' ? 'Respondido' : 'Não respondido';
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/mensagens/${mensagem._id}`,
-        {
-          status: newStatus,
-        }
+        { status: newStatus }
       );
       setMensagens(
-        mensagens.map((msg) =>
-          msg._id === mensagem._id ? { ...msg, status: newStatus } : msg
-        )
+        mensagens.map((msg) => (msg._id === mensagem._id ? { ...msg, status: newStatus } : msg))
       );
       if (selectedMensagem && selectedMensagem._id === mensagem._id) {
         setSelectedMensagem({ ...mensagem, status: newStatus });
@@ -103,12 +89,12 @@ export default function Mensagens() {
   });
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`${
           selectedMensagem ? 'hidden' : 'flex'
-        } w-full md:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex-col`}
+        } md:flex flex-col w-full md:w-1/3 lg:w-1/4 bg-white border-r border-gray-200`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -183,12 +169,9 @@ export default function Mensagens() {
                         {mensagem.nome}
                       </h3>
                       <span className="text-xs text-gray-500 flex-shrink-0">
-                        {new Date(mensagem.createdAt).toLocaleDateString(
-                          'pt-BR'
-                        )}
+                        {new Date(mensagem.createdAt).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
-                    {/* Ajuste na pré-visualização da mensagem */}
                     <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2">
                       {mensagem.mensagem}
                     </p>
@@ -263,7 +246,7 @@ export default function Mensagens() {
                 <section className="bg-white rounded-xl shadow-md p-6">
                   <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
                     <FontAwesomeIcon
-                      icon={faEnvelope}
+                      icon={faIdBadge}
                       className="mr-2 text-blue-600"
                     />
                     Informações do Remetente
@@ -272,43 +255,22 @@ export default function Mensagens() {
                     <div>
                       <p className="text-gray-700 mb-2">
                         <span className="font-medium">Nome:</span>{' '}
-                        <span className="font-bold">
-                          {selectedMensagem.nome}
-                        </span>
+                        <span className="font-bold">{selectedMensagem.nome}</span>
                       </p>
                       <p className="text-gray-700 mb-2">
                         <span className="font-medium">Email:</span>{' '}
-                        <span className="font-bold">
-                          {selectedMensagem.email}
-                        </span>
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">Telefone:</span>{' '}
-                        <span className="font-bold">
-                          {selectedMensagem.telefone}
-                        </span>
+                        <span className="font-bold">{selectedMensagem.email}</span>
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-700 mb-2">
-                        <span className="font-medium">Status:</span>{' '}
-                        <button
-                          onClick={() => handleStatusToggle(selectedMensagem)}
-                          className={`px-3 py-1 rounded-full text-sm font-medium focus:outline-none ${
-                            selectedMensagem.status === 'Não respondido'
-                              ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                              : 'bg-green-100 text-green-600 hover:bg-green-200'
-                          }`}
-                        >
-                          {selectedMensagem.status}
-                        </button>
+                    <p className="text-gray-700 mb-2">
+                        <span className="font-medium">Telefone:</span>{' '}
+                        <span className="font-bold">{selectedMensagem.telefone}</span>
                       </p>
-                      <p className="text-gray-700">
+                      <p className="text-gray-700 mb-2">
                         <span className="font-medium">Data:</span>{' '}
                         <span className="font-bold">
-                          {new Date(
-                            selectedMensagem.createdAt
-                          ).toLocaleDateString('pt-BR')}
+                          {new Date(selectedMensagem.createdAt).toLocaleDateString('pt-BR')}
                         </span>
                       </p>
                     </div>
@@ -318,11 +280,7 @@ export default function Mensagens() {
                 {/* Conteúdo da Mensagem */}
                 <section className="bg-white rounded-xl shadow-md p-6">
                   <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <FontAwesomeIcon
-                      icon={faEnvelope}
-                      className="mr-2 text-blue-600"
-                    />
-                    Mensagem
+                    Mensagem:
                   </h3>
                   <p className="text-gray-800 leading-relaxed whitespace-pre-wrap break-words">
                     {selectedMensagem.mensagem}
@@ -341,11 +299,8 @@ export default function Mensagens() {
                     </h3>
                     <p className="text-gray-700">
                       Código do Veículo:{' '}
-                      <span className="font-bold">
-                        {selectedMensagem.customId}
-                      </span>
+                      <span className="font-bold">{selectedMensagem.customId}</span>
                     </p>
-                    {/* Aqui você pode adicionar mais detalhes do veículo se necessário */}
                   </section>
                 )}
               </div>
@@ -353,9 +308,7 @@ export default function Mensagens() {
           </>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">
-              Selecione uma mensagem para visualizar os detalhes.
-            </p>
+            <p className="text-gray-500">Selecione uma mensagem para visualizar os detalhes.</p>
           </div>
         )}
       </div>

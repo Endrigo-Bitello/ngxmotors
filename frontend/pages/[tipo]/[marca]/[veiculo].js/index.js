@@ -10,8 +10,8 @@ import { setSEO } from '../../../../utils/seo';
 
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
-const Loading = dynamic(() => import('../../../components/Loading'), { ssr: false }); 
-const GoogleMaps = dynamic(() => import('@/pages/components/GoogleMaps'), { ssr: false }); 
+const Loading = dynamic(() => import('../../../components/Loading'), { ssr: false });
+const GoogleMaps = dynamic(() => import('@/pages/components/GoogleMaps'), { ssr: false });
 
 
 
@@ -190,13 +190,13 @@ export default function VehiclePage() {
 
         };
 
-        return labelMap[key] || key; 
+        return labelMap[key] || key;
     };
 
 
     const images = vehicleData.imagens.map((imagem) => ({
-        original: imagem, 
-        thumbnail: imagem, 
+        original: imagem,
+        thumbnail: imagem,
     }));
 
 
@@ -258,15 +258,15 @@ export default function VehiclePage() {
                                     { label: 'Ano de Fabricação', value: vehicleData.anoFabricacao },
                                     { label: 'Ano do Modelo', value: vehicleData.anoModelo },
                                     { label: 'Câmbio', value: vehicleData.transmissao },
-                                    { label: 'Quilometragem', value: `${vehicleData.quilometragem} Km` },
+                                    { label: 'Quilometragem', value: `${vehicleData.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km` }, // Quilometragem formatada
                                     { label: 'Cor', value: vehicleData.cor },
                                     { label: 'Combustível', value: vehicleData.combustivel },
                                     { label: 'Portas', value: vehicleData.numeroDePortas },
                                     { label: 'Categoria', value: vehicleData.tipoDeCarro || 'Não especificada' },
                                     { label: 'Direção', value: vehicleData.direcao },
-                                    { label: 'Potência', value: vehicleData.potencia + ' cv' },
+                                    { label: 'Potência', value: `${vehicleData.potencia} cv` },
                                     { label: 'Motor', value: vehicleData.motor },
-                                    { label: 'Torque', value: vehicleData.torque + 'kgfm' },
+                                    { label: 'Torque', value: `${vehicleData.torque} kgfm` },
                                 ].map((item, index) => (
                                     <li
                                         key={index}
@@ -277,6 +277,7 @@ export default function VehiclePage() {
                                     </li>
                                 ))}
                             </ul>
+
                             {/* Preço do veículo */}
                             <div className="mt-6 px-4">
                                 <div className="bg-gradient-to-r from-green-100 to-green-300 p-6 rounded-lg shadow-lg flex flex-col items-center lg:flex-row lg:justify-between border border-green-300">

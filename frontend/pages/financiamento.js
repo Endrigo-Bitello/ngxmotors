@@ -3,11 +3,11 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';;
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { setSEO } from './../utils/seo';
 import Image from 'next/image';
+import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 import Navbar from './components/Navbar';
@@ -22,11 +22,12 @@ export default function FinanciamentoPage() {
   const [vehicles, setVehicles] = useState([]); // Lista de veículos
   const [loading, setLoading] = useState(true); // Controla o estado de loading
   const [etapa, setEtapa] = useState(1); // Controla a etapa do processo
-  const [entrada, setEntrada] = useState(0); // Valor da entrada
+  const [entrada, setEntrada] = useState(''); // Valor da entrada
   const [parcelas, setParcelas] = useState(48); // Parcelas selecionadas
   const [parcelaEstimada, setParcelaEstimada] = useState(0); // Estimativa da parcela
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('');
+  const [isEntradaValida, setIsEntradaValida] = useState(false);
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -458,7 +459,7 @@ export default function FinanciamentoPage() {
                                 <path d="M9 21.5422C4.94289 20.2679 2 16.4776 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 16.4776 19.0571 20.2679 15 21.5422" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
                               </g>
                             </svg>
-                            {vehicle.quilometragem} Km
+                            {vehicle.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km
                           </div>
                           <div className="text-gray-600 text-sm flex gap-1">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">
@@ -551,19 +552,39 @@ export default function FinanciamentoPage() {
               <h3 className="text-xl font-semibold mb-4 text-gray-700">Simule o seu Financiamento</h3>
               <form>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+                  <div className="relative">
                     <label className="block text-gray-700 mb-2">Valor de Entrada (mínimo de 10%):</label>
                     <input
                       type="text"
                       value={entrada !== '' ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(entrada) : ''}
                       onChange={(e) => {
                         const numericValue = parseFloat(e.target.value.replace(/\D/g, '')) / 100;
-                        setEntrada(isNaN(numericValue) ? '' : numericValue.toFixed(2));
+                        const formattedValue = isNaN(numericValue) ? '' : numericValue.toFixed(2);
+                        setEntrada(formattedValue);
+
+                        // Validação: verifica se o valor de entrada é maior ou igual a 10% do valor do veículo
+                        if (formattedValue >= vehicleData.valorVenda * 0.1) {
+                          setIsEntradaValida(true);
+                        } else {
+                          setIsEntradaValida(false);
+                        }
                       }}
                       placeholder={`Mínimo: ${formatCurrency(vehicleData.valorVenda * 0.1)}`}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${isEntradaValida ? 'border-green-500 focus:ring-green-200' : 'border-red-500 focus:ring-red-200'
+                        }`}
                     />
+
+                    {/* Ícone de feedback visual */}
+                    {entrada && (
+                      <span className="absolute right-4 top-10">
+                        <FontAwesomeIcon
+                          icon={isEntradaValida ? faCheckCircle : faTimesCircle}
+                          className={`text-2xl ${isEntradaValida ? 'text-green-500' : 'text-red-500'}`}
+                        />
+                      </span>
+                    )}
                   </div>
+
                   <div>
                     <label className="block text-gray-700 mb-2">Quantidade de Parcelas</label>
                     <select
@@ -580,10 +601,13 @@ export default function FinanciamentoPage() {
                   </div>
                 </div>
 
+                {/* Botão desabilitado se o valor de entrada não for válido */}
                 <button
                   type="button"
                   onClick={calcularParcela}
-                  className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                  disabled={!isEntradaValida}
+                  className={`mt-6 w-full font-semibold py-3 rounded-lg transition-colors ${isEntradaValida ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                   Calcular Financiamento
                 </button>

@@ -122,11 +122,6 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link href="/venda-seu-carro" legacyBehavior>
-                <a className="hover:text-blue-600 transition-colors duration-300">VENDA SEU CARRO</a>
-              </Link>
-            </li>
-            <li>
               <Link href="/financiamento" legacyBehavior>
                 <a className="hover:text-blue-600 transition-colors duration-300">FINANCIE</a>
               </Link>
@@ -187,9 +182,6 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/venda-seu-carro" legacyBehavior>
-                  <a className="hover:text-blue-600 transition-colors duration-300">VENDA SEU CARRO</a>
-                </Link>
               </li>
               <li>
                 <Link href="/financiamento" legacyBehavior>
