@@ -11,6 +11,7 @@ import Image from 'next/image';
 const Loading = dynamic(() => import('../components/Loading'), { ssr: false });
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { whatsappWhite } from '@/utils/share';
 
 
 export default function VehicleTypePage() {
@@ -355,7 +356,7 @@ export default function VehicleTypePage() {
                     onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                     className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                   >
-                    <FontAwesomeIcon icon={faWhatsapp} className="text-[22px]" />
+                    {whatsappWhite}
                     Chame no WhatsApp
                   </button>
                 </div>

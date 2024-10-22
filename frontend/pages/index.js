@@ -5,7 +5,6 @@ import axios from 'axios';
 import Link from 'next/link';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import "react-image-gallery/styles/css/image-gallery.css";
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { setSEO } from './../utils/seo';
 
 import Footer from './components/Footer';
@@ -13,6 +12,7 @@ const Loading = dynamic(() => import('./components/Loading'), { ssr: false });
 import Navbar from './components/Navbar';
 import Banner from './components/Banner';
 import Image from 'next/image';
+import { whatsappWhite } from '../utils/share';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
@@ -348,7 +348,7 @@ const Home = () => {
                                         onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                                         className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                                     >
-                                        <FontAwesomeIcon icon={faWhatsapp} className="text-[22px]" />
+                                        {whatsappWhite}
                                         Chame no WhatsApp
                                     </button>
                                 </div>
