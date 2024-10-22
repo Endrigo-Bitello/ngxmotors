@@ -67,9 +67,6 @@ const Overview = () => {
 
   const totalVeiculos = totalCarros + totalMotos;
   const proporcaoCarrosParaMotos = totalMotos > 0 ? (totalCarros / totalMotos).toFixed(2) : 'N/A';
-  const proporcaoMarcas = Object.keys(carrosPorMarca).length + Object.keys(motosPorMarca).length;
-
-  // Configurações do gráfico de pizza com cores vibrantes
   const chartOptions = {
     chart: {
       type: 'pie',
@@ -91,96 +88,100 @@ const Overview = () => {
     ],
   };
 
-  const chartSeries = [totalCarros, totalMotos]; // Quantidade de Carros e Motos
+  const chartSeries = [totalCarros, totalMotos];
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Visão geral</h1>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <h1 className="text-4xl font-bold text-gray-800 mb-8">Visão Geral</h1>
 
-      {/* Grid com métricas principais */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-green-100 shadow-lg p-6 rounded-lg text-center hover:shadow-xl transition-shadow duration-300">
-          <h3 className="text-lg font-semibold text-green-800">Veículos Totais</h3>
-          <p className="text-4xl font-bold text-green-900">{totalVeiculos}</p>
+      {/* Seção de métricas principais */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-white shadow-xl rounded-lg p-6 text-center hover:shadow-2xl transition-shadow duration-300">
+          <h3 className="text-lg font-semibold text-gray-500">Veículos Totais</h3>
+          <p className="text-5xl font-bold text-gray-800 mt-4">{totalVeiculos}</p>
         </div>
-        <div className="bg-blue-100 shadow-lg p-6 rounded-lg text-center hover:shadow-xl transition-shadow duration-300">
-          <h3 className="text-lg font-semibold text-blue-800">Carros</h3>
-          <p className="text-4xl font-bold text-blue-900">{totalCarros}</p>
+        <div className="bg-white shadow-xl rounded-lg p-6 text-center hover:shadow-2xl transition-shadow duration-300">
+          <h3 className="text-lg font-semibold text-gray-500">Carros</h3>
+          <p className="text-5xl font-bold text-blue-600 mt-4">{totalCarros}</p>
         </div>
-        <div className="bg-red-100 shadow-lg p-6 rounded-lg text-center hover:shadow-xl transition-shadow duration-300">
-          <h3 className="text-lg font-semibold text-red-800">Motos</h3>
-          <p className="text-4xl font-bold text-red-900">{totalMotos}</p>
-        </div>
-        <div className="bg-white shadow-lg p-6 rounded-lg text-center hover:shadow-xl transition-shadow duration-300">
-          <h3 className="text-lg font-semibold text-gray-700">Proporção Carros para Motos</h3>
-          {/* Gráfico de Pizza */}
-          <div className="flex justify-center mt-4">
-            <ApexCharts options={chartOptions} series={chartSeries} type="pie" width={320} />
-          </div>
+        <div className="bg-white shadow-xl rounded-lg p-6 text-center hover:shadow-2xl transition-shadow duration-300">
+          <h3 className="text-lg font-semibold text-gray-500">Motos</h3>
+          <p className="text-5xl font-bold text-red-600 mt-4">{totalMotos}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Informações de Carros */}
-        <div className="bg-blue-50 shadow-lg p-6 rounded-lg">
-          <h2 className="text-lg font-semibold text-blue-800 mb-4">Carros Disponíveis por Marca</h2>
+      {/* Gráfico de proporção de veículos */}
+      <div className="bg-white shadow-xl rounded-lg p-6 mb-12">
+        <h3 className="text-lg font-semibold text-gray-500 text-center mb-6">Proporção Carros para Motos</h3>
+        <div className="flex justify-center">
+          <ApexCharts options={chartOptions} series={chartSeries} type="pie" width={360} />
+        </div>
+      </div>
+
+      {/* Listagem de Carros e Motos por marca */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="bg-white shadow-xl rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-blue-600 mb-6">Carros Disponíveis por Marca</h2>
           <div className="space-y-4">
             {Object.entries(carrosPorMarca).map(([marca, quantidade]) => (
               <div key={marca} className="flex items-center">
                 <Image src={`/icons/${marca.toLowerCase()}.png`} alt={marca} width={40} height={40} className="mr-4" />
-                <p className="text-gray-700 text-base font-medium">{marca}</p>
-                <span className="ml-auto text-lg font-semibold text-gray-900">{quantidade}</span>
+                <p className="text-gray-700 font-medium">{marca}</p>
+                <span className="ml-auto text-lg font-bold text-gray-900">{quantidade}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Informações de Motos */}
-        <div className="bg-red-50 shadow-lg p-6 rounded-lg">
-          <h2 className="text-lg font-semibold text-red-800 mb-4">Motos Disponíveis por Marca</h2>
+        <div className="bg-white shadow-xl rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-red-600 mb-6">Motos Disponíveis por Marca</h2>
           <div className="space-y-4">
             {Object.entries(motosPorMarca).map(([marca, quantidade]) => (
               <div key={marca} className="flex items-center">
                 <Image src={`/icons/${marca.toLowerCase()}.png`} alt={marca} width={40} height={40} className="mr-4" />
-                <p className="text-gray-700 text-base font-medium">{marca}</p>
-                <span className="ml-auto text-lg font-semibold text-gray-900">{quantidade}</span>
+                <p className="text-gray-700 font-medium">{marca}</p>
+                <span className="ml-auto text-lg font-bold text-gray-900">{quantidade}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Simulações de Financiamento */}
-      <div className="bg-white shadow-lg p-6 rounded-lg mb-8">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Últimas simulações de financiamento</h2>
-        <div className="space-y-4">
+      {/* Últimas simulações de financiamento */}
+      <div className="bg-white shadow-xl rounded-lg p-6 mb-12">
+        <h2 className="text-xl font-semibold text-gray-600 mb-6">Últimas Simulações de Financiamento</h2>
+        <div className="space-y-6">
           {simulacoesFinanciamento.slice(0, 3).map((simulacao, index) => (
-            <div key={index} className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg flex items-center">
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-700">Cliente: {simulacao.nome}</p>
-                <p className="text-sm text-gray-600">Entrada: R$ {simulacao.entrada?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                <p className="text-sm text-gray-600">Parcelas: {simulacao.parcelas}x de R$ {simulacao.parcelaEstimada?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-              </div>
-              <div className="ml-4 text-sm text-gray-400">
-                {new Date(simulacao.createdAt).toLocaleDateString('pt-BR')}
+            <div key={index} className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-gray-800 font-semibold">{simulacao.nome}</p>
+                  <p className="text-gray-500">Entrada: R$ {simulacao.entrada?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-gray-500">Parcelas: {simulacao.parcelas}x de R$ {simulacao.parcelaEstimada?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </div>
+                <div className="text-sm text-gray-400">
+                  {new Date(simulacao.createdAt).toLocaleDateString('pt-BR')}
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Mensagens Recebidas */}
-      <div className="bg-yellow-50 shadow-lg p-6 rounded-lg">
-        <h2 className="text-lg font-semibold text-yellow-800 mb-4">Últimas mensagens</h2>
-        <div className="space-y-4">
+      {/* Últimas mensagens recebidas */}
+      <div className="bg-white shadow-xl rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-yellow-600 mb-6">Últimas Mensagens</h2>
+        <div className="space-y-6">
           {mensagensRecebidas.slice(0, 3).map((mensagem, index) => (
-            <div key={index} className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg flex items-center">
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-700">De: {mensagem.nome}</p>
-                <p className="text-sm text-gray-600">{mensagem.mensagem}</p>
-              </div>
-              <div className="ml-4 text-sm text-gray-400">
-                {new Date(mensagem.createdAt).toLocaleDateString('pt-BR')}
+            <div key={index} className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-gray-800 font-semibold">De: {mensagem.nome}</p>
+                  <p className="text-gray-500">{mensagem.mensagem}</p>
+                </div>
+                <div className="text-sm text-gray-400">
+                  {new Date(mensagem.createdAt).toLocaleDateString('pt-BR')}
+                </div>
               </div>
             </div>
           ))}
