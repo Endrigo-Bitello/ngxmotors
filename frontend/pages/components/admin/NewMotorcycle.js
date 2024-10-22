@@ -209,22 +209,19 @@ const NewMotorcycle = () => {
         e.preventDefault();
 
         try {
-            // Primeira requisição: criar a moto no banco de dados
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/motos`, formData);
-            const customId = response.data.customId; // Supondo que o backend retorne o customId
+            const customId = response.data.customId; 
 
             console.log('Moto adicionada com sucesso:', response.data);
 
-            // Se houver imagens para enviar, faça o upload delas
             if (formData.imagens.length > 0) {
                 const formDataImagens = new FormData();
 
-                // Adiciona as imagens ao FormData
                 Array.from(formData.imagens).forEach((file, index) => {
-                    formDataImagens.append('imagens', file); // 'imagens' é a chave usada para múltiplos arquivos
+                    formDataImagens.append('imagens', file); 
                 });
 
-                // Segunda requisição: enviar as imagens
+            
                 const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/motos/upload/${customId}`, formDataImagens, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
