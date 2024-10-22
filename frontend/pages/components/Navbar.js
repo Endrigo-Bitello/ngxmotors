@@ -182,8 +182,6 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-              </li>
-              <li>
                 <Link href="/financiamento" legacyBehavior>
                   <a className="hover:text-blue-600 transition-colors duration-300">FINANCIE</a>
                 </Link>

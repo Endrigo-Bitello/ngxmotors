@@ -24,7 +24,7 @@ const Footer = () => {
               className="mb-4"
             />
             <p className="text-sm text-gray-400">
-              Conectando você ao futuro da revenda de veículos online, com confiança e inovação.
+              {process.env.NEXT_PUBLIC_SLOGAN}
             </p>
           </div>
 
@@ -146,8 +146,11 @@ const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="bg-gray-800 p-4 text-center text-gray-500 text-sm">
-        © 2024 {process.env.NEXT_PUBLIC_NAME}. Todos os direitos reservados.
+      <div className="bg-gray-800 p-6 text-center text-gray-400 text-sm">
+        <p>© 2024 {process.env.NEXT_PUBLIC_NAME}. Todos os direitos reservados.</p>
+        <p>
+          Desenvolvido por <span className="text-white font-semibold">EMX Softwares</span>
+        </p>
       </div>
     </footer>
   );
