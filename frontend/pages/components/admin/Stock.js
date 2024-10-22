@@ -216,13 +216,6 @@ export default function Stock() {
                         key={vehicle._id}
                         className="relative bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
                     >
-                        {/* Etiqueta com o tipo do veículo */}
-                        <span
-                            className={`absolute top-0 left-0 m-2 px-2 py-1 rounded-full text-white text-xs font-semibold uppercase ${vehicle.tipo === 'carro' ? 'bg-blue-600' : 'bg-red-600'
-                                }`}
-                        >
-                            {vehicle.tipo === 'carro' ? 'Carro' : 'Moto'}
-                        </span>
 
                         {/* Imagem do veículo */}
                         {vehicle.imagens && vehicle.imagens.length > 0 ? (
