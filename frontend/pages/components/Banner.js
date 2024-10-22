@@ -6,14 +6,13 @@ const Banner = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   return (
-    <div className={`relative w-full ${isMobile ? 'h-[260px]' : 'h-[650px]'}`}> {/* Altura ajustada para cada dispositivo */}
+    <div className="relative w-full h-[650px]"> {/* Ajuste para altura de 650px */}
       <Image
-        src={isMobile ? '/banner-mobile.webp' : '/banner-desktop.png'} // Imagem condicional baseada no dispositivo
+        src={isMobile ? '/banner-mobile.png' : '/banner-desktop.png'} // Renderizar diferentes imagens
         alt="Banner"
-        layout="fill" // Preencher o container
-        objectFit="cover" // Mostrar a imagem inteira sem cortar
+        fill
+        style={{ objectFit: 'cover' }}
         quality={100}
-        priority // Carregar a imagem com prioridade
       />
     </div>
   );
