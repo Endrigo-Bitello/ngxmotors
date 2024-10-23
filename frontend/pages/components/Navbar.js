@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaPhoneAlt, FaWhatsapp, FaBars, FaTimes, FaSearch } from 'react-icons/fa';
@@ -9,7 +9,23 @@ const Navbar = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false); // Estado de loading
+  const [settings, setSettings] = useState(null); // Estado para armazenar as configurações
   const router = useRouter();
+
+  // Função para buscar as configurações da API
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data); // Armazena os dados das configurações no estado
+    } catch (error) {
+      console.error('Erro ao buscar as configurações:', error);
+    }
+  };
+
+  // useEffect para buscar as configurações quando o componente é montado
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -40,6 +56,10 @@ const Navbar = () => {
     }
   };
 
+  // Enquanto as configurações estão sendo carregadas
+  if (!settings) {
+    return null; // Retorna null ou um loader enquanto espera os dados
+  }
 
   return (
     <>
@@ -49,19 +69,19 @@ const Navbar = () => {
           {/* Horários de atendimento */}
           <div className="hidden sm:flex space-x-4 md:space-x-6">
             <span className="font-semibold">Horário de atendimento:</span>
-            <span>{process.env.NEXT_PUBLIC_OPENING_HOURS}</span>
+            <span>{settings.openingHours}</span>
           </div>
           {/* Links de contato */}
           <div className="flex space-x-4 md:space-x-6">
             <a
-              href={`tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`}
+              href={`tel:${settings.phoneNumber}`}
               className="flex items-center hover:text-yellow-400 transition duration-300"
             >
               <FaPhoneAlt className="mr-2" />
-              <span className="hidden sm:inline">{process.env.NEXT_PUBLIC_PHONE_NUMBER}</span>
+              <span className="hidden sm:inline">{settings.phoneNumber}</span>
             </a>
             <a
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
+              href={`https://wa.me/${settings.whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center hover:text-green-400 transition duration-300"

@@ -31,23 +31,35 @@ export default function VehiclePage() {
     const [email, setEmail] = useState('');
     const [telefone, setTelefone] = useState('');
     const [mensagem, setMensagem] = useState('');
+    const [settings, setSettings] = useState(null);
 
 
+    const fetchSettings = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+            setSettings(data);
+        } catch (error) {
+            console.error('Erro ao buscar as configurações:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
 
     useEffect(() => {
         if (vehicleData) {
             setSEO(
                 {
-                    title: `${process.env.NEXT_PUBLIC_NAME} - ${vehicleData.marca} ${vehicleData.modelo} ${vehicleData.anoModelo} ${vehicleData.transmissao}`,
+                    title: `${settings.name} - ${vehicleData.marca} ${vehicleData.modelo} ${vehicleData.anoModelo} ${vehicleData.transmissao}`,
                     metaDescription: `Conheça o ${vehicleData.modelo}, 
-                    uma ótima opção da ${vehicleData.marca} disponível na ${process.env.NEXT_PUBLIC_NAME}. 
-                    Visite-nos em ${process.env.NEXT_PUBLIC_ADDRESS} ou fale conosco pelo WhatsApp 
-                    ${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}. Nosso horário de atendimento é 
-                    ${process.env.NEXT_PUBLIC_OPENING_HOURS}. Não perca essa oportunidade!`
+                    uma ótima opção da ${vehicleData.marca} disponível na ${settings.name}. 
+                    Visite-nos em ${settings.address} ou fale conosco pelo WhatsApp 
+                    ${settings.whatsappNumber}. Nosso horário de atendimento é 
+                    ${settings.openingHours}. Não perca essa oportunidade!`
                 });
         }
-    }, [vehicleData]);
-
+    }, [vehicleData, settings]);
 
     // Função para enviar o formulário de contato
     const handleSubmit = async (e) => {
@@ -621,7 +633,7 @@ export default function VehiclePage() {
                     className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 hover:scale-110 transition-all duration-300 ease-in-out"
                     onClick={() => {
                         window.open(
-                            `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicleData.marca.toUpperCase()} ${vehicleData.modelo}`,
+                            `https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicleData.marca.toUpperCase()} ${vehicleData.modelo}`,
                             '_blank'
                         );
                     }}
