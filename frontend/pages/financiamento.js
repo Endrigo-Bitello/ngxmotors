@@ -137,10 +137,12 @@ export default function FinanciamentoPage() {
     setEtapa(2);
   };
 
+  
+
   const enviarSimulacao = async () => {
     try {
-      // Faz a requisição POST para enviar os dados do formulário
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos`, {
+      // Faz a requisição POST para enviar os dados do formulário de simulação
+      const resSimulacao = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos`, {
         nome,
         email,
         telefone,
@@ -148,36 +150,51 @@ export default function FinanciamentoPage() {
         entrada: parseFloat(entrada),
         parcelas,
         parcelaEstimada,
-        customId: vehicleData.customId, // Certifica-se de que o ID do veículo está incluído
+        customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
       });
-
-      // Verifica a resposta da API e exibe uma mensagem de sucesso
-      if (res.status === 201) {
-        setMensagem({
-          tipo: 'sucesso',
-          texto: 'Simulação enviada com sucesso!',
+  
+      // Verifica a resposta da API de simulação
+      if (resSimulacao.status === 201) {
+        // Agora, faz o envio do lead com a customId
+        const resLead = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/simulacao`, {
+          nome,
+          email,
+          telefone,
+          etapa: 'Novo Lead', // Definindo como "Novo Lead"
+          fonteLead: 'Simulação', // Fonte do lead é a simulação
+          customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
         });
-
-        // Limpa os campos do formulário após o envio
-        setNome('');
-        setEmail('');
-        setTelefone('');
-        setCpf('');
-        setEntrada('');
-        setParcelas(12); // Volta para 12 parcelas como padrão
-        setParcelaEstimada(0);
-        setEtapa(1); // Volta para a primeira etapa
+  
+        // Verifica a resposta da API de lead e exibe mensagem de sucesso
+        if (resLead.status === 201) {
+          setMensagem({
+            tipo: 'sucesso',
+            texto: 'Simulação enviada e lead criado com sucesso!',
+          });
+  
+          // Limpa os campos do formulário após o envio
+          setNome('');
+          setEmail('');
+          setTelefone('');
+          setCpf('');
+          setEntrada('');
+          setParcelas(12); // Volta para 12 parcelas como padrão
+          setParcelaEstimada(0);
+          setEtapa(1); // Volta para a primeira etapa
+        }
       }
     } catch (error) {
-      console.error('Erro ao enviar a simulação:', error);
-
+      console.error('Erro ao enviar a simulação ou criar lead:', error);
+  
       // Exibe uma mensagem de erro ao usuário
       setMensagem({
         tipo: 'erro',
-        texto: 'Erro ao enviar a simulação. Por favor, tente novamente.',
+        texto: 'Erro ao enviar a simulação ou criar lead. Por favor, tente novamente.',
       });
     }
   };
+  
+
 
   useEffect(() => {
     if (id) {

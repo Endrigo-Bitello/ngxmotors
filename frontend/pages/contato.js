@@ -15,31 +15,47 @@ const Contato = () => {
     const [telefone, setTelefone] = useState('');
     const [mensagem, setMensagem] = useState('');
 
+    const [fonteLead, setFonteLead] = useState('');
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            // Envia os dados do formulário para a rota de mensagens com o customId do veículo
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens/contato`, {
+            // Primeiro, enviamos a mensagem
+            const resMensagem = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens/contato`, {
                 nome,
                 email,
                 telefone,
                 mensagem,
             });
 
-            // Exibe uma mensagem de sucesso
-            alert('Mensagem enviada com sucesso!');
-            console.log('Resposta do servidor:', res.data);
+            console.log('Mensagem enviada:', resMensagem.data);
 
+            // Agora, enviamos o lead para a collection Clientes
+            const resCliente = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/contato`, {
+                nome,
+                email,
+                telefone,
+                etapa: 'Novo Lead', // Define o cliente como Novo Lead
+                fonteLead,
+            });
+
+
+            console.log('Lead criado:', resCliente.data);
+
+
+            // Limpa os campos do formulário
             setNome('');
             setEmail('');
             setTelefone('');
             setMensagem('');
+            setFonteLead('')
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);
             alert('Ocorreu um erro ao enviar o formulário. Tente novamente mais tarde.');
         }
     };
+
 
     useEffect(() => {
         setSEO({ title: `${process.env.NEXT_PUBLIC_NAME} - Contato` });

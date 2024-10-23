@@ -25,6 +25,15 @@ module.exports = {
         'desktop-banner': '650px',  // Para desktop
         'small-mobile-banner': '125px', // Para dispositivos móveis pequenos
       },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
+      },
+      animation: {
+        wiggle: 'wiggle 1s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

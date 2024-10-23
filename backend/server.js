@@ -99,6 +99,7 @@ const mensagensRoutes = require('./routes/mensagensRoutes');
 const protectedRoutes = require('./routes/protectedRoutes');
 const vehiclesRoutes = require('./routes/vehiclesRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const customersRoutes = require('./routes/customersRoutes');
 
 // Usar as rotas
 app.use('/api/carros', carRoutes);
@@ -107,9 +108,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/financiamentos', financiamentoRoutes);
 app.use('/api/mensagens', mensagensRoutes);
 app.use('/api/vehicles', vehiclesRoutes);
+app.use('/api/clientes', customersRoutes);
 app.use('/api', contactRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api', searchRoutes);
+
+
 
 app.get('/api/fipeAPI', (req, res) => {
   const { marca, modelo, ano } = req.query;
