@@ -7,6 +7,14 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
+# Fotos dos veículos
+/frontend/public/imagens/carros/*
+/frontend/public/imagens/motos/*
+
+# Exceto o arquivo .gitkeep
+!/frontend/public/imagens/carros/.gitkeep
+!/frontend/public/imagens/motos/.gitkeep
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
