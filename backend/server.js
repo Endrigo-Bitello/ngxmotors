@@ -126,13 +126,12 @@ app.get('/api/fipeAPI', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Bem-vindo à API de Simulações de Financiamento!');
+  res.send('Você não possui acesso.');
 });
 
 // Iniciar o servidor
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`[EMX Tecnologia] Sistema iniciado com sucesso`);
-  console.log(`[EMX Tecnologia] Desenvolvido por Endrigo Bitello`);
   console.log(`[EMX Tecnologia] Servidor rodando na porta: ${PORT}`);
 
   carregarCarros(); 

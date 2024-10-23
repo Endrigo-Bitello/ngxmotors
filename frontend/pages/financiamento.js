@@ -169,7 +169,7 @@ export default function FinanciamentoPage() {
         if (resLead.status === 201) {
           setMensagem({
             tipo: 'sucesso',
-            texto: 'Simulação enviada e lead criado com sucesso!',
+            texto: 'Simulação enviada com sucesso!',
           });
   
           // Limpa os campos do formulário após o envio

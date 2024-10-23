@@ -29,7 +29,6 @@ const Contato = () => {
                 mensagem,
             });
 
-            console.log('Mensagem enviada:', resMensagem.data);
 
             // Agora, enviamos o lead para a collection Clientes
             const resCliente = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/contato`, {
@@ -41,7 +40,6 @@ const Contato = () => {
             });
 
 
-            console.log('Lead criado:', resCliente.data);
 
 
             // Limpa os campos do formulário

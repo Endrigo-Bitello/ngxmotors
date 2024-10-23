@@ -65,8 +65,7 @@ export default function VehiclePage() {
             });
 
             // Exibe uma mensagem de sucesso
-            alert('Formulário enviado com sucesso!');
-            console.log('Resposta do servidor:', res.data);
+            alert('Mensagem enviada com sucesso!');
 
             // Limpa os campos do formulário após o envio
             setNome('');

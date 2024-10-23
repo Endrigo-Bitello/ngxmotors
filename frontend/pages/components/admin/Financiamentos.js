@@ -71,7 +71,6 @@ const Financiamentos = () => {
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos/${id}`
       );
-      console.log(`Simulação ${id} excluída por veículo não existente.`);
     } catch (error) {
       console.error(`Erro ao excluir a simulação ${id}:`, error);
     }

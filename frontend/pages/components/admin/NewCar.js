@@ -229,8 +229,6 @@ const NewCar = () => {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/carros`, formData);
             const customId = response.data.customId; // Supondo que o backend retorne o customId
 
-            console.log('Carro adicionado com sucesso:', response.data);
-
             // Se houver imagens para enviar, faça o upload delas
             if (formData.imagens.length > 0) {
                 const formDataImagens = new FormData();
@@ -246,8 +244,6 @@ const NewCar = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-
-                console.log('Imagens enviadas com sucesso:', uploadResponse.data);
             }
 
             setShowStock(true);

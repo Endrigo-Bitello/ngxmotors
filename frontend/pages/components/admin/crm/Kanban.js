@@ -111,7 +111,7 @@ const DraggableCard = ({ lead, index, moveCard, colunaOrigem }) => {
           </p>
         ) : (
           lead.customId && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm itelic text-red-600">
               Veículo de interesse: {lead.customId}
             </p>
           )
