@@ -7,6 +7,7 @@ import {
   FaSearch,
   FaTrashAlt,
   FaInfoCircle,
+  FaUser,
 } from 'react-icons/fa';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -125,6 +126,40 @@ const fetchVeiculosList = async () => {
   }
 };
 
+const siglasEstados = {
+  'Acre': 'AC',
+  'Alagoas': 'AL',
+  'Amapá': 'AP',
+  'Amazonas': 'AM',
+  'Bahia': 'BA',
+  'Ceará': 'CE',
+  'Distrito Federal': 'DF',
+  'Espírito Santo': 'ES',
+  'Goiás': 'GO',
+  'Maranhão': 'MA',
+  'Mato Grosso': 'MT',
+  'Mato Grosso do Sul': 'MS',
+  'Minas Gerais': 'MG',
+  'Pará': 'PA',
+  'Paraíba': 'PB',
+  'Paraná': 'PR',
+  'Pernambuco': 'PE',
+  'Piauí': 'PI',
+  'Rio de Janeiro': 'RJ',
+  'Rio Grande do Norte': 'RN',
+  'Rio Grande do Sul': 'RS',
+  'Rondônia': 'RO',
+  'Roraima': 'RR',
+  'Santa Catarina': 'SC',
+  'São Paulo': 'SP',
+  'Sergipe': 'SE',
+  'Tocantins': 'TO',
+};
+
+const formatarEstado = (estado) => {
+  return siglasEstados[estado] || estado; // Se o estado não for encontrado, retorna o nome original
+};
+
 // Componente de Card individual (arrastável)
 const DraggableCard = ({
   lead,
@@ -148,14 +183,14 @@ const DraggableCard = ({
     Instagram: 'bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-pink-400 border border-pink-400',
     Facebook: 'bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400',
     LinkedIn: 'bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-indigo-400 border border-indigo-400',
-    'Círculo pessoal': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+    'Círculo pessoal': 'bg-orange-100 text-orange-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-orange-300 border border-orange-300',
     Indicação: 'bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-purple-400 border border-purple-400',
     Indefinido: 'bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-400 border border-gray-500',
-    'Pág. Veículo': 'bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-red-400 border border-red-4000',
+    'Pág. Veículo': 'bg-fuchsia-100 text-fuchsia-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-fuchsia-400 border border-fuchsia-400',
   };
 
   const customIdColors = {
-    carro: 'bbg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-red-400 border border-red-400',
+    carro: 'bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-red-400 border border-red-400',
     moto: 'bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400',
   };
 
@@ -172,6 +207,44 @@ const DraggableCard = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editedLead, setEditedLead] = useState(lead);
   const [veiculosDisponiveis, setVeiculosDisponiveis] = useState([]);
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [users, setUsers] = useState([]);
+  const [newLead, setNewLead] = useState({
+    nome: '',
+    telefone: '',
+    email: '',
+    estado: '',
+    cidade: '',
+    fonteLead: 'Indefinido',
+    etapa: 'Novo Lead',
+    responsavelLead: '',
+  });
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const token = localStorage.getItem('token'); // Certifique-se de ter o token armazenado
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Inclua o token JWT no cabeçalho
+          },
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+      }
+    }
+
+    if (isModalOpen) {
+      fetchUsers();
+    }
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
 
   useEffect(() => {
     const loadVehicleData = async () => {
@@ -224,6 +297,29 @@ const DraggableCard = ({
   };
 
 
+  const handleOpenAssignModal = () => {
+    setAssignModalOpen(true);
+    setUsers(); // Load users when modal opens
+  };
+
+  const handleCloseAssignModal = () => {
+    setAssignModalOpen(false); // Closes the modal
+  };
+
+  // Função para confirmar a atribuição do responsável
+  const handleConfirmResponsavel = async () => {
+    if (selectedResponsavel) {
+      try {
+        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${selectedLead}/assign`, {
+          responsavelLead: selectedResponsavel,
+        });
+        fetchLeads(); // Atualiza a lista de leads
+        setIsResponsavelModalOpen(false); // Fecha o modal
+      } catch (error) {
+        console.error('Erro ao atribuir responsável:', error);
+      }
+    }
+  };
 
 
 
@@ -264,6 +360,24 @@ const DraggableCard = ({
               </div>
             )
           )}
+
+          {lead.obteveResposta !== undefined && (
+            <p className="text-sm text-gray-600">
+              Obteve Resposta: {lead.obteveResposta ? 'Sim' : 'Não'}
+            </p>
+          )}
+
+          {(lead.estado || lead.cidade) && (
+            <p className="text-sm text-gray-600">
+              Localização:{' '}
+              {lead.cidade && lead.estado
+                ? `${lead.cidade}/${formatarEstado(lead.estado)}`
+                : lead.cidade
+                  ? `${lead.cidade}`
+                  : `${lead.estado}`}
+            </p>
+          )}
+
           <p className="text-xs text-gray-400 mt-2">
             Criado em: {formatDateTime(lead.dataCriacao)}
           </p>
@@ -276,10 +390,13 @@ const DraggableCard = ({
               <strong>Motivo da perda:</strong><br></br>{lead.motivoPerda}
             </div>
           )}
+
         </div>
+
         <div className="flex justify-start mt-2 space-x-2">
           <span
-            className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded ${fonteLeadColors[lead.fonteLead]}`}>
+            className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded ${fonteLeadColors[lead.fonteLead]}`}
+          >
             {lead.fonteLead === 'Pág. Veículo' ? lead.fonteLead : lead.fonteLead}
           </span>
           {lead.customId && (
@@ -292,8 +409,103 @@ const DraggableCard = ({
               Cód. {lead.customId}
             </span>
           )}
+
+        </div>
+
+        <div className="text-sm text-gray-600 flex items-center">
+          {lead.responsavelLead ? (
+            <div className="flex items-center">
+              <FaUser className="mr-2" />
+              <p>{lead.responsavelLead.username}</p>
+            </div>
+          ) : (
+            <button
+              onClick={() => setAssignModalOpen(true)}
+              className="text-blue-500 underline"
+            >
+              Atribuir responsável
+            </button>
+          )}
         </div>
       </div>
+
+
+
+      <Modal
+          isOpen={assignModalOpen}
+          onRequestClose={handleCloseAssignModal} // Ensure the close function works
+          contentLabel="Atribuir Responsável"
+          className="fixed inset-0 flex items-center justify-center z-50"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+        >
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 md:mx-auto relative">
+            {/* Botão para fechar o modal */}
+            <button
+              onClick={() => setAssignModalOpen(false)} // Fecha o modal ao clicar no botão de fechar
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Fechar"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+              Atribuir Responsável
+            </h2>
+
+            {/* Seleção do responsável */}
+            <form className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Selecione um responsável
+                </label>
+                <select
+                  value={newLead.responsavelLead}
+                  onChange={(e) => setNewLead({ ...newLead, responsavelLead: e.target.value })}
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecione um Responsável</option>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.username}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Carregando usuários...</option>
+                  )}
+                </select>
+              </div>
+            </form>
+
+            <div className="flex justify-end space-x-4 mt-8">
+              <button
+                onClick={() => setAssignModalOpen(false)} // Fecha o modal
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmResponsavel} // Função para confirmar a atribuição do responsável
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                Atribuir
+              </button>
+            </div>
+          </div>
+        </Modal>
 
       {/* Modal de Edição do Lead */}
       <Modal
@@ -385,21 +597,33 @@ const DraggableCard = ({
                 <label className="block text-sm font-medium text-gray-700">
                   Estado
                 </label>
-                <select
+                <input
+                  type="text"
+                  placeholder="Digite o estado"
                   value={editedLead.estado}
                   onChange={(e) =>
                     setEditedLead({ ...editedLead, estado: e.target.value })
                   }
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Selecione o Estado</option>
-                  {estadosBrasileiros.map((estado) => (
-                    <option key={estado} value={estado}>
-                      {estado}
-                    </option>
-                  ))}
-                </select>
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
+
+              {/* Cidade */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Cidade
+                </label>
+                <input
+                  type="text"
+                  placeholder="Digite a cidade"
+                  value={editedLead.cidade}
+                  onChange={(e) =>
+                    setEditedLead({ ...editedLead, cidade: e.target.value })
+                  }
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
 
               {/* Fonte do Lead */}
               <div>
@@ -484,6 +708,7 @@ const DraggableCard = ({
           </div>
         </div>
       </Modal>
+
     </>
   );
 };
@@ -512,7 +737,7 @@ const DroppableColumn = ({
       >
         {etapa} ({leads.length})
       </div>
-      <div className="flex-1 overflow-auto space-y-4">
+      <div className="flex-1 overflow-y-auto max-h-[80vh] space-y-4 no-scrollbar">
         {leads.length === 0 ? (
           <p className="text-gray-500 italic text-center mt-6">
             Nenhum lead nesta etapa.
@@ -538,13 +763,16 @@ const DroppableColumn = ({
 const Kanban = () => {
   const [leads, setLeads] = useState([[], [], [], [], [], []]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [users, setUsers] = useState([]);
   const [newLead, setNewLead] = useState({
     nome: '',
     telefone: '',
     email: '',
     estado: '',
+    cidade: '',
     fonteLead: 'Indefinido',
     etapa: 'Novo Lead',
+    responsavelLead: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -557,10 +785,41 @@ const Kanban = () => {
   const [veiculosDisponiveis, setVeiculosDisponiveis] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState('');
   const [motivoPerdaOutro, setMotivoPerdaOutro] = useState('');
+  const [isObteveRespostaModalOpen, setIsObteveRespostaModalOpen] = useState(false);
+  const [obteveResposta, setObteveResposta] = useState('');
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+
+  const [selectedResponsavel, setSelectedResponsavel] = useState('');
+  const [isResponsavelModalOpen, setIsResponsavelModalOpen] = useState(false);
+
+
+
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const token = localStorage.getItem('token'); // Certifique-se de ter o token armazenado
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Inclua o token JWT no cabeçalho
+          },
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+      }
+    }
+
+    if (isModalOpen) {
+      fetchUsers();
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     fetchLeads();
   }, []);
+
+
 
   const fetchLeads = async () => {
     try {
@@ -587,31 +846,44 @@ const Kanban = () => {
 
     const lead = leads[sourceIndex].find((l) => l._id === leadId);
 
-    if (etapaDestino === 'Em Negociação' && !lead.customId) {
+    if (etapaDestino === 'Qualificação' && (!lead.obteveResposta || lead.obteveResposta === '')) {
+      setSelectedLead({ id: leadId, destinationIndex });
+      setIsObteveRespostaModalOpen(true);
+
+    } else if (etapaDestino === 'Em Negociação' && !lead.customId) {
       // Impede o movimento e abre o modal para selecionar veículo
       setSelectedLead({ id: leadId, destinationIndex });
       const veiculos = await fetchVeiculosList();
       setVeiculosDisponiveis(veiculos);
       setIsSelectVehicleModalOpen(true);
+
     } else if (etapaDestino === 'Perdidos' && etapaOrigem !== 'Perdidos') {
       // Abrir modal para inserir motivo da perda
       setSelectedLead({ id: leadId, destinationIndex });
       setIsMotivoModalOpen(true);
+
     } else if (etapaDestino !== 'Perdidos' && etapaOrigem === 'Perdidos') {
       // Abrir modal para confirmar restauração
       setSelectedLead({ id: leadId, destinationIndex });
       setIsRestoreModalOpen(true);
+
     } else {
       // Movimento normal sem modais
       updateLeadStage(leadId, destinationIndex);
     }
   };
 
+
+
+
+
   const updateLeadStage = async (
     leadId,
     destinationIndex,
     motivo = null,
-    customId = null
+    customId = null,
+    obteveResposta = null
+
   ) => {
     setLeads((prevLeads) => {
       const newLeads = [...prevLeads];
@@ -631,17 +903,22 @@ const Kanban = () => {
         movedLead.customId = customId;
       }
 
+      if (obteveResposta !== null) {
+        movedLead.obteveResposta = obteveResposta;
+      }
+
       newLeads[destinationIndex].push(movedLead);
       return newLeads;
     });
 
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${leadId}/update-motivo-perda`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${leadId}/update-etapa`,
         {
           etapa: etapaNames[destinationIndex],
           motivoPerda: motivo,
           customId: customId,
+          ...(obteveResposta !== null && { obteveResposta }),
           ultimaInteracao: new Date(),
         }
       );
@@ -650,27 +927,53 @@ const Kanban = () => {
     }
   };
 
-
   const handleAddLead = async () => {
     try {
-      await axios.post(
+      // Cria o lead no banco de dados com o responsável incluído
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/clientes`,
         newLead
       );
+
+      // Atualiza a lista de leads
       fetchLeads();
+
+      // Fecha o modal após a adição do lead
       setIsModalOpen(false);
+
+      // Limpa os campos do formulário
       setNewLead({
         nome: '',
         telefone: '',
         email: '',
         estado: '',
+        cidade: '',
         fonteLead: '',
         etapa: 'Novo Lead',
+        responsavelLead: '', // Limpa o campo de responsável após a adição
       });
     } catch (error) {
       console.error('Erro ao adicionar lead:', error);
     }
   };
+
+
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setNewLead({
+      nome: '',
+      telefone: '',
+      email: '',
+      estado: '',
+      cidade: '',
+      fonteLead: '',
+      etapa: 'Novo Lead',
+      responsavelLead: '',
+    });
+  };
+
+
 
   const filteredLeads = leads.map((columnLeads) =>
     columnLeads.filter(
@@ -722,10 +1025,10 @@ const Kanban = () => {
           </div>
         </div>
 
-        {/* Modal de Adicionar Lead */}
+
         <Modal
           isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
+          onRequestClose={handleModalClose}
           contentLabel="Adicionar Lead"
           className="fixed inset-0 flex items-center justify-center z-50"
           overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -733,115 +1036,92 @@ const Kanban = () => {
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 md:mx-auto relative">
             {/* Botão para fechar o modal */}
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={handleModalClose}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
               aria-label="Fechar"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
             <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
               Adicionar Novo Lead
             </h2>
+
             <div className="space-y-5">
+              {/* Nome */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Nome
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Nome</label>
                 <input
                   type="text"
                   placeholder="Nome"
                   value={newLead.nome}
-                  onChange={(e) =>
-                    setNewLead({ ...newLead, nome: e.target.value })
-                  }
+                  onChange={(e) => setNewLead({ ...newLead, nome: e.target.value })}
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
+              {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
                 <input
                   type="email"
                   placeholder="Email"
                   value={newLead.email}
-
-                  onChange={(e) =>
-                    setNewLead({ ...newLead, email: e.target.value })
-                  }
+                  onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
+              {/* Telefone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Telefone
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Telefone</label>
                 <input
                   type="tel"
                   placeholder="Telefone"
                   value={newLead.telefone}
                   onChange={(e) => {
-                    // Remove caracteres não numéricos
                     let telefone = e.target.value.replace(/\D/g, '');
-
-                    // Limita o número de caracteres a 11 (DDD + 9 dígitos)
-                    if (telefone.length > 11) {
-                      telefone = telefone.slice(0, 11);
-                    }
-
-                    // Aplica a formatação de telefone brasileiro (DDD) 9XXXX-XXXX
-                    telefone = telefone
-                      .replace(/^(\d{2})(\d)/g, '($1) $2') // Adiciona parênteses ao DDD
-                      .replace(/(\d{5})(\d{4})$/, '$1-$2'); // Adiciona hífen no número
-
+                    if (telefone.length > 11) telefone = telefone.slice(0, 11);
+                    telefone = telefone.replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d{4})$/, '$1-$2');
                     setNewLead({ ...newLead, telefone });
                   }}
-                  maxLength={15} // Define o limite máximo de caracteres (incluindo a formatação)
+                  maxLength={15}
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
+              {/* Estado */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Estado
-                </label>
-                <select
+                <label className="block text-sm font-medium text-gray-700">Estado</label>
+                <input
+                  type="text"
+                  placeholder="Digite o estado"
                   value={newLead.estado}
-                  onChange={(e) =>
-                    setNewLead({ ...newLead, estado: e.target.value })
-                  }
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Selecione o Estado</option>
-                  {estadosBrasileiros.map((estado) => (
-                    <option key={estado} value={estado}>
-                      {estado}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(e) => setNewLead({ ...newLead, estado: e.target.value })}
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
+
+              {/* Cidade */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Fonte do Lead
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Cidade</label>
+                <input
+                  type="text"
+                  placeholder="Digite a cidade"
+                  value={newLead.cidade}
+                  onChange={(e) => setNewLead({ ...newLead, cidade: e.target.value })}
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Fonte do Lead */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Fonte do Lead</label>
                 <select
                   value={newLead.fonteLead}
-                  onChange={(e) =>
-                    setNewLead({ ...newLead, fonteLead: e.target.value })
-                  }
+                  onChange={(e) => setNewLead({ ...newLead, fonteLead: e.target.value })}
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="Indefinido">Selecione a Fonte</option>
@@ -852,10 +1132,33 @@ const Kanban = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Responsável */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Atribuir Responsável</label>
+                <select
+                  value={newLead.responsavelLead}
+                  onChange={(e) => setNewLead({ ...newLead, responsavelLead: e.target.value })}
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecione um Responsável</option>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.username}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Carregando usuários...</option>
+                  )}
+                </select>
+              </div>
             </div>
+
+            {/* Botões de ação */}
             <div className="flex justify-end space-x-4 mt-6">
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleModalClose}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
               >
                 Cancelar
@@ -869,6 +1172,111 @@ const Kanban = () => {
             </div>
           </div>
         </Modal>
+
+        {/* Modal para Obteve Resposta */}
+        <Modal
+          isOpen={isObteveRespostaModalOpen}
+          onRequestClose={() => {
+            setIsObteveRespostaModalOpen(false);
+            setObteveResposta('');
+            setSelectedLead(null);
+          }}
+          contentLabel="Obteve Resposta"
+          className="fixed inset-0 flex items-center justify-center z-50"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+        >
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md mx-4 md:mx-auto relative">
+            {/* Botão para fechar o modal */}
+            <button
+              onClick={() => {
+                setIsObteveRespostaModalOpen(false);
+                setObteveResposta('');
+                setSelectedLead(null);
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Fechar"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                Obteve Resposta do Lead?
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Por favor, indique se obteve resposta do lead antes de prosseguir.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex justify-center space-x-6">
+                <button
+                  onClick={() => setObteveResposta('Sim')}
+                  className={`px-5 py-2 rounded-md focus:outline-none focus:ring-2 ${obteveResposta === 'Sim'
+                    ? 'bg-blue-600 text-white focus:ring-blue-500'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                >
+                  Sim
+                </button>
+                <button
+                  onClick={() => setObteveResposta('Não')}
+                  className={`px-5 py-2 rounded-md focus:outline-none focus:ring-2 ${obteveResposta === 'Não'
+                    ? 'bg-blue-600 text-white focus:ring-blue-500'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                >
+                  Não
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-4 mt-6">
+              <button
+                onClick={() => {
+                  setIsObteveRespostaModalOpen(false);
+                  setObteveResposta('');
+                  setSelectedLead(null);
+                }}
+                className="px-5 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedLead && obteveResposta) {
+                    updateLeadStage(
+                      selectedLead.id,
+                      selectedLead.destinationIndex,
+                      null,
+                      null,
+                      obteveResposta
+                    );
+                    setIsObteveRespostaModalOpen(false);
+                    setObteveResposta('');
+                    setSelectedLead(null);
+                  }
+                }}
+                disabled={!obteveResposta}
+                className={`px-5 py-2 text-white rounded-md transition-colors focus:outline-none focus:ring-2 ${obteveResposta
+                  ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                  : 'bg-blue-300 cursor-not-allowed'
+                  }`}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </Modal>
+
 
         {/* Modal para Motivo da Perda */}
         <Modal
@@ -902,10 +1310,16 @@ const Kanban = () => {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
+            {/* Cabeçalho */}
             <div className="text-center">
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">
                 Motivo da Perda do Lead
@@ -915,6 +1329,7 @@ const Kanban = () => {
               </p>
             </div>
 
+            {/* Formulário de seleção do motivo */}
             <div className="space-y-4">
               <select
                 value={motivoPerda}
@@ -924,6 +1339,7 @@ const Kanban = () => {
                 <option value="">Selecione o motivo</option>
                 {[
                   'Não respondeu',
+                  'Parou de responder',
                   'Não atendeu telefone',
                   'Cliente desistiu',
                   'Concorrente ganhou',
@@ -941,6 +1357,7 @@ const Kanban = () => {
                 ))}
               </select>
 
+              {/* Campo de texto para "Outro" */}
               {motivoPerda === 'Outro' && (
                 <textarea
                   value={motivoPerdaOutro}
@@ -948,10 +1365,11 @@ const Kanban = () => {
                   placeholder="Por favor, especifique o motivo"
                   className="block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
-                ></textarea>
+                />
               )}
             </div>
 
+            {/* Botões de ação */}
             <div className="flex justify-end space-x-4 mt-6">
               <button
                 onClick={() => {
@@ -968,11 +1386,7 @@ const Kanban = () => {
                 onClick={() => {
                   if (selectedLead) {
                     const motivo = motivoPerda === 'Outro' ? motivoPerdaOutro : motivoPerda;
-                    updateLeadStage(
-                      selectedLead.id,
-                      selectedLead.destinationIndex,
-                      motivo
-                    );
+                    updateLeadStage(selectedLead.id, selectedLead.destinationIndex, motivo);
                     setIsMotivoModalOpen(false);
                     setMotivoPerda('');
                     setMotivoPerdaOutro('');
@@ -991,6 +1405,119 @@ const Kanban = () => {
           </div>
         </Modal>
 
+
+
+        {/* Modal para Obteve Resposta */}
+        <Modal
+          isOpen={isObteveRespostaModalOpen}
+          onRequestClose={() => {
+            setIsObteveRespostaModalOpen(false);
+            setObteveResposta('');
+            setSelectedLead(null);
+          }}
+          contentLabel="Obteve Resposta"
+          className="fixed inset-0 flex items-center justify-center z-50"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+        >
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md mx-4 md:mx-auto relative">
+            {/* Botão para fechar o modal */}
+            <button
+              onClick={() => {
+                setIsObteveRespostaModalOpen(false);
+                setObteveResposta('');
+                setSelectedLead(null);
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Fechar"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Cabeçalho */}
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                Obteve Resposta do Lead?
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Por favor, indique se obteve resposta do lead antes de prosseguir.
+              </p>
+            </div>
+
+            {/* Botões de seleção */}
+            <div className="space-y-4">
+              <div className="flex justify-center space-x-6">
+                <button
+                  onClick={() => setObteveResposta('Sim')}
+                  className={`px-5 py-2 rounded-md focus:outline-none focus:ring-2 ${obteveResposta === 'Sim'
+                    ? 'bg-blue-600 text-white focus:ring-blue-500'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                >
+                  Sim
+                </button>
+                <button
+                  onClick={() => setObteveResposta('Não')}
+                  className={`px-5 py-2 rounded-md focus:outline-none focus:ring-2 ${obteveResposta === 'Não'
+                    ? 'bg-blue-600 text-white focus:ring-blue-500'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                >
+                  Não
+                </button>
+              </div>
+            </div>
+
+            {/* Botões de ação */}
+            <div className="flex justify-end space-x-4 mt-6">
+              <button
+                onClick={() => {
+                  setIsObteveRespostaModalOpen(false);
+                  setObteveResposta('');
+                  setSelectedLead(null);
+                }}
+                className="px-5 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedLead && obteveResposta) {
+                    updateLeadStage(
+                      selectedLead.id,
+                      selectedLead.destinationIndex,
+                      null,
+                      null,
+                      obteveResposta
+                    );
+                    setIsObteveRespostaModalOpen(false);
+                    setObteveResposta('');
+                    setSelectedLead(null);
+                  }
+                }}
+                disabled={!obteveResposta}
+                className={`px-5 py-2 text-white rounded-md transition-colors focus:outline-none focus:ring-2 ${obteveResposta
+                  ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                  : 'bg-blue-300 cursor-not-allowed'
+                  }`}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </Modal>
 
         {/* Modal de Restauração do Lead */}
         <Modal
@@ -1022,10 +1549,16 @@ const Kanban = () => {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
+            {/* Cabeçalho */}
             <div className="text-center">
               <h2
                 id="modal-title"
@@ -1041,6 +1574,7 @@ const Kanban = () => {
               </p>
             </div>
 
+            {/* Botões de ação */}
             <div className="flex justify-center space-x-4 mt-6">
               <button
                 onClick={() => {
@@ -1063,7 +1597,7 @@ const Kanban = () => {
                     setSelectedLead(null);
                   }
                 }}
-                className="px-5 py-2 bg-green-500 text-white rounded-md transition-colors focus:outline-none"
+                className="px-5 py-2 bg-green-500 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 Restaurar Lead
               </button>
@@ -1112,6 +1646,7 @@ const Kanban = () => {
               </svg>
             </button>
 
+            {/* Cabeçalho do modal */}
             <div className="text-center">
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">
                 Selecionar Veículo
@@ -1121,6 +1656,7 @@ const Kanban = () => {
               </p>
             </div>
 
+            {/* Seleção de veículo */}
             <div className="space-y-4">
               <div className="relative">
                 <select
@@ -1147,6 +1683,7 @@ const Kanban = () => {
               </div>
             </div>
 
+            {/* Botões de ação */}
             <div className="flex justify-end space-x-4 mt-8">
               <button
                 onClick={() => {
@@ -1174,8 +1711,8 @@ const Kanban = () => {
                 }}
                 disabled={!selectedVehicle}
                 className={`px-5 py-2 text-white rounded-md transition-colors focus:outline-none focus:ring-2 ${selectedVehicle
-                    ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
-                    : 'bg-blue-300 cursor-not-allowed'
+                  ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                  : 'bg-blue-300 cursor-not-allowed'
                   }`}
               >
                 Confirmar

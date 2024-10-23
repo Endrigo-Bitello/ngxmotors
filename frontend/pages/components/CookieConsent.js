@@ -25,8 +25,8 @@ const CookieConsent = () => {
     <div className="fixed bottom-4 left-4 right-4 md:left-6 md:right-6 p-4 bg-white border border-gray-300 shadow-lg rounded-lg flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-6 text-gray-700 z-50 transition-all">
       <p className="text-sm md:text-base leading-relaxed">
         Utilizamos cookies para personalizar e melhorar sua experiência em nosso site. Ao continuar navegando, você aceita nossa{' '}
-        <Link href="/politica-de-privacidade">
-          <a className="text-blue-600 hover:underline">política de privacidade</a>
+        <Link href="/politica-de-privacidade"
+        className="text-blue-600 hover:underline">política de privacidade
         </Link>.
       </p>
       <button

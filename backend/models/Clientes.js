@@ -43,8 +43,9 @@ const clienteSchema = new mongoose.Schema({
     default: Date.now,
   },
   responsavelLead: {
-    type: String,
-    default: 'Não atribuído',
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User',
+    default: null,
   },
   preferenciaContato: {
     type: String,
@@ -54,54 +55,39 @@ const clienteSchema = new mongoose.Schema({
 
   customId: {
     type: String,
-},
+  },
 
- motivoPerda: {
-  type: String,
-  required: false,
-},
+  motivoPerda: {
+    type: String,
+    required: false,
+  },
 
+  obteveResposta: {
+    type: String,
+    enum: ['Sim', 'Não'],
+    required: false,
+  },
 
-tentativasContato: {
-  type: Number,
-  min: 1, 
-  max: 7, 
-  default: 1, 
-},
+  possuiUrgencia: {
+    type: Boolean,
+    required: false
+  },
+
+  tentativasContato: {
+    type: Number,
+    min: 1,
+    max: 7,
+    default: 1,
+  },
 
   estado: {
     type: String,
-    enum: [
-      'Acre',
-      'Alagoas',
-      'Amapá',
-      'Amazonas',
-      'Bahia',
-      'Ceará',
-      'Distrito Federal',
-      'Espírito Santo',
-      'Goiás',
-      'Maranhão',
-      'Mato Grosso',
-      'Mato Grosso do Sul',
-      'Minas Gerais',
-      'Pará',
-      'Paraíba',
-      'Paraná',
-      'Pernambuco',
-      'Piauí',
-      'Rio de Janeiro',
-      'Rio Grande do Norte',
-      'Rio Grande do Sul',
-      'Rondônia',
-      'Roraima',
-      'Santa Catarina',
-      'São Paulo',
-      'Sergipe',
-      'Tocantins'
-    ]
+  },
+
+  cidade: {
+    type: String,
+    required: false
   }
-  
 
 });
 
