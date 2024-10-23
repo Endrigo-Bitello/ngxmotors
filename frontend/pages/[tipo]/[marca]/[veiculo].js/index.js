@@ -59,7 +59,7 @@ export default function VehiclePage() {
                 nome,
                 email,
                 telefone,
-                cpf: '123.456.789-10', // Você pode adicionar um campo CPF se necessário
+                cpf: '123.456.789-10',
                 mensagem,
                 customId: vehicleData.customId, // customId do veículo
             });
@@ -89,8 +89,6 @@ export default function VehiclePage() {
     const prosseguirFinanciamento = (id) => {
         router.push(`/financiamento?id=${id}`);
     };
-
-
 
 
     // Checa se é mobile

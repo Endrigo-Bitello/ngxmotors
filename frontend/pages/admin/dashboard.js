@@ -24,7 +24,7 @@ import Financiamentos from '../components/admin/Financiamentos';
 import Overview from '../components/admin/Overview';
 import ConsultaFipe from '../components/admin/ConsultaFipe';
 import AddVehicle from '../components/admin/AddVehicle';
-import CRM from '../components/admin/CRM';
+import Kanban from '../components/admin/crm/Kanban';
 
 function Dashboard() {
     const [view, setView] = useState('overview');
@@ -43,7 +43,7 @@ function Dashboard() {
 
     const navigationItems = [
         { name: 'Visão Geral', view: 'overview', icon: faHome },
-        { name: 'CRM', view: 'crm', icon: faLightbulb},
+        { name: 'CRM', view: 'kanban', icon: faLightbulb},
         {
             name: 'Estoque',
             items: [
@@ -140,7 +140,7 @@ function Dashboard() {
             {/* Conteúdo principal */}
             <main className="flex-1 p-8">
                 {view === 'overview' && <Overview />}
-                {view === 'crm' && <CRM />}
+                {view === 'kanban' && <Kanban />}
                 {view === 'stock' && <Stock />}
                 {view === 'newvehicle' && <AddVehicle />}
                 {view === 'mensagens' && <Mensagens />}
