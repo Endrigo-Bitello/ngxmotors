@@ -43,8 +43,6 @@ const Contato = () => {
 
             console.log('Lead criado:', resCliente.data);
 
-            // Exibe uma mensagem de sucesso para ambos os posts
-            alert('Mensagem enviada com sucesso e cliente cadastrado como Novo Lead!');
 
             // Limpa os campos do formulário
             setNome('');

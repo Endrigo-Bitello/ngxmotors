@@ -53,6 +53,10 @@ const clienteSchema = new mongoose.Schema({
     default: 'Telefone',
   },
 
+  customId: {
+    type: String,
+},
+
   estado: {
     type: String,
     enum: [

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Cliente = require('../models/Clientes'); // Supondo que você tenha um modelo Cliente definido no MongoDB
+const Cliente = require('../models/Clientes'); 
 
 // Rota para listar todos os clientes
 router.get('/', async (req, res) => {
@@ -49,6 +49,28 @@ router.post('/contato', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
+router.post('/simulacao', async (req, res) => {
+  const { nome, telefone, email, etapa, fonteLead, customId } = req.body;
+  
+  // Criação de um novo lead com o customId incluído
+  const novoCliente = new Cliente({
+    nome,
+    telefone,
+    email,
+    etapa: etapa || "Novo Lead", // Se não houver uma etapa definida, usamos "Novo Lead"
+    fonteLead: fonteLead || "Simulação", // Definimos a fonte do lead como "Simulação"
+    customId: customId // Adicionamos o customId ao cliente, caso seja fornecido
+  });
+
+  try {
+    const clienteSalvo = await novoCliente.save();
+    res.status(201).json(clienteSalvo);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 
 // Rota para atualizar as informações de um cliente específico
 router.put('/:id', async (req, res) => {
