@@ -26,6 +26,34 @@ export default function VehicleTypePage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('');
 
+  const [settings, setSettings] = useState(null); 
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data);
+    } catch (error) {
+      console.error('Erro ao buscar as configurações:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings(); // Busca as configurações quando o componente é montado
+  }, []);
+
+  useEffect(() => {
+    if (settings) {
+      setSEO({
+        title: `${settings.name} - Conheça nosso estoque de Veículos Novos, Seminovos e Usados!`,
+        metaDescription: `Bem-vindo à ${settings.name}, sua referência em veículos de qualidade. 
+        Localizados em ${settings.address}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
+        Fale conosco pelo WhatsApp ${settings.whatsappNumber} e visite-nos durante nosso 
+        horário de funcionamento: ${settings.openingHours}. 
+        Conquiste seu próximo veículo com confiança e segurança.`
+      });
+    }
+  }, [settings]);
+
   const handleSortOrder = (order) => {
     setSortOrder(order);
 
@@ -48,17 +76,6 @@ export default function VehicleTypePage() {
     return ''; // Caso não haja fotos ou ocorra algum erro
   };
 
-
-  useEffect(() => {
-    setSEO(
-      {
-        title: `${process.env.NEXT_PUBLIC_NAME} - Conheça nosso estoque de Veículos Novos, Seminovos e Usados!`,
-        metaDescription: `Bem-vindo à ${process.env.NEXT_PUBLIC_NAME}, sua referência em veículos de qualidade. 
-      Localizados em ${process.env.NEXT_PUBLIC_ADDRESS}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
-      Fale conosco pelo WhatsApp ${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER} e visite-nos durante nosso 
-      horário de funcionamento: ${process.env.NEXT_PUBLIC_OPENING_HOURS}. 
-      Conquiste seu próximo veículo com confiança e segurança.` });
-  }, []);
 
   const fetchVehicles = async () => {
     setLoading(true);
@@ -94,9 +111,6 @@ export default function VehicleTypePage() {
       <main className="container mx-auto p-6 flex-grow">
         <div className="flex justify-between items-center mb-6">
           <div>
-
-
-
 
             <h1 className="text-2xl font-bold text-gray-800">
               {searched ? `Resultados da pesquisa para "${search}"` : 'Veículos Usados, seminovos e Novos à venda'}
@@ -356,7 +370,7 @@ export default function VehicleTypePage() {
                   </div>
                   <button
                     title={`Chame no WhatsApp para saber mais sobre ${vehicle.modelo} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
-                    onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
+                    onClick={() => window.open(`https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                     className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                   >
                     {whatsappWhite}

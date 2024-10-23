@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import {
-    faBars,
     faHome,
     faClipboardList,
     faPlusCircle,
-    faUsers,
     faMessage,
     faSearch,
     faSignOutAlt,
     faChevronDown,
     faBank,
     faLightbulb,
+    faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -25,6 +24,7 @@ import Overview from '../components/admin/Overview';
 import ConsultaFipe from '../components/admin/ConsultaFipe';
 import AddVehicle from '../components/admin/AddVehicle';
 import Kanban from '../components/admin/crm/Kanban';
+import Settings from '../components/admin/Settings';
 
 function Dashboard() {
     const [view, setView] = useState('overview');
@@ -59,6 +59,7 @@ function Dashboard() {
             ],
         },
         { name: 'Consulta Fipe', view: 'consultafipe', icon: faSearch },
+        { name: 'Configurações', view: 'settings', icon: faGear},
     ];
 
     // Função para alternar o dropdown aberto
@@ -146,6 +147,7 @@ function Dashboard() {
                 {view === 'mensagens' && <Mensagens />}
                 {view === 'financiamentos' && <Financiamentos />}
                 {view === 'consultafipe' && <ConsultaFipe />}
+                {view === 'settings' && <Settings />}
             </main>
 
             {/* Navbar inferior para dispositivos móveis */}

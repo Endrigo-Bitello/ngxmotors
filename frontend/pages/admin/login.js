@@ -8,10 +8,26 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [settings, setSettings] = useState(null); 
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data);
+    } catch (error) {
+      console.error('Erro ao buscar as configurações:', error);
+    }
+  };
 
   useEffect(() => {
-    setSEO({ title: `${process.env.NEXT_PUBLIC_NAME} - Acesse sua conta` });
+    fetchSettings(); // Busca as configurações quando o componente é montado
   }, []);
+
+  useEffect(() => {
+    if (settings) {
+      setSEO({ title: `${settings.name} - Autenticação` });
+    }
+  }, [settings]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

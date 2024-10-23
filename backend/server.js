@@ -9,8 +9,10 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const jwt = require('jsonwebtoken'); // Adicionar JWT para autenticação
 const compression = require('compression');
+const fs = require('fs');
 
 dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -100,6 +102,7 @@ const protectedRoutes = require('./routes/protectedRoutes');
 const vehiclesRoutes = require('./routes/vehiclesRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const customersRoutes = require('./routes/customersRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 
 // Usar as rotas
 app.use('/api/carros', carRoutes);
@@ -108,6 +111,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/financiamentos', financiamentoRoutes);
 app.use('/api/mensagens', mensagensRoutes);
 app.use('/api/vehicles', vehiclesRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/clientes', customersRoutes);
 app.use('/api', contactRoutes);
 app.use('/api', protectedRoutes);
@@ -124,6 +128,7 @@ app.get('/api/fipeAPI', (req, res) => {
       .then(response => res.json(response.data))
       .catch(error => res.status(500).json({ error: 'Erro ao buscar dados da FIPE' }));
 });
+
 
 app.get('/', (req, res) => {
   res.send('Você não possui acesso.');

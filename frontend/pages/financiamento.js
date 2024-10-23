@@ -34,14 +34,35 @@ export default function FinanciamentoPage() {
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
   const [cpf, setCpf] = useState('');
-
+  const [settings, setSettings] = useState(null); 
   const [mensagem, setMensagem] = useState(null);
 
 
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data);
+    } catch (error) {
+      console.error('Erro ao buscar as configurações:', error);
+    }
+  };
+
   useEffect(() => {
-    setSEO(
-      { title: `${process.env.NEXT_PUBLIC_NAME} - Financiamento` });
+    fetchSettings(); // Busca as configurações quando o componente é montado
   }, []);
+
+  useEffect(() => {
+    if (settings) {
+      setSEO({
+        title: `${settings.name} - Conheça nosso estoque de Veículos Novos, Seminovos e Usados!`,
+        metaDescription: `Bem-vindo à ${settings.name}, sua referência em veículos de qualidade. 
+        Localizados em ${settings.address}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
+        Fale conosco pelo WhatsApp ${settings.whatsappNumber} e visite-nos durante nosso 
+        horário de funcionamento: ${settings.openingHours}. 
+        Conquiste seu próximo veículo com confiança e segurança.`
+      });
+    }
+  }, [settings]);
 
   const fetchVehicleData = async () => {
     try {
@@ -137,7 +158,7 @@ export default function FinanciamentoPage() {
     setEtapa(2);
   };
 
-  
+
 
   const enviarSimulacao = async () => {
     try {
@@ -152,7 +173,7 @@ export default function FinanciamentoPage() {
         parcelaEstimada,
         customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
       });
-  
+
       // Verifica a resposta da API de simulação
       if (resSimulacao.status === 201) {
         // Agora, faz o envio do lead com a customId
@@ -164,14 +185,14 @@ export default function FinanciamentoPage() {
           fonteLead: 'Simulação', // Fonte do lead é a simulação
           customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
         });
-  
+
         // Verifica a resposta da API de lead e exibe mensagem de sucesso
         if (resLead.status === 201) {
           setMensagem({
             tipo: 'sucesso',
             texto: 'Simulação enviada com sucesso!',
           });
-  
+
           // Limpa os campos do formulário após o envio
           setNome('');
           setEmail('');
@@ -185,7 +206,7 @@ export default function FinanciamentoPage() {
       }
     } catch (error) {
       console.error('Erro ao enviar a simulação ou criar lead:', error);
-  
+
       // Exibe uma mensagem de erro ao usuário
       setMensagem({
         tipo: 'erro',
@@ -193,7 +214,7 @@ export default function FinanciamentoPage() {
       });
     }
   };
-  
+
 
 
   useEffect(() => {
@@ -504,7 +525,7 @@ export default function FinanciamentoPage() {
                       </div>
                       <button
                         title={`Chame no WhatsApp para saber mais sobre ${vehicle.modelo} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
-                        onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
+                        onClick={() => window.open(`https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                         className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                       >
                         {whatsappWhite}
@@ -571,7 +592,9 @@ export default function FinanciamentoPage() {
               <form>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="relative">
-                    <label className="block text-gray-700 mb-2">Valor de Entrada (mínimo de 10%):</label>
+                    <label className="block text-gray-700 mb-2">
+                      Valor de Entrada (mínimo de {settings.taxaString}):
+                    </label>
                     <input
                       type="text"
                       value={entrada !== '' ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(entrada) : ''}
@@ -580,14 +603,15 @@ export default function FinanciamentoPage() {
                         const formattedValue = isNaN(numericValue) ? '' : numericValue.toFixed(2);
                         setEntrada(formattedValue);
 
-                        // Validação: verifica se o valor de entrada é maior ou igual a 10% do valor do veículo
-                        if (formattedValue >= vehicleData.valorVenda * 0.1) {
+                        // Validação: verifica se o valor de entrada é maior ou igual ao valor da taxa configurada no .env
+                        const taxaEntrada = parseFloat(settings.taxaValue) / 100;
+                        if (formattedValue >= vehicleData.valorVenda * taxaEntrada) {
                           setIsEntradaValida(true);
                         } else {
                           setIsEntradaValida(false);
                         }
                       }}
-                      placeholder={`Mínimo: ${formatCurrency(vehicleData.valorVenda * 0.1)}`}
+                      placeholder={`Mínimo: ${formatCurrency(vehicleData.valorVenda * (parseFloat(settings.taxaValue) / 100))}`}
                       className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${isEntradaValida ? 'border-green-500 focus:ring-green-200' : 'border-red-500 focus:ring-red-200'
                         }`}
                     />

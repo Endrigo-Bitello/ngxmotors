@@ -23,17 +23,33 @@ const Home = () => {
     const [showAllVehicles, setShowAllVehicles] = useState(false); // Estado para controlar a exibição de todos os veículos
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [sortOrder, setSortOrder] = useState('');
+    const [settings, setSettings] = useState(null);
+
+    const fetchSettings = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+            setSettings(data);
+        } catch (error) {
+            console.error('Erro ao buscar as configurações:', error);
+        }
+    };
 
     useEffect(() => {
-        setSEO(
-            {
-                title: `${process.env.NEXT_PUBLIC_NAME} - Veículos Novos, Seminovos e Usados de Qualidade! Confira nossa lista de motos e carros`,
-                metaDescription: `Bem-vindo à ${process.env.NEXT_PUBLIC_NAME}, sua referência em veículos de qualidade. 
-          Localizados em ${process.env.NEXT_PUBLIC_ADDRESS}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
-          Fale conosco pelo WhatsApp ${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER} e visite-nos durante nosso 
-          horário de funcionamento: ${process.env.NEXT_PUBLIC_OPENING_HOURS}. 
-          Conquiste seu próximo veículo com confiança e segurança.` });
+        fetchSettings();
     }, []);
+
+    useEffect(() => {
+        if (settings) {
+            setSEO({
+                title: `${settings.name} - Conheça nosso estoque de Veículos Novos, Seminovos e Usados!`,
+                metaDescription: `Bem-vindo à ${settings.name}, sua referência em veículos de qualidade. 
+        Localizados em ${settings.address}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
+        Fale conosco pelo WhatsApp ${settings.whatsappNumber} e visite-nos durante nosso 
+        horário de funcionamento: ${settings.openingHours}. 
+        Conquiste seu próximo veículo com confiança e segurança.`
+            });
+        }
+    }, [settings]);
 
 
     // Função para ordenar os veículos
@@ -345,7 +361,7 @@ const Home = () => {
                                     </div>
                                     <button
                                         title={`Chame no WhatsApp para saber mais sobre ${vehicle.modelo} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
-                                        onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
+                                        onClick={() => window.open(`https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                                         className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                                     >
                                         {whatsappWhite}
@@ -377,7 +393,7 @@ const Home = () => {
                 className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 hover:scale-110 transition-all duration-300 ease-in-out"
                 onClick={() => {
                     window.open(
-                        `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Olá, gostaria de mais informações!`,
+                        `https://wa.me/${settings.whatsappNumber}?text=${settings.whatsappMessage}`,
                         '_blank'
                     );
                 }}

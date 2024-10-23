@@ -1,16 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faFacebook, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 const Medias = () => {
+  const [settings, setSettings] = useState(null); // Estado para armazenar as configurações
+
+  // Função para buscar as configurações da API
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data);
+    } catch (error) {
+      console.error('Erro ao buscar as configurações:', error);
+    }
+  };
+
+  // useEffect para buscar as configurações quando o componente é montado
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  // Se as configurações ainda não foram carregadas, exibe um estado de carregamento
+  if (!settings) {
+    return null; // Ou exiba um loader, por exemplo, <p>Carregando...</p>
+  }
+
   return (
     <div className="fixed top-[22%] right-0 flex flex-col items-end z-50">
       {/* Container de Ícones */}
       <div className="flex flex-col items-center gap-0">
         {/* Ícone do Instagram */}
         <a
-          href={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
+          href={settings.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Acesse Instagram"
@@ -21,7 +44,7 @@ const Medias = () => {
 
         {/* Ícone do Facebook */}
         <a
-          href={process.env.NEXT_PUBLIC_FACEBOOK_URL}
+          href={settings.facebookUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Acesse Facebook"
@@ -32,8 +55,8 @@ const Medias = () => {
 
         {/* Ícone do WhatsApp */}
         <a
-          href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(
-            process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE
+          href={`https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(
+            settings.whatsappMessage
           )}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -45,7 +68,7 @@ const Medias = () => {
 
         {/* Ícone do Email */}
         <a
-          href={`mailto:${process.env.NEXT_PUBLIC_EMAIL}`}
+          href={`mailto:${settings.email}`}
           aria-label="Envie um email"
           className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 hover:scale-110 transition-transform duration-200 ease-in-out"
         >

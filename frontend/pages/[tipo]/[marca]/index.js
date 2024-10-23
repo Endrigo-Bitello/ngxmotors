@@ -3,10 +3,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
-
+import { setSEO } from '../../../utils/seo';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { whatsappWhite } from '@/utils/share';
@@ -15,6 +13,8 @@ const GoogleMaps = dynamic(() => import('@/pages/components/GoogleMaps'), { ssr:
 
 
 const capitalizeBrandName = (string) => {
+    if (!string) return ''; // Retorna uma string vazia se o valor for undefined ou null
+
     const uppercaseBrands = ["BYD", "BMW", "RAM"];
 
     if (string.toLowerCase() === "mercedes-benz") {
@@ -24,11 +24,9 @@ const capitalizeBrandName = (string) => {
     return string
         .split('-')
         .map((part) => {
-
             if (uppercaseBrands.includes(part.toUpperCase())) {
                 return part.toUpperCase();
             }
-
             return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
         })
         .join('-');
@@ -54,6 +52,21 @@ export default function VehiclesByBrandPage() {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [sortOrder, setSortOrder] = useState('');
+    const [settings, setSettings] = useState(null);
+
+    const fetchSettings = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+            setSettings(data);
+        } catch (error) {
+            console.error('Erro ao buscar as configurações:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
 
     const handleSortOrder = (order) => {
         setSortOrder(order);
@@ -98,6 +111,19 @@ export default function VehiclesByBrandPage() {
         fetchVehiclesByBrand();
     }, [marca]);
 
+
+    useEffect(() => {
+        if (settings) {
+            setSEO({
+                title: `${settings.name} - Conheça nosso estoque de Veículos Novos, Seminovos e Usados!`,
+                metaDescription: `Bem-vindo à ${settings.name}, sua referência em veículos de qualidade. 
+        Localizados em ${settings.address}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
+        Fale conosco pelo WhatsApp ${settings.whatsappNumber} e visite-nos durante nosso 
+        horário de funcionamento: ${settings.openingHours}. 
+        Conquiste seu próximo veículo com confiança e segurança.`
+            });
+        }
+    }, [settings]);
 
 
     return (
@@ -367,7 +393,7 @@ export default function VehiclesByBrandPage() {
                                     </div>
                                     <button
                                         title={`Chame no WhatsApp para saber mais sobre ${vehicle.modelo} ${vehicle.modelo} ${vehicle.anoFabricacao}`}
-                                        onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Quero mais informações sobre o veículo ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
+                                        onClick={() => window.open(`https://wa.me/${settings.whatsappNumber}?text=${settings.whatsappMessage} ${vehicle.marca.toUpperCase()} ${vehicle.modelo.toUpperCase()}`, '_blank')}
                                         className="w-full py-4 grow flex justify-center items-center gap-3 font-bold uppercase text-white bg-green-700 cursor-pointer hover:bg-green-500 transition-all ease-out duration-150"
                                     >
                                         {whatsappWhite}
