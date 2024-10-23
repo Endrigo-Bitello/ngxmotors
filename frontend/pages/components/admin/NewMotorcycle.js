@@ -212,7 +212,6 @@ const NewMotorcycle = () => {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/motos`, formData);
             const customId = response.data.customId; 
 
-            console.log('Moto adicionada com sucesso:', response.data);
 
             if (formData.imagens.length > 0) {
                 const formDataImagens = new FormData();
@@ -228,7 +227,6 @@ const NewMotorcycle = () => {
                     },
                 });
 
-                console.log('Imagens enviadas com sucesso:', uploadResponse.data);
             }
 
             setShowStock(true);

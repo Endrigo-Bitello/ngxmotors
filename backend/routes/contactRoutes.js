@@ -20,7 +20,6 @@ router.post('/contact', (req, res) => {
 
     // Adiciona o contato ao array
     contacts.push(newContact);
-    console.log('Novo contato adicionado:', newContact);
 
     res.status(201).json({ message: 'Contato enviado com sucesso!', contact: newContact });
 });
@@ -39,7 +38,6 @@ router.delete('/contact/:id', (req, res) => {
 
     if (contactIndex !== -1) {
         const removedContact = contacts.splice(contactIndex, 1);
-        console.log('Contato removido:', removedContact);
         res.status(200).json({ message: 'Contato removido com sucesso!', contact: removedContact });
     } else {
         res.status(404).json({ message: 'Contato não encontrado.' });
