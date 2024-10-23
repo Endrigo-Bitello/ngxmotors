@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaPhone, FaEnvelope, FaPlus } from 'react-icons/fa'; // Ícone de "+"
+import { FaPhone, FaEnvelope, FaPlus, FaQuestion, FaCloud, FaInfoCircle } from 'react-icons/fa'; // Ícone de "+"
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import axios from 'axios';
@@ -103,7 +103,7 @@ const DraggableCard = ({ lead, index, moveCard, colunaOrigem }) => {
         <div className="text-sm text-gray-600 flex items-center">
           <FaPhone className="mr-2" /> {lead.telefone}
         </div>
-  
+
         {/* Mostra o nome do veículo se ele existir */}
         {veiculo ? (
           <p className="text-sm text-gray-600">
@@ -111,30 +111,39 @@ const DraggableCard = ({ lead, index, moveCard, colunaOrigem }) => {
           </p>
         ) : (
           lead.customId && (
-            <p className="text-sm itelic text-red-600">
-              Veículo de interesse: {lead.customId}
-            </p>
+            <div className="flex items-center space-x-2 relative">
+              <FaInfoCircle className="text-red-600 group-hover:cursor-pointer" />
+              <p className="text-sm italic text-red-600">
+                Veículo removido: {lead.customId}
+              </p>
+              <div className="relative">
+                <div className="absolute left-0 top-full mt-1 hidden group-hover:flex bg-gray-700 text-white text-xs rounded p-2 z-10">
+                  O veículo que o lead havia se interessado foi removido do estoque.
+                </div>
+              </div>
+            </div>
           )
         )}
-  
+
+
+
         <p className="text-xs text-gray-400 mt-2">Criado em: {new Date(lead.dataCriacao).toLocaleDateString()}</p>
         <p className="text-xs text-gray-400">Última modificação: {new Date(lead.ultimaInteracao).toLocaleDateString()}</p>
       </div>
-  
+
       <div className="flex justify-start mt-2 space-x-2">
         {/* Etiqueta da fonte do lead */}
         <span className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded ${fonteLeadColors[lead.fonteLead]}`}>
           {lead.fonteLead}
         </span>
-  
+
         {/* Etiqueta para carro ou moto com base no customId */}
         {lead.customId && (
           <span
-            className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded ${ 
-              lead.customId.startsWith('c') ? customIdColors.carro : customIdColors.moto
-            }`}
+            className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded ${lead.customId.startsWith('c') ? customIdColors.carro : customIdColors.moto
+              }`}
           >
-           Cód. {lead.customId}
+            Cód. {lead.customId}
           </span>
         )}
       </div>
