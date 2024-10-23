@@ -71,6 +71,27 @@ router.post('/simulacao', async (req, res) => {
   }
 });
 
+router.post('/mensagem-veiculo', async (req, res) => {
+  const { nome, telefone, email, etapa, fonteLead, customId } = req.body;
+  
+  // Criação de um novo lead com o customId incluído
+  const novoCliente = new Cliente({
+    nome,
+    telefone,
+    email,
+    etapa: etapa || "Novo Lead", // Se não houver uma etapa definida, usamos "Novo Lead"
+    fonteLead: fonteLead || "Página do veículo", // Definimos a fonte do lead como "Simulação"
+    customId: customId // Adicionamos o customId ao cliente, caso seja fornecido
+  });
+
+  try {
+    const clienteSalvo = await novoCliente.save();
+    res.status(201).json(clienteSalvo);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 
 // Rota para atualizar as informações de um cliente específico
 router.put('/:id', async (req, res) => {
@@ -109,6 +130,30 @@ router.patch('/:id/mover-etapa', async (req, res) => {
     res.json(clienteAtualizado); // Retorna o cliente atualizado como resposta
   } catch (err) {
     res.status(400).json({ message: err.message }); // Retorna um erro se algo der errado
+  }
+});
+
+router.patch('/:id/update-motivo-perda', async (req, res) => {
+  try {
+    const cliente = await Cliente.findById(req.params.id);
+    if (!cliente) {
+      return res.status(404).json({ message: 'Cliente não encontrado' });
+    }
+
+
+    // Update the motivoPerda field
+    cliente.motivoPerda = req.body.motivoPerda || null; // Set to null if not provided
+
+    // Update the etapa if provided
+    if (req.body.etapa) {
+      cliente.etapa = req.body.etapa;
+      cliente.dataEtapa = Date.now();
+    }
+
+    const clienteAtualizado = await cliente.save();
+    res.json(clienteAtualizado);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 

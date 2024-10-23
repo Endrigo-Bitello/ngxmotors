@@ -284,7 +284,7 @@ export default function VehiclesByBrandPage() {
                                                         alt={vehicle.modelo}
                                                         layout="fill"
                                                         objectFit="cover"
-                                                        className="rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
+                                                        className="rounded-sm"
                                                     />
                                                 </div>
                                             ) : (
@@ -294,12 +294,12 @@ export default function VehiclesByBrandPage() {
                                             )}
                                             {/* Etiqueta de destaque ou blindado */}
                                             {vehicle.destaque ? (
-                                                <figcaption className="absolute -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                                                <figcaption className="absolute bg-custom-linear-gradient -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                                                     Destaque
                                                 </figcaption>
                                             ) : (
                                                 vehicle.opcionais?.blindado && (
-                                                    <figcaption className="absolute -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                                                    <figcaption className="absolute bg-custom-blindado-gradient -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                                                         Blindado
                                                     </figcaption>
                                                 )

@@ -13,6 +13,8 @@ import Navbar from './components/Navbar';
 import Banner from './components/Banner';
 import Image from 'next/image';
 import { whatsappWhite } from '../utils/share';
+import CookieConsent from './components/CookieConsent';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
@@ -253,7 +255,7 @@ const Home = () => {
                                                         alt={vehicle.modelo}
                                                         layout="fill"
                                                         objectFit="cover"
-                                                        className="rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
+                                                        className="rounded-sm"
                                                     />
                                                 </div>
                                             ) : (
@@ -263,12 +265,12 @@ const Home = () => {
                                             )}
                                             {/* Etiqueta de destaque ou blindado */}
                                             {vehicle.destaque ? (
-                                                <figcaption className="absolute -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                                                <figcaption className="absolute bg-custom-linear-gradient -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                                                     Destaque
                                                 </figcaption>
                                             ) : (
                                                 vehicle.opcionais?.blindado && (
-                                                    <figcaption className="absolute -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                                                    <figcaption className="absolute bg-custom-blindado-gradient -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                                                         Blindado
                                                     </figcaption>
                                                 )
@@ -390,17 +392,18 @@ const Home = () => {
             {/* Botão de WhatsApp Flutuante */}
             <button
                 aria-label={`Converse com nossos atendentes pelo WhatsApp!`}
-                className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 hover:scale-110 transition-all duration-300 ease-in-out"
+                className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 transition-transform transform hover:scale-110 shadow-lg animate-bounce"
                 onClick={() => {
                     window.open(
-                        `https://wa.me/${settings.whatsappNumber}?text=${settings.whatsappMessage}`,
+                        `https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicleData.marca.toUpperCase()} ${vehicleData.modelo}`,
                         '_blank'
                     );
                 }}
             >
-                <span className="fa-brands fa-whatsapp !text-[48px]"></span>
+                <FaWhatsapp className="text-4xl" />
             </button>
 
+            <CookieConsent />
             <GoogleMaps />
             <Footer />
         </div>

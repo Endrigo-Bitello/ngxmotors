@@ -8,58 +8,89 @@ import { useRouter } from 'next/router';
 const Navbar = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false); // Estado de loading
-  const [settings, setSettings] = useState(null); // Estado para armazenar as configurações
+  const [settings, setSettings] = useState(null);
   const router = useRouter();
+  const { pathname } = router;
+
+  const navItems = [
+    { name: 'ESTOQUE', href: '/estoque' },
+    { name: 'FINANCIE', href: '/financiamento' },
+    { name: 'SOBRE', href: '/sobre' },
+    { name: 'CONTATO', href: '/contato' },
+  ];
 
   // Função para buscar as configurações da API
   const fetchSettings = async () => {
     try {
       const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
-      setSettings(data); // Armazena os dados das configurações no estado
+      setSettings(data);
     } catch (error) {
       console.error('Erro ao buscar as configurações:', error);
     }
   };
 
-  // useEffect para buscar as configurações quando o componente é montado
   useEffect(() => {
     fetchSettings();
   }, []);
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
 
-    if (searchQuery.trim() === '') return; // Não faz a busca se o campo estiver vazio
+    if (searchQuery.trim() === '') return;
 
-    setLoading(true); // Inicia o loading
-
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/search`, {
-        params: { search: searchQuery },
-      });
-
-      // Redireciona para a página de resultados da pesquisa
-      router.push({
-        pathname: '/estoque',
-        query: { search: searchQuery }
-      });
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        alert(`Nenhum resultado encontrado para: ${searchQuery}`);
-        router.push('/estoque'); // Redireciona para a página de estoque normalmente
-      } else {
-        console.error('Erro ao buscar veículos:', error);
-      }
-    } finally {
-      setLoading(false); // Finaliza o loading
-    }
+    router.push({
+      pathname: '/estoque',
+      query: { search: searchQuery },
+    });
   };
 
-  // Enquanto as configurações estão sendo carregadas
-  if (!settings) {
-    return null; // Retorna null ou um loader enquanto espera os dados
-  }
+  const renderNavLinks = (isMobile) => (
+    <ul
+      className={`${
+        isMobile ? 'flex flex-col space-y-4 px-4 py-6' : 'hidden lg:flex space-x-6'
+      } font-medium text-gray-700`}
+    >
+      {navItems.map((item) => {
+        const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+        const linkClassName = `hover:text-blue-600 transition-colors duration-300 ${
+          isActive ? 'text-blue-600 font-bold border-b-2 border-blue-600' : ''
+        }`;
+
+        return (
+          <li key={item.href}>
+            <Link href={item.href} legacyBehavior>
+              <a className={linkClassName}>{item.name}</a>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  const renderSearchBar = () => (
+    <form onSubmit={handleSearch} className="flex w-full max-w-md mx-auto">
+      <label htmlFor="search" className="sr-only">
+        Buscar veículos, marcas ou modelos
+      </label>
+      <div className="relative flex-grow">
+        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        <input
+          type="text"
+          id="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Buscar veículos, marcas ou modelos..."
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <button
+        type="submit"
+        className="px-4 bg-blue-600 text-white font-medium rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Buscar
+      </button>
+    </form>
+  );
 
   return (
     <>
@@ -69,19 +100,19 @@ const Navbar = () => {
           {/* Horários de atendimento */}
           <div className="hidden sm:flex space-x-4 md:space-x-6">
             <span className="font-semibold">Horário de atendimento:</span>
-            <span>{settings.openingHours}</span>
+            <span>{settings?.openingHours || 'Horário não disponível'}</span>
           </div>
           {/* Links de contato */}
           <div className="flex space-x-4 md:space-x-6">
             <a
-              href={`tel:${settings.phoneNumber}`}
+              href={`tel:${settings?.phoneNumber || '#'}`}
               className="flex items-center hover:text-yellow-400 transition duration-300"
             >
               <FaPhoneAlt className="mr-2" />
-              <span className="hidden sm:inline">{settings.phoneNumber}</span>
+              <span className="hidden sm:inline">{settings?.phoneNumber || 'Telefone'}</span>
             </a>
             <a
-              href={`https://wa.me/${settings.whatsappNumber}`}
+              href={`https://wa.me/${settings?.whatsappNumber || '#'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center hover:text-green-400 transition duration-300"
@@ -110,60 +141,17 @@ const Navbar = () => {
           </Link>
 
           {/* Barra de Pesquisa para Desktop */}
-          <div className="hidden lg:flex items-center flex-grow px-4">
-            <form onSubmit={handleSearch} className="w-full max-w-md mx-auto">
-              <div className="flex">
-                <div className="relative flex-grow">
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="text"
-                    id="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar veículos, marcas ou modelos..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 bg-blue-600 text-white font-medium rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Buscar
-                </button>
-              </div>
-            </form>
-          </div>
+          <div className="hidden lg:flex items-center flex-grow px-4">{renderSearchBar()}</div>
 
           {/* Links de Navegação para Desktop */}
-          <ul className="hidden lg:flex space-x-6 font-medium text-gray-700">
-            <li>
-              <Link href="/estoque" legacyBehavior>
-                <a className="hover:text-blue-600 transition-colors duration-300">ESTOQUE</a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/financiamento" legacyBehavior>
-                <a className="hover:text-blue-600 transition-colors duration-300">FINANCIE</a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/sobre" legacyBehavior>
-                <a className="hover:text-blue-600 transition-colors duration-300">SOBRE</a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/contato" legacyBehavior>
-                <a className="hover:text-blue-600 transition-colors duration-300">CONTATO</a>
-              </Link>
-            </li>
-          </ul>
+          {renderNavLinks(false)}
 
           {/* Botão do Menu Móvel */}
           <div className="lg:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
               className="text-gray-800 focus:outline-none"
-              aria-label="Toggle mobile menu"
+              aria-label="Alternar menu móvel"
             >
               {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
@@ -174,49 +162,9 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white shadow-md transition-all duration-300">
             {/* Barra de Pesquisa para Mobile */}
-            <div className="px-4 py-4">
-              <form onSubmit={handleSearch} className="flex">
-                <div className="relative flex-grow">
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="text"
-                    id="search-mobile"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar veículos, modelos..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 bg-blue-600 text-white font-medium rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Buscar
-                </button>
-              </form>
-            </div>
-            <ul className="flex flex-col space-y-4 px-4 py-6 text-gray-700 font-medium">
-              <li>
-                <Link href="/estoque" legacyBehavior>
-                  <a className="hover:text-blue-600 transition-colors duration-300">ESTOQUE</a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/financiamento" legacyBehavior>
-                  <a className="hover:text-blue-600 transition-colors duration-300">FINANCIE</a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/sobre" legacyBehavior>
-                  <a className="hover:text-blue-600 transition-colors duration-300">SOBRE</a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/contato" legacyBehavior>
-                  <a className="hover:text-blue-600 transition-colors duration-300">CONTATO</a>
-                </Link>
-              </li>
-            </ul>
+            <div className="px-4 py-4">{renderSearchBar()}</div>
+            {/* Links de Navegação para Mobile */}
+            {renderNavLinks(true)}
           </div>
         )}
       </nav>
