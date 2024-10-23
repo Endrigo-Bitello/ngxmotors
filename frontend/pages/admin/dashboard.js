@@ -10,6 +10,7 @@ import {
     faSignOutAlt,
     faChevronDown,
     faBank,
+    faLightbulb,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -23,6 +24,7 @@ import Financiamentos from '../components/admin/Financiamentos';
 import Overview from '../components/admin/Overview';
 import ConsultaFipe from '../components/admin/ConsultaFipe';
 import AddVehicle from '../components/admin/AddVehicle';
+import CRM from '../components/admin/CRM';
 
 function Dashboard() {
     const [view, setView] = useState('overview');
@@ -41,6 +43,7 @@ function Dashboard() {
 
     const navigationItems = [
         { name: 'Visão Geral', view: 'overview', icon: faHome },
+        { name: 'CRM', view: 'crm', icon: faLightbulb},
         {
             name: 'Estoque',
             items: [
@@ -67,7 +70,7 @@ function Dashboard() {
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
             {/* Navbar para Desktop */}
-            <header className="hidden md:flex items-center justify-between bg-zinc-900 text-white px-8 py-4">
+            <header className="hidden md:flex items-center justify-between bg-zinc-900 text-white px-8 py-4 z-50 sticky top-0">
                 <div className="flex items-center">
                     <Image src="/logo-light.png" alt="Logo" width={120} height={40} />
                 </div>
@@ -137,6 +140,7 @@ function Dashboard() {
             {/* Conteúdo principal */}
             <main className="flex-1 p-8">
                 {view === 'overview' && <Overview />}
+                {view === 'crm' && <CRM />}
                 {view === 'stock' && <Stock />}
                 {view === 'newvehicle' && <AddVehicle />}
                 {view === 'mensagens' && <Mensagens />}

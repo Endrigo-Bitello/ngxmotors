@@ -219,7 +219,7 @@ export default function Stock() {
 
                         {/* Imagem do veículo */}
                         {vehicle.imagens && vehicle.imagens.length > 0 ? (
-                            <div className="relative h-64 w-full">
+                            <div className="relative h-72 w-full">
                                 <Image
                                     src={getImagePath(vehicle)}
                                     alt={vehicle.modelo}

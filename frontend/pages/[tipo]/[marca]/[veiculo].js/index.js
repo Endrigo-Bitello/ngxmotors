@@ -228,7 +228,7 @@ export default function VehiclePage() {
                                 slideDuration={280}
                                 slideInterval={5000}
                                 autoPlay={true}
-                                showBullets={true}
+                                showBullets={false}
                             />
                         </div>
                     </div>
