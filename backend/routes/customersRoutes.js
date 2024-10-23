@@ -14,13 +14,14 @@ router.get('/', async (req, res) => {
 
 // Rota para criar um novo cliente
 router.post('/', async (req, res) => {
-  const { nome, telefone, email, cpf, etapa } = req.body;
+  const { nome, telefone, email, cpf, etapa, fonteLead } = req.body;
   const novoCliente = new Cliente({
     nome,
     telefone,
     email,
     cpf,
     etapa, // "Novo Lead", etc
+    fonteLead
   });
 
   try {
@@ -71,17 +72,18 @@ router.post('/simulacao', async (req, res) => {
   }
 });
 
+  // Rota para mensagens oriundas da página do veículo ([veiculo]/index.js)
 router.post('/mensagem-veiculo', async (req, res) => {
   const { nome, telefone, email, etapa, fonteLead, customId } = req.body;
   
-  // Criação de um novo lead com o customId incluído
+  
   const novoCliente = new Cliente({
     nome,
     telefone,
     email,
-    etapa: etapa || "Novo Lead", // Se não houver uma etapa definida, usamos "Novo Lead"
-    fonteLead: fonteLead || "Página do veículo", // Definimos a fonte do lead como "Simulação"
-    customId: customId // Adicionamos o customId ao cliente, caso seja fornecido
+    etapa: etapa || "Novo Lead", 
+    fonteLead: fonteLead || "Pág. Veículo", 
+    customId: customId 
   });
 
   try {
@@ -107,6 +109,8 @@ router.put('/:id', async (req, res) => {
     cliente.email = req.body.email || cliente.email;
     cliente.cpf = req.body.cpf || cliente.cpf;
     cliente.etapa = req.body.etapa || cliente.etapa;
+    cliente.estado = req.body.estado || cliente.estado;
+    cliente.fonteLead = req.body.fonteLead || cliente.fonteLead;
 
     const clienteAtualizado = await cliente.save();
     res.json(clienteAtualizado);
@@ -140,15 +144,10 @@ router.patch('/:id/update-motivo-perda', async (req, res) => {
       return res.status(404).json({ message: 'Cliente não encontrado' });
     }
 
-
-    // Update the motivoPerda field
-    cliente.motivoPerda = req.body.motivoPerda || null; // Set to null if not provided
-
-    // Update the etapa if provided
-    if (req.body.etapa) {
-      cliente.etapa = req.body.etapa;
-      cliente.dataEtapa = Date.now();
-    }
+    if (req.body.etapa) cliente.etapa = req.body.etapa;
+    if (req.body.motivoPerda !== undefined) cliente.motivoPerda = req.body.motivoPerda;
+    if (req.body.customId) cliente.customId = req.body.customId;
+    if (req.body.ultimaInteracao) cliente.ultimaInteracao = req.body.ultimaInteracao;
 
     const clienteAtualizado = await cliente.save();
     res.json(clienteAtualizado);
@@ -156,6 +155,7 @@ router.patch('/:id/update-motivo-perda', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Rota para deletar um cliente específico
 router.delete('/:id', async (req, res) => {

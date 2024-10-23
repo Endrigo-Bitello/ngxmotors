@@ -58,7 +58,7 @@ export default function VehicleTypePage() {
   useEffect(() => {
     if (settings) {
       setSEO({
-        title: `${settings.name} - ${tipo.replace('motos', 'Motos'.replace('carros', 'Carros'))} Disponíveis`,
+        title: `${settings.name} - ${tipo.replace("motos", "Motos").replace("carros", "Carros")} Disponíveis`,
         metaDescription: `Bem-vindo à ${settings.name}, sua referência em veículos de qualidade. 
         Localizados em ${settings.address}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
         Fale conosco pelo WhatsApp ${settings.whatsappNumber} e visite-nos durante nosso 

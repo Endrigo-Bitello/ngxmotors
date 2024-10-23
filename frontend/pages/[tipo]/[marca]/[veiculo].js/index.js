@@ -62,34 +62,52 @@ export default function VehiclePage() {
         }
     }, [vehicleData, settings]);
 
-    // Função para enviar o formulário de contato
-    const handleSubmit = async (e) => {
-        e.preventDefault();
 
-        try {
-            // Envia os dados do formulário para a rota de mensagens com o customId do veículo
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, {
+// Função para enviar o formulário de contato
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+        // Faz a requisição POST para enviar os dados da mensagem
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, {
+            nome,
+            email,
+            telefone,
+            cpf: '123.456.789-10', // CPF estático, pode ser alterado para ser dinâmico se necessário
+            mensagem,
+            customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
+        });
+
+        // Verifica a resposta da API de mensagem
+        if (res.status === 201) {
+            // Agora, faz o envio do lead com o customId
+            const resLead = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/mensagem-veiculo`, {
                 nome,
                 email,
                 telefone,
-                cpf: '123.456.789-10',
-                mensagem,
-                customId: vehicleData.customId, // customId do veículo
+                etapa: 'Novo Lead', 
+                fonteLead: 'Pág. Veículo', 
+                customId: vehicleData?.customId || '', 
             });
 
-            // Exibe uma mensagem de sucesso
-            alert('Mensagem enviada com sucesso!');
+            // Verifica a resposta da API de lead e exibe mensagem de sucesso
+            if (resLead.status === 201) {
+                alert('Mensagem e lead enviados com sucesso!');
 
-            // Limpa os campos do formulário após o envio
-            setNome('');
-            setEmail('');
-            setTelefone('');
-            setMensagem('');
-        } catch (error) {
-            console.error('Erro ao enviar o formulário:', error);
-            alert('Ocorreu um erro ao enviar o formulário. Tente novamente mais tarde.');
+                // Limpa os campos do formulário após o envio
+                setNome('');
+                setEmail('');
+                setTelefone('');
+                setMensagem('');
+            }
         }
-    };
+    } catch (error) {
+        console.error('Erro ao enviar a mensagem ou criar lead:', error);
+
+        // Exibe uma mensagem de erro ao usuário
+        alert('Erro ao enviar a mensagem ou criar lead. Por favor, tente novamente.');
+    }
+};
 
 
     useEffect(() => {

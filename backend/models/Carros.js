@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const generateCarId = () => {
   const randomNum = Math.floor(100000 + Math.random() * 900000); 
   return `c${randomNum}`;
-};
+}; 
 
 const carroSchema = new mongoose.Schema({
 

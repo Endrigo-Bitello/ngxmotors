@@ -569,7 +569,6 @@ export default function FinanciamentoPage() {
                     alt={`${vehicleData.marca} ${vehicleData.modelo}`}
                     layout="fill"
                     objectFit="cover"
-                    className="transition-transform duration-300 ease-in-out hover:scale-105"
                   />
                 </div>
               </div>
