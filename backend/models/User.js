@@ -19,6 +19,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+
+  leadsAtribuidos: {
+    type: Number,
+    default: 0
+  },
+  
   role: {
     type: String,
     enum: ['Administrador', 'Gerente', 'Vendedor'],

@@ -114,10 +114,50 @@ export default function Settings() {
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={instagramUrl.replace('https://www.instagram.com/', '')} // Exibe apenas o usuário, removendo a parte fixa da URL
+            value={instagramUrl.replace('https://instagram.com/', '')} // Exibe apenas o usuário, removendo a parte fixa da URL
             onChange={(e) => setInstagramUrl(`https://instagram.com/${e.target.value}`)} // Atualiza a URL completa
             className="block w-full pl-[190px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
             placeholder="Digite o usuário do Instagram"
+          />
+        </div>
+      </div>
+
+
+      {/* TikTok */}
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">TikTok</label>
+        <div className="relative mt-1">
+          {/* Parte fixa da URL */}
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+            https://tiktok.com/@
+          </span>
+          {/* Campo para editar apenas o usuário */}
+          <input
+            type="text"
+            value={facebookUrl.replace('https://tiktok.com/', '')} // Exibe apenas o usuário
+            onChange={(e) => setTiktokUrl(`https://tiktok.com/${e.target.value}`)} // Atualiza a URL completa
+            className="block w-full pl-[185px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
+            placeholder="Digite o usuário do TikTok"
+          />
+        </div>
+      </div>
+
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
+        <div className="relative mt-1">
+          {/* Parte fixa da URL */}
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+            https://linkedin.com/
+          </span>
+          {/* Campo para editar apenas o usuário */}
+          <input
+            type="text"
+            value={facebookUrl.replace('https://linkedin.com/', '')} // Exibe apenas o usuário
+            onChange={(e) => setTiktokUrl(`https://tiktok.com/${e.target.value}`)} // Atualiza a URL completa
+            className="block w-full pl-[185px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
+            placeholder="Digite o usuário do TikTok"
           />
         </div>
       </div>
@@ -133,8 +173,8 @@ export default function Settings() {
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={facebookUrl.replace('https://www.facebook.com/', '')} // Exibe apenas o usuário
-            onChange={(e) => setFacebookUrl(`https://facebook.com/${e.target.value}`)} // Atualiza a URL completa
+            value={facebookUrl.replace('https://facebook.com/', '')} 
+            onChange={(e) => setFacebookUrl(`https://facebook.com/${e.target.value}`)}
             className="block w-full pl-[185px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
             placeholder="Digite o usuário do Facebook"
           />
@@ -143,7 +183,7 @@ export default function Settings() {
 
       {/* Twitter */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Twitter</label>
+        <label className="block text-sm font-medium text-gray-700">X (Twitter)</label>
         <div className="relative mt-1">
           {/* Parte fixa da URL */}
           <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -152,8 +192,8 @@ export default function Settings() {
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={twitterUrl.replace('https://www.twitter.com/', '')} // Exibe apenas o usuário
-            onChange={(e) => setTwitterUrl(`https://twitter.com/${e.target.value}`)} // Atualiza a URL completa
+            value={twitterUrl.replace('https://linkedin.com/', '')} 
+            onChange={(e) => setLinkedinUrl(`https://linkedin.com/${e.target.value}`)} 
             className="block w-full pl-[155px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
             placeholder="Digite o usuário do Twitter"
           />

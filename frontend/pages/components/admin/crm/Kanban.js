@@ -4,7 +4,6 @@ import {
   FaEnvelope,
   FaPlus,
   FaEdit,
-  FaSearch,
   FaTrashAlt,
   FaInfoCircle,
   FaUser,
@@ -19,35 +18,6 @@ const ItemTypes = {
   CARD: 'card',
 };
 
-const estadosBrasileiros = [
-  'Acre',
-  'Alagoas',
-  'Amapá',
-  'Amazonas',
-  'Bahia',
-  'Ceará',
-  'Distrito Federal',
-  'Espírito Santo',
-  'Goiás',
-  'Maranhão',
-  'Mato Grosso',
-  'Mato Grosso do Sul',
-  'Minas Gerais',
-  'Pará',
-  'Paraíba',
-  'Paraná',
-  'Pernambuco',
-  'Piauí',
-  'Rio de Janeiro',
-  'Rio Grande do Norte',
-  'Rio Grande do Sul',
-  'Rondônia',
-  'Roraima',
-  'Santa Catarina',
-  'São Paulo',
-  'Sergipe',
-  'Tocantins',
-];
 
 const fontesLeads = [
   'Mensagem no site',
@@ -259,6 +229,19 @@ const DraggableCard = ({
     }
   };
 
+  const handleAddAssign = async () => {
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${lead._id}`,
+        editedLead
+      );
+      setAssignModalOpen(false);
+      fetchLeads();
+    } catch (error) {
+      console.error('Erro ao editar lead:', error);
+    }
+  };
+
   const onAssignLead = (lead) => {
     setSelectedLead(lead); // Define o lead selecionado
     setAssignModalOpen(true); // Abre o modal
@@ -274,19 +257,6 @@ const DraggableCard = ({
     setAssignModalOpen(false);
   };
 
-  const handleConfirmResponsavel = async () => {
-    if (selectedResponsavel) {
-      try {
-        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${selectedLead}/assign`, {
-          responsavelLead: selectedResponsavel,
-        });
-        fetchLeads(); // Atualiza a lista de leads
-        setIsResponsavelModalOpen(false); // Fecha o modal
-      } catch (error) {
-        console.error('Erro ao atribuir responsável:', error);
-      }
-    }
-  };
 
   const handleDeleteLead = async () => {
     try {
@@ -298,6 +268,7 @@ const DraggableCard = ({
       console.error('Erro ao deletar lead:', error);
     }
   };
+
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -313,6 +284,32 @@ const DraggableCard = ({
     return `${formattedDate} às ${formattedTime}`;
   };
 
+  const handleConfirmResponsavel = async () => {
+    if (!selectedResponsavel || !selectedLead) {
+      alert('Selecione um responsável e um lead!');
+      return;
+    }
+
+    try {
+      // Faz a requisição PATCH para atribuir o responsável ao lead
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${editedLead._id}/assign`,
+        { responsavelLead: selectedResponsavel }
+      );
+
+      // Atualiza a lista de leads
+      fetchLeads();
+
+      // Fecha o modal após atribuir
+      setAssignModalOpen(false);
+
+      // Mensagem de sucesso
+      alert('Responsável atribuído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atribuir responsável:', error);
+      alert('Erro ao atribuir responsável. Tente novamente.');
+    }
+  };
 
   return (
     <>
@@ -376,7 +373,7 @@ const DraggableCard = ({
             Última modificação: {formatDateTime(lead.ultimaInteracao)}
           </p>
 
-          {etapaNames[colunaIndex] === 'Perdidos' && lead.motivoPerda && (
+          {etapaNames[colunaIndex] === 'Perdidos' && lead.motivoPerda && lead.motivoPerda !== '' && (
             <div className="bg-red-100 text-red-700 px-2 py-1 rounded text-sm mt-2">
               <strong>Motivo da perda:</strong><br></br>{lead.motivoPerda}
             </div>
@@ -414,88 +411,11 @@ const DraggableCard = ({
               onClick={() => onAssignLead(lead)} // Agora a função existe e está disponível
               className="text-blue-500 underline"
             >
-              Atribuir responsável
+              + Atribuir responsável
             </button>
           )}
         </div>
       </div>
-
-
-      <Modal
-        isOpen={assignModalOpen}
-        onRequestClose={() => setAssignModalOpen(false)} // Função para fechar o modal
-        contentLabel="Atribuir Responsável"
-        className="fixed inset-0 flex items-center justify-center z-50"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
-      >
-        <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 md:mx-auto relative">
-          {/* Botão para fechar o modal */}
-          <button
-            onClick={() => setAssignModalOpen(false)} // Fecha o modal ao clicar no botão de fechar
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
-            aria-label="Fechar"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-            Atribuir Responsável
-          </h2>
-
-          {/* Seleção do responsável */}
-          <form className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Selecione um responsável
-              </label>
-              <select
-                value={editedLead.responsavelLead}
-                onChange={(e) => setEditedLead({ ...editedLead, responsavelLead: e.target.value })}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecione um Responsável</option>
-                {users.length > 0 ? (
-                  users.map((user) => (
-                    <option key={user._id} value={user._id}>
-                      {user.username}
-                    </option>
-                  ))
-                ) : (
-                  <option disabled>Carregando usuários...</option>
-                )}
-              </select>
-            </div>
-          </form>
-
-          <div className="flex justify-end space-x-4 mt-8">
-            <button
-              onClick={() => setAssignModalOpen(false)} // Fecha o modal
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleConfirmResponsavel} // Função para confirmar a atribuição do responsável
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              Atribuir
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       {/* Modal de Edição do Lead */}
       <Modal
@@ -699,6 +619,83 @@ const DraggableCard = ({
         </div>
       </Modal>
 
+      <Modal
+        isOpen={assignModalOpen}
+        onRequestClose={() => setAssignModalOpen(false)} // Função para fechar o modal
+        contentLabel="Atribuir Responsável"
+        className="fixed inset-0 flex items-center justify-center z-50"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+      >
+        <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 md:mx-auto relative">
+          {/* Botão para fechar o modal */}
+          <button
+            onClick={() => setAssignModalOpen(false)} // Fecha o modal ao clicar no botão de fechar
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
+            aria-label="Fechar"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+            Atribuir Responsável
+          </h2>
+
+          {/* Seleção do responsável */}
+          <form className="space-y-5">
+            <div className="relative z-50 overflow-visible">
+              <label className="block text-sm font-medium text-gray-700">
+                Selecione um responsável
+              </label>
+              <select
+                value={editedLead.responsavelLead}
+                onChange={(e) => setEditedLead({ ...editedLead, responsavelLead: e.target.value })}
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecione um Responsável</option>
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <option key={user._id} value={user._id}>
+                      {user.username}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>Carregando usuários...</option>
+                )}
+              </select>
+            </div>
+          </form>
+
+          <div className="flex justify-end space-x-4 mt-8">
+            <button
+              onClick={() => setAssignModalOpen(false)} // Fecha o modal
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleAddAssign} // Função para confirmar a atribuição do responsável
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              Atribuir
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+
     </>
   );
 };
@@ -710,7 +707,7 @@ const DroppableColumn = ({
   index,
   moveCard,
   fetchLeads,
-  onAssignLead = { onAssignLead },
+  onAssignLead,
   children,
 }) => {
   const [, drop] = useDrop({
@@ -731,7 +728,7 @@ const DroppableColumn = ({
       <div className="flex-1 overflow-y-auto max-h-[80vh] space-y-4 no-scrollbar">
         {leads.length === 0 ? (
           <p className="text-gray-500 italic text-center mt-6">
-            Nenhum lead nesta etapa.
+            Nenhum lead encontrado.
           </p>
         ) : (
           leads.map((lead, i) => (
@@ -964,19 +961,6 @@ const Kanban = () => {
     setAssignModalOpen(false);
   };
 
-  const handleConfirmResponsavel = async () => {
-    if (selectedResponsavel) {
-      try {
-        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/${selectedLead}/assign`, {
-          responsavelLead: selectedResponsavel,
-        });
-        fetchLeads(); // Atualiza a lista de leads
-        setIsResponsavelModalOpen(false); // Fecha o modal
-      } catch (error) {
-        console.error('Erro ao atribuir responsável:', error);
-      }
-    }
-  };
 
 
 
@@ -1005,6 +989,8 @@ const Kanban = () => {
     )
   );
 
+
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gray-50 p-6">
@@ -1017,19 +1003,17 @@ const Kanban = () => {
               <FaPlus className="text-blue-500" />
               <span>Adicionar Lead</span>
             </button>
-
-            {/* Barra de pesquisa atualizada */}
             <div className="relative">
               <input
                 type="search"
-                placeholder="Pesquisar leads..."
+                placeholder="Procurar leads..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="shadow-lg focus:border-2 border-gray-300 px-5 py-3 rounded-xl w-44 md:w-56 transition-all duration-300 focus:w-64 outline-none"
+                className="border border-blue-500 text-blue-500 placeholder-blue-500 px-4 py-2 pr-10 rounded-full shadow-sm outline-none w-44 md:w-56"
                 name="search"
               />
               <svg
-                className="w-6 h-6 absolute top-3 right-3 text-gray-500 pointer-events-none"
+                className="w-6 h-6 absolute top-1/2 transform -translate-y-1/2 right-3 text-blue-500 pointer-events-none"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 viewBox="0 0 24 24"
@@ -1194,82 +1178,6 @@ const Kanban = () => {
           </div>
         </Modal>
 
-
-        <Modal
-          isOpen={assignModalOpen}
-          onRequestClose={() => setAssignModalOpen(false)} // Função para fechar o modal
-          contentLabel="Atribuir Responsável"
-          className="fixed inset-0 flex items-center justify-center z-50"
-          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
-        >
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 md:mx-auto relative">
-            {/* Botão para fechar o modal */}
-            <button
-              onClick={() => setAssignModalOpen(false)} // Fecha o modal ao clicar no botão de fechar
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
-              aria-label="Fechar"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-              Atribuir Responsável
-            </h2>
-
-            {/* Seleção do responsável */}
-            <form className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Selecione um responsável
-                </label>
-                <select
-                  value={newLead.responsavelLead}
-                  onChange={(e) => setNewLead({ ...newLead, responsavelLead: e.target.value })}
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Selecione um Responsável</option>
-                  {users.length > 0 ? (
-                    users.map((user) => (
-                      <option key={user._id} value={user._id}>
-                        {user.username}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>Carregando usuários...</option>
-                  )}
-                </select>
-              </div>
-            </form>
-
-            <div className="flex justify-end space-x-4 mt-8">
-              <button
-                onClick={() => setAssignModalOpen(false)} // Fecha o modal
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmResponsavel} // Função para confirmar a atribuição do responsável
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                Atribuir
-              </button>
-            </div>
-          </div>
-        </Modal>
 
         {/* Modal para Obteve Resposta */}
         <Modal
@@ -1703,8 +1611,6 @@ const Kanban = () => {
           </div>
         </Modal>
 
-
-
         {/* Modal para Selecionar Veículo */}
         <Modal
           isOpen={isSelectVehicleModalOpen}
@@ -1819,8 +1725,6 @@ const Kanban = () => {
           </div>
         </Modal>
 
-
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
           {filteredLeads.map((columnLeads, index) => (
             <DroppableColumn
@@ -1836,7 +1740,9 @@ const Kanban = () => {
         </div>
       </div>
     </DndProvider>
+
   );
+
 };
 
 export default Kanban;
