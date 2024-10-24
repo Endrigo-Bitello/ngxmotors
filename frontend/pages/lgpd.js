@@ -7,24 +7,26 @@ import { setSEO } from './../utils/seo';
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 
-const [settings, setSettings] = useState(null); // Estado para armazenar os dados da collection settings
-
-// Função para buscar os dados da collection settings
-const fetchSettings = async () => {
-  try {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
-    setSettings(data); // Armazena os dados da configuração
-  } catch (error) {
-    console.error('Erro ao buscar configurações:', error);
-  }
-};
-
-// Buscando os dados ao carregar o componente
-useEffect(() => {
-  fetchSettings();
-}, []);
 
 const LGPD = () => {
+
+
+  const [settings, setSettings] = useState(null); 
+  // Função para buscar os dados da collection settings
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data); // Armazena os dados da configuração
+    } catch (error) {
+      console.error('Erro ao buscar configurações:', error);
+    }
+  };
+  
+  // Buscando os dados ao carregar o componente
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
   useEffect(() => {
     setSEO({
       title: `${settings.name} - LGPD`,
