@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import {
     FaCarSide,
@@ -15,8 +15,9 @@ import {
     FaTimes
 } from 'react-icons/fa';
 import {HiOutlineQuestionMarkCircle} from 'react-icons/hi';
+import Stock from './Stock';
 
-export default function Details({vehicle, onClose}) {
+export default function Details({vehicle, onClose, onSave}) {
     const [editableVehicle, setEditableVehicle] = useState(vehicle || {
         marca: '',
         modelo: '',
@@ -87,6 +88,9 @@ export default function Details({vehicle, onClose}) {
 
     const [isEditing, setIsEditing] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
+    const [vehicles, setVehicles] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showStock, setShowStock] = useState(false);
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
@@ -102,98 +106,25 @@ export default function Details({vehicle, onClose}) {
         }
     };
 
-    const handleRemoveImage = async (image, index) => {
-        if (isEditing) {
-            const updatedImages = editableVehicle.imagens.filter((_, i) => i !== index);
-            setEditableVehicle({...editableVehicle, imagens: updatedImages});
 
-            if (!(image instanceof File)) {
-                try {
-                    // Remove a imagem no backend
-                    const route = vehicle.tipo === 'carro' ? 'carros' : 'motos';
-                    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/remove-image/${editableVehicle.customId}/${encodeURIComponent(image)}`);
-                } catch (error) {
-                    console.error('Erro ao remover a imagem:', error);
-                }
-            }
-        }
-    };
-
-
-    const handleAddImage = async (image, index) => {
-        if (isEditing) {
-            // Atualiza o estado local removendo a imagem correspondente do array
-            const updatedImages = editableVehicle.imagens.filter((_, i) => i !== index);
-            setEditableVehicle({...editableVehicle, imagens: updatedImages});
-
-            // Verifica se a imagem é uma nova imagem (instância de File)
-            if (image instanceof File) {
-                try {
-                    // Prepara o FormData para enviar a imagem
-                    const formData = new FormData();
-                    formData.append('imagens', image);
-
-                    // Define a rota correta com base no tipo de veículo
-                    const route = vehicle.tipo === 'carro' ? 'carros' : 'motos';
-
-                    // Envia a imagem nova para o servidor
-                    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/add-image/${editableVehicle.customId}`, formData, {
-                        headers: {'Content-Type': 'multipart/form-data'},
-                    });
-                } catch (error) {
-                    console.error('Erro ao adicionar a imagem:', error);
-                }
-            }
-        }
-    };
-
-
-// Função para salvar as imagens e dados
     const handleSave = async () => {
         try {
-            const route = vehicle.tipo === 'carro' ? 'carros' : 'motos';
-
-            // Atualiza os dados do veículo no banco de dados
-            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/${editableVehicle.customId}`, editableVehicle);
-
-            // Array para guardar as imagens que precisam ser removidas
-            const imagesToRemove = [];
-
-            // Verifica quais imagens são para deletar
-            editableVehicle.imagens.forEach((image) => {
-                if (!(image instanceof File)) {
-                    // Se não for um arquivo, significa que é uma imagem já existente que pode ter sido removida
-                    imagesToRemove.push(image);
-                }
-            });
-
-            // Remover imagens
-            for (const image of imagesToRemove) {
-                await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/remove-image/${editableVehicle.customId}/${encodeURIComponent(image)}`);
-            }
-
-            // Adicionar novas imagens
-            const formData = new FormData();
-            editableVehicle.imagens.forEach((image) => {
-                if (image instanceof File) {
-                    // Apenas imagens que são do tipo File serão enviadas (novas imagens)
-                    formData.append('imagens', image);
-                }
-            });
-
-            // Envia as novas imagens para o backend
-            if (formData.has('imagens')) {
-                await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/upload/${editableVehicle.customId}`, formData, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                });
-            }
-
-            setIsEditing(false);
+          const route = vehicle.tipo === 'carro' ? 'carros' : 'motos';
+    
+          // Atualiza os dados do veículo no banco de dados
+          await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/${editableVehicle.customId}`, editableVehicle);
+    
+          // Notifica o Stock.js que os veículos foram atualizados
+          if (onSave) {
+            onSave();  // Chama a função que recarrega os veículos
             onClose();
+          }
+    
+          setIsEditing(false);  // Fecha o modo de edição
         } catch (error) {
-            console.error('Erro ao salvar as alterações:', error);
+          console.error('Erro ao salvar as alterações:', error);
         }
-    };
+      };
 
     // Renderiza cada seção baseada no botão clicado
     const renderSection = () => {
@@ -202,7 +133,7 @@ export default function Details({vehicle, onClose}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Informações Básicas</h2>
-                        <form onSubmit={handleSave}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {[
                                     {key: 'marca', label: 'Marca'},
@@ -344,7 +275,7 @@ export default function Details({vehicle, onClose}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Ficha Técnica</h2>
-                        <form onSubmit={handleSave}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Campos comuns a ambos os tipos de veículos */}
                                 {[
@@ -607,7 +538,7 @@ export default function Details({vehicle, onClose}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Documentação e Regularização</h2>
-                        <form onSubmit={handleSave}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                             <div className="space-y-6">
                                 {[
                                     {key: 'placa', label: 'Placa'},
@@ -814,7 +745,7 @@ export default function Details({vehicle, onClose}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Opcionais do Veículo</h2>
-                        <form onSubmit={handleSave}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {opcionais.map((opcional) => (
                                     <div key={opcional.key} className="flex items-center">
@@ -882,7 +813,7 @@ export default function Details({vehicle, onClose}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Valores e Imagens</h2>
-                        <form onSubmit={handleSave}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                             {/* Valor de Compra */}
                             <div className="mb-6">
                                 <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">

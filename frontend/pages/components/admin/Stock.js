@@ -182,6 +182,11 @@ export default function Stock() {
     }
   };
 
+
+  const handleVehicleUpdate = () => {
+    fetchVehicles(); // Recarrega os veículos
+  };
+
   useEffect(() => {
     fetchVehicles();
   }, []);
@@ -336,7 +341,7 @@ export default function Stock() {
         <Details
           vehicle={selectedVehicle}
           onClose={handleCloseDetails}
-          onSave={fetchVehicles}
+          onSave={handleVehicleUpdate}
         />
       )}
 
