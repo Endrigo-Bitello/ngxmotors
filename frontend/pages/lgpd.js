@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import axios from 'axios'; // Certifique-se de que o axios está importado
 import { setSEO } from './../utils/seo';
+import Loading from './components/Loading';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
@@ -36,8 +36,14 @@ const LGPD = () => {
   }, [settings]);
 
   if (!settings) {
-    return <p>Carregando...</p>; // Pode exibir um placeholder enquanto os dados são carregados
+    return (
+      <div>
+        <Navbar /> 
+        <Loading /> 
+      </div>
+    );
   }
+
 
   return (
     <>

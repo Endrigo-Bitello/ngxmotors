@@ -161,7 +161,7 @@ const Overview = () => {
         setTotalMotos(motos.length);
         setSimulacoesFinanciamento(financiamentosRes.data);
         setMensagensRecebidas(mensagensRes.data);
-        setUsuario(usuarioRes.data); // Definir o usuário logado
+        setUsuario(usuarioRes.data);
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
         setError('Ocorreu um erro ao carregar os dados.');

@@ -5,7 +5,7 @@ import { setSEO } from './../utils/seo';
 import axios from 'axios';
 
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Loading from './components/Loading';
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 const Contato = () => {
@@ -68,9 +68,13 @@ const Contato = () => {
     }
   };
 
-  // Se as configurações ainda não foram carregadas, exibe um estado de carregamento
   if (!settings) {
-    return <div>Carregando...</div>;
+    return (
+      <div>
+        <Navbar /> 
+        <Loading /> 
+      </div>
+    );
   }
 
   return (

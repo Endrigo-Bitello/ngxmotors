@@ -10,7 +10,6 @@ import {
     faBank,
     faLightbulb,
     faGear,
-    faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -19,6 +18,7 @@ import { setSEO } from '../../utils/seo';
 import withAuth from '../../utils/withAuth';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
+import Loading from '../components/Loading';
 
 const Stock = dynamic(() => import('../components/admin/Stock'));
 const Mensagens = dynamic(() => import('../components/admin/Mensagens'));
@@ -31,9 +31,9 @@ const Settings = dynamic(() => import('../components/admin/Settings'));
 
 function Dashboard() {
     const [view, setView] = useState('overview');
-    const [openDropdown, setOpenDropdown] = useState(null); // Estado para controlar qual dropdown está aberto
+    const [openDropdown, setOpenDropdown] = useState(null);
     const router = useRouter();
-    const [settings, setSettings] = useState(null); // Inicializa como null para evitar erro
+    const [settings, setSettings] = useState(null);
 
     // Função para buscar as configurações
     const fetchSettings = async () => {
@@ -46,21 +46,48 @@ function Dashboard() {
     };
 
     useEffect(() => {
-        fetchSettings(); // Busca as configurações quando o componente é montado
+        fetchSettings();
     }, []);
 
-    // Atualiza o SEO apenas quando o settings é carregado
     useEffect(() => {
         if (settings) {
             setSEO({ title: `${settings.name} - Painel Administrativo` });
         }
     }, [settings]);
 
-    // Função de logout
+    // Função para logout
     const handleLogout = () => {
         localStorage.removeItem('token');
         router.push('/admin/login');
     };
+
+    // Função para verificar a expiração do token
+    const checkTokenExpiration = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            handleLogout(); // Se o token não existir, redireciona para login
+            return;
+        }
+
+        const tokenPayload = JSON.parse(atob(token.split('.')[1])); // Decodifica o payload do token
+        const expirationTime = tokenPayload.exp * 1000; // Tempo de expiração do token em ms
+
+        const currentTime = Date.now(); // Tempo atual em ms
+
+        if (currentTime >= expirationTime) {
+            handleLogout(); // Se o token já expirou, faz logout
+        } else {
+            // Se o token ainda não expirou, configura um timeout para deslogar quando ele expirar
+            const timeUntilExpiration = expirationTime - currentTime;
+            setTimeout(() => {
+                handleLogout();
+            }, timeUntilExpiration);
+        }
+    };
+
+    useEffect(() => {
+        checkTokenExpiration(); // Verifica a expiração do token ao carregar o componente
+    }, []);
 
     const navigationItems = [
         { name: 'Visão Geral', view: 'overview', icon: faHome },
@@ -79,20 +106,20 @@ function Dashboard() {
                 { name: 'Simulações', view: 'financiamentos', icon: faBank },
             ],
         },
-
         { name: 'Consultar Fipe', view: 'consultafipe', icon: faSearch },
         { name: 'Configurações', view: 'settings', icon: faGear },
     ];
 
-    // Função para alternar o dropdown aberto
     const toggleDropdown = (dropdownName) => {
-        // Fecha o dropdown anterior e abre o novo
         setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
     };
 
-    // Verifica se as configurações foram carregadas antes de renderizar
     if (!settings) {
-        return <div>Carregando...</div>; // Pode adicionar um loader ou texto enquanto as configurações são carregadas
+        return (
+          <div>
+            <Loading />  
+          </div>
+        );
     }
 
     return (
@@ -108,7 +135,7 @@ function Dashboard() {
                             <div key={item.name} className="relative">
                                 {/* Botão principal que abre o dropdown */}
                                 <button
-                                    onClick={() => toggleDropdown(item.name)} // Chama a função para alternar o dropdown
+                                    onClick={() => toggleDropdown(item.name)}
                                     className="flex items-center space-x-3 hover:text-blue-500 transition duration-300"
                                 >
                                     <FontAwesomeIcon icon={item.items[0].icon} className="h-5 w-5" />
@@ -119,7 +146,6 @@ function Dashboard() {
                                             }`}
                                     />
                                 </button>
-                                {/* Dropdown que abre ao clicar */}
                                 {openDropdown === item.name && (
                                     <div className="absolute left-0 mt-2 w-48 bg-zinc-800 text-white shadow-lg rounded-md z-50">
                                         {item.items.map((subItem) => (
@@ -127,7 +153,7 @@ function Dashboard() {
                                                 key={subItem.name}
                                                 onClick={() => {
                                                     setView(subItem.view);
-                                                    setOpenDropdown(null); // Fechar o dropdown ao clicar em um item
+                                                    setOpenDropdown(null);
                                                 }}
                                                 className={`block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white w-full text-left ${view === subItem.view ? 'bg-blue-600' : 'text-gray-400'
                                                     }`}
@@ -144,7 +170,7 @@ function Dashboard() {
                                 key={item.name}
                                 onClick={() => {
                                     setView(item.view);
-                                    setOpenDropdown(null); // Fechar dropdown ao clicar em outro item
+                                    setOpenDropdown(null);
                                 }}
                                 className={`flex items-center space-x-3 hover:text-blue-500 transition duration-300 ${view === item.view ? 'text-blue-500' : 'text-gray-400'
                                     }`}
@@ -164,8 +190,6 @@ function Dashboard() {
                     <FontAwesomeIcon icon={faSignOutAlt} className="h-5 w-5" />
                     <span className="font-medium">Sair</span>
                 </button>
-
-
             </header>
 
             {/* Conteúdo principal */}
