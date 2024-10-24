@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
     enum: ['Administrador', 'Gerente', 'Vendedor'],
     default: 'Vendedor'
   },
+  
   profileImage: {
     type: String,
     default: '/default-profile.png' 

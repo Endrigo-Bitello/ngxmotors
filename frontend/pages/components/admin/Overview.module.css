@@ -1,0 +1,110 @@
+/* components/Overview.module.css */
+
+/* Container do Dashboard com Gradiente de Fundo */
+.dashboardContainer {
+    background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+  }
+  
+  /* Estilos para os Cards de Métricas */
+  .metricCard {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .metricTitle {
+    /* Estilos adicionais para os títulos das métricas */
+  }
+  
+  .metricValue {
+    /* Estilos adicionais para os valores das métricas */
+  }
+  
+  /* Container dos Gráficos */
+  .chartContainer {
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #ffffff, #f9fafb);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Radar Chart */
+  .radarChart {
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff, #f9fafb);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Listas de Marcas com Efeitos de Hover */
+  .brandList {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .brandList:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .brandTitle {
+    /* Estilos personalizados para os títulos das listas de marcas */
+  }
+  
+  .brandItem {
+    transition: background-color 0.3s ease;
+  }
+  
+  .brandItem:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+  }
+  
+  /* Listas de Simulações e Mensagens */
+  .simulationList,
+  .messageList {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .simulationList:hover,
+  .messageList:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .simulationItem,
+  .messageItem {
+    transition: background-color 0.3s ease;
+  }
+  
+  .simulationItem:hover,
+  .messageItem:hover {
+    background-color: rgba(30, 144, 255, 0.1);
+  }
+  
+  /* Seções do Dashboard */
+  .metricsSection {
+    /* Espaçamento e layout específico para a seção de métricas */
+  }
+  
+  .chartsSection {
+    /* Espaçamento e layout específico para a seção de gráficos principais */
+  }
+  
+  .additionalChartsSection {
+    /* Espaçamento e layout específico para as seções de gráficos adicionais */
+  }
+  
+  .vehicleChartsSection {
+    /* Espaçamento e layout específico para as seções de gráficos de veículos */
+  }
+  
+  .radialChart {
+    /* Estilos específicos para o gráfico radial */
+  }
+  
+  .brandListsSection {
+    /* Espaçamento e layout específico para as listas de marcas */
+  }
+  
+  .simulationsMessagesSection {
+    /* Espaçamento e layout específico para simulações e mensagens */
+  }
+  
