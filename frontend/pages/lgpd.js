@@ -2,16 +2,14 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import axios from 'axios'; // Certifique-se de que o axios está importado
 import { setSEO } from './../utils/seo';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
-
-
 const LGPD = () => {
+  const [settings, setSettings] = useState(null);
 
-
-  const [settings, setSettings] = useState(null); 
   // Função para buscar os dados da collection settings
   const fetchSettings = async () => {
     try {
@@ -21,18 +19,25 @@ const LGPD = () => {
       console.error('Erro ao buscar configurações:', error);
     }
   };
-  
+
   // Buscando os dados ao carregar o componente
   useEffect(() => {
     fetchSettings();
   }, []);
 
+  // Atualizando SEO somente quando settings for carregado
   useEffect(() => {
-    setSEO({
-      title: `${settings.name} - LGPD`,
-      metaDescription: `${settings.name} está comprometida com a proteção dos seus dados. Saiba mais sobre como seguimos as diretrizes da Lei Geral de Proteção de Dados (LGPD) no Brasil.`
-    });
-  }, []);
+    if (settings) {
+      setSEO({
+        title: `${settings.name} - LGPD`,
+        metaDescription: `${settings.name} está comprometida com a proteção dos seus dados. Saiba mais sobre como seguimos as diretrizes da Lei Geral de Proteção de Dados (LGPD) no Brasil.`,
+      });
+    }
+  }, [settings]);
+
+  if (!settings) {
+    return <p>Carregando...</p>; // Pode exibir um placeholder enquanto os dados são carregados
+  }
 
   return (
     <>
@@ -42,7 +47,7 @@ const LGPD = () => {
 
         <section className="mb-10">
           <p className="text-lg text-gray-700 mb-4">
-            Na <strong>${settings.name}</strong>, estamos comprometidos com a proteção dos seus dados pessoais. Esta página explica como coletamos, usamos, e armazenamos suas informações em conformidade com a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong>, conhecida como <strong>LGPD</strong>.
+            Na <strong>{settings.name}</strong>, estamos comprometidos com a proteção dos seus dados pessoais. Esta página explica como coletamos, usamos, e armazenamos suas informações em conformidade com a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong>, conhecida como <strong>LGPD</strong>.
           </p>
         </section>
 
