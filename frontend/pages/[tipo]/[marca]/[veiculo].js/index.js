@@ -10,6 +10,7 @@ import { setSEO } from '../../../../utils/seo';
 
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
+import { FaWhatsapp } from 'react-icons/fa';
 const Loading = dynamic(() => import('../../../components/Loading'), { ssr: false });
 const GoogleMaps = dynamic(() => import('@/pages/components/GoogleMaps'), { ssr: false });
 
@@ -394,6 +395,7 @@ export default function VehiclePage() {
                             Precisa financiar? Veja uma simulação agora
                         </h2>
                         <button
+                            aria-label="Abrir simulação de financiamento"
                             className="flex items-center bg-blue-600 text-white p-2 rounded-full hover:bg-blue-500 transition-all duration-300 ease-in-out"
                             onClick={() => setShowSimulacao(!showSimulacao)}
                         >
@@ -629,8 +631,8 @@ export default function VehiclePage() {
 
                 {/* Botão de WhatsApp Flutuante */}
                 <button
-                    aria-label={`Fale pelo whatsapp sobre o veículo ${vehicleData.modelo}`}
-                    className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 hover:scale-110 transition-all duration-300 ease-in-out"
+                    aria-label={`Fale pelo WhatsApp sobre o veículo ${vehicleData.modelo}`}
+                    className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 transition-transform transform hover:scale-110 shadow-lg animate-bounce"
                     onClick={() => {
                         window.open(
                             `https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicleData.marca.toUpperCase()} ${vehicleData.modelo}`,
@@ -638,7 +640,7 @@ export default function VehiclePage() {
                         );
                     }}
                 >
-                    <span className="fa-brands fa-whatsapp !text-[48px]"></span>
+                    <FaWhatsapp className="text-4xl" />
                 </button>
 
 

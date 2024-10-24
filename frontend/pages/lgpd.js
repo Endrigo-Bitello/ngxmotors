@@ -6,11 +6,29 @@ import { setSEO } from './../utils/seo';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
+
+const [settings, setSettings] = useState(null); // Estado para armazenar os dados da collection settings
+
+// Função para buscar os dados da collection settings
+const fetchSettings = async () => {
+  try {
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+    setSettings(data); // Armazena os dados da configuração
+  } catch (error) {
+    console.error('Erro ao buscar configurações:', error);
+  }
+};
+
+// Buscando os dados ao carregar o componente
+useEffect(() => {
+  fetchSettings();
+}, []);
+
 const LGPD = () => {
   useEffect(() => {
     setSEO({
-      title: `Conformidade com a LGPD - ${process.env.NEXT_PUBLIC_NAME}`,
-      metaDescription: `${process.env.NEXT_PUBLIC_NAME} está comprometida com a proteção dos seus dados. Saiba mais sobre como seguimos as diretrizes da Lei Geral de Proteção de Dados (LGPD) no Brasil.`
+      title: `${settings.name} - LGPD`,
+      metaDescription: `${settings.name} está comprometida com a proteção dos seus dados. Saiba mais sobre como seguimos as diretrizes da Lei Geral de Proteção de Dados (LGPD) no Brasil.`
     });
   }, []);
 
@@ -22,7 +40,7 @@ const LGPD = () => {
 
         <section className="mb-10">
           <p className="text-lg text-gray-700 mb-4">
-            Na <strong>{process.env.NEXT_PUBLIC_NAME}</strong>, estamos comprometidos com a proteção dos seus dados pessoais. Esta página explica como coletamos, usamos, e armazenamos suas informações em conformidade com a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong>, conhecida como <strong>LGPD</strong>.
+            Na <strong>${settings.name}</strong>, estamos comprometidos com a proteção dos seus dados pessoais. Esta página explica como coletamos, usamos, e armazenamos suas informações em conformidade com a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong>, conhecida como <strong>LGPD</strong>.
           </p>
         </section>
 
@@ -69,7 +87,7 @@ const LGPD = () => {
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Contato</h2>
           <p className="text-lg text-gray-700 mb-4">
-            Caso tenha dúvidas sobre nossa política de privacidade ou deseje exercer seus direitos como titular de dados, entre em contato conosco pelo e-mail: <strong>{process.env.NEXT_PUBLIC_EMAIL}</strong>.
+            Caso tenha dúvidas sobre nossa política de privacidade ou deseje exercer seus direitos como titular de dados, entre em contato conosco pelo e-mail: <strong>{settings.email}</strong>.
           </p>
         </section>
 

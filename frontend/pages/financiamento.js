@@ -4,7 +4,6 @@ import axios from 'axios';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';;
-import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { setSEO } from './../utils/seo';
 import Image from 'next/image';
 import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
@@ -34,7 +33,7 @@ export default function FinanciamentoPage() {
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
   const [cpf, setCpf] = useState('');
-  const [settings, setSettings] = useState(null); 
+  const [settings, setSettings] = useState(null);
   const [mensagem, setMensagem] = useState(null);
 
 
@@ -416,7 +415,7 @@ export default function FinanciamentoPage() {
                                 alt={vehicle.modelo}
                                 layout="fill"
                                 objectFit="cover"
-                                className="rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
+                                className="rounded-sm"
                               />
                             </div>
                           ) : (
@@ -426,12 +425,12 @@ export default function FinanciamentoPage() {
                           )}
                           {/* Etiqueta de destaque ou blindado */}
                           {vehicle.destaque ? (
-                            <figcaption className="absolute -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                            <figcaption className="absolute bg-custom-linear-gradient -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                               Destaque
                             </figcaption>
                           ) : (
                             vehicle.opcionais?.blindado && (
-                              <figcaption className="absolute -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                              <figcaption className="absolute bg-custom-blindado-gradient -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                                 Blindado
                               </figcaption>
                             )
@@ -605,16 +604,27 @@ export default function FinanciamentoPage() {
 
                         // Validação: verifica se o valor de entrada é maior ou igual ao valor da taxa configurada no .env
                         const taxaEntrada = parseFloat(settings.taxaValue) / 100;
-                        if (formattedValue >= vehicleData.valorVenda * taxaEntrada) {
-                          setIsEntradaValida(true);
+                        const valorMinimoEntrada = vehicleData.valorVenda * taxaEntrada;
+
+                        // Verifica se o valor de entrada é válido
+                        if (numericValue >= valorMinimoEntrada && numericValue <= vehicleData.valorVenda) {
+                          setIsEntradaValida(true); // Entrada é válida
                         } else {
-                          setIsEntradaValida(false);
+                          setIsEntradaValida(false); // Entrada é inválida (menor que o mínimo ou maior que o valor do carro)
                         }
                       }}
                       placeholder={`Mínimo: ${formatCurrency(vehicleData.valorVenda * (parseFloat(settings.taxaValue) / 100))}`}
                       className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${isEntradaValida ? 'border-green-500 focus:ring-green-200' : 'border-red-500 focus:ring-red-200'
                         }`}
                     />
+
+                    {/* Exibição de mensagem de erro se a entrada for maior que o valor do carro */}
+                    {entrada > vehicleData.valorVenda && (
+                      <p className="text-red-500 text-sm mt-2">
+                        O valor de entrada não pode ser maior que o valor de venda do veículo.
+                      </p>
+                    )}
+
 
                     {/* Ícone de feedback visual */}
                     {entrada && (

@@ -16,24 +16,44 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { setSEO } from '../../utils/seo';
 import withAuth from '../../utils/withAuth';
+import axios from 'axios';
+import dynamic from 'next/dynamic';
 
-import Stock from '../components/admin/Stock';
-import Mensagens from '../components/admin/Mensagens';
-import Financiamentos from '../components/admin/Financiamentos';
-import Overview from '../components/admin/Overview';
-import ConsultaFipe from '../components/admin/ConsultaFipe';
-import AddVehicle from '../components/admin/AddVehicle';
-import Kanban from '../components/admin/crm/Kanban';
-import Settings from '../components/admin/Settings';
+const Stock = dynamic(() => import('../components/admin/Stock'));
+const Mensagens = dynamic(() => import('../components/admin/Mensagens'));
+const Financiamentos = dynamic(() => import('../components/admin/Financiamentos'));
+const Overview = dynamic(() => import('../components/admin/Overview'));
+const ConsultaFipe = dynamic(() => import('../components/admin/ConsultaFipe'));
+const AddVehicle = dynamic(() => import('../components/admin/AddVehicle'));
+const Kanban = dynamic(() => import('../components/admin/crm/Kanban'));
+const Settings = dynamic(() => import('../components/admin/Settings'));
 
 function Dashboard() {
     const [view, setView] = useState('overview');
     const [openDropdown, setOpenDropdown] = useState(null); // Estado para controlar qual dropdown está aberto
     const router = useRouter();
+    const [settings, setSettings] = useState(null); // Inicializa como null para evitar erro
+
+    // Função para buscar as configurações
+    const fetchSettings = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+            setSettings(data);
+        } catch (error) {
+            console.error('Erro ao buscar as configurações:', error);
+        }
+    };
 
     useEffect(() => {
-        setSEO({ title: `${process.env.NEXT_PUBLIC_NAME} - Painel Administrativo` });
+        fetchSettings(); // Busca as configurações quando o componente é montado
     }, []);
+
+    // Atualiza o SEO apenas quando o settings é carregado
+    useEffect(() => {
+        if (settings) {
+            setSEO({ title: `${settings.name} - Painel Administrativo` });
+        }
+    }, [settings]);
 
     // Função de logout
     const handleLogout = () => {
@@ -43,7 +63,7 @@ function Dashboard() {
 
     const navigationItems = [
         { name: 'Visão Geral', view: 'overview', icon: faHome },
-        { name: 'CRM', view: 'kanban', icon: faLightbulb},
+        { name: 'CRM', view: 'kanban', icon: faLightbulb },
         {
             name: 'Estoque',
             items: [
@@ -58,8 +78,9 @@ function Dashboard() {
                 { name: 'Simulações', view: 'financiamentos', icon: faBank },
             ],
         },
-        { name: 'Consulta Fipe', view: 'consultafipe', icon: faSearch },
-        { name: 'Configurações', view: 'settings', icon: faGear},
+
+        { name: 'Consultar Fipe', view: 'consultafipe', icon: faSearch },
+        { name: 'Configurações', view: 'settings', icon: faGear },
     ];
 
     // Função para alternar o dropdown aberto
@@ -67,6 +88,11 @@ function Dashboard() {
         // Fecha o dropdown anterior e abre o novo
         setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
     };
+
+    // Verifica se as configurações foram carregadas antes de renderizar
+    if (!settings) {
+        return <div>Carregando...</div>; // Pode adicionar um loader ou texto enquanto as configurações são carregadas
+    }
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -193,15 +219,14 @@ function Dashboard() {
                     <p className="text-xs">Consulta FIPE</p>
                 </button>
             </div>
+
+            {/* Footer */}
             <footer className="hidden md:block bg-zinc-900 text-gray-400 text-sm py-4 text-center">
-                <p>Desenvolvido por EMX Softwares</p>
+                <p>Desenvolvido com ❤️ para <strong>{settings.name}</strong></p>
                 <p className="mt-2 italic text-gray-500">EMX Motors vAlpha 1.0.0</p>
             </footer>
-
         </div>
-
     );
-
 }
 
 // Exporta com proteção da rota

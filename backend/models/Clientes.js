@@ -36,7 +36,7 @@ const clienteSchema = new mongoose.Schema({
   },
   fonteLead: {
     type: String,
-    enum: ['Mensagem no site', 'Simulação', 'Instagram', 'Facebook', 'LinkedIn', 'Círculo pessoal', 'Indicação', 'Indefinido'],
+    enum: ['Mensagem no site', 'Página do veículo', 'Simulação', 'Instagram', 'Facebook', 'LinkedIn', 'Círculo pessoal', 'Indicação', 'Indefinido'],
     default: 'Indefinido',
   },
   dataEtapa: {
@@ -55,6 +55,24 @@ const clienteSchema = new mongoose.Schema({
 
   customId: {
     type: String,
+},
+
+ motivoPerda: {
+  type: String,
+  enum: [
+    'Não respondeu',
+    'Não atendeu telefone',
+    'Cliente desistiu',
+    'Concorrente ganhou',
+    'Problema de orçamento',
+    'Veículo não atende às necessidades',
+    'Veículo já foi vendido',
+    'Não conseguiu contato',
+    'Lead não qualificado',
+    'Mudança de prioridade do cliente',
+    'Outro',
+  ],
+  required: false,
 },
 
   estado: {

@@ -22,6 +22,7 @@ export default function VehicleTypePage() {
   const [loading, setLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('');
+  const [settings, setSettings] = useState(null);
 
   const handleSortOrder = (order) => {
     setSortOrder(order);
@@ -41,10 +42,31 @@ export default function VehicleTypePage() {
     setVehicles(sortedVehicles);
   };
 
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data);
+    } catch (error) {
+      console.error('Erro ao buscar as configurações:', error);
+    }
+  };
+
   useEffect(() => {
-    setSEO(
-      { title: `${process.env.NEXT_PUBLIC_NAME} - Veículos disponíveis` });
+    fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (settings) {
+      setSEO({
+        title: `${settings.name} - ${tipo.replace('motos', 'Motos'.replace('carros', 'Carros'))} Disponíveis`,
+        metaDescription: `Bem-vindo à ${settings.name}, sua referência em veículos de qualidade. 
+        Localizados em ${settings.address}, oferecemos um atendimento personalizado para ajudá-lo a encontrar o carro ideal. 
+        Fale conosco pelo WhatsApp ${settings.whatsappNumber} e visite-nos durante nosso 
+        horário de funcionamento: ${settings.openingHours}. 
+        Conquiste seu próximo veículo com confiança e segurança.`
+      });
+    }
+  }, [settings]);
 
   // Função para obter a rota correta da imagem com a URL completa
   const getImagePath = (vehicle) => {
@@ -244,7 +266,7 @@ export default function VehicleTypePage() {
                             alt={vehicle.modelo}
                             layout="fill"
                             objectFit="cover"
-                            className="rounded-sm group-hover:scale-110 transition-all ease-in-out duration-100"
+                            className="rounded-sm"
                           />
                         </div>
                       ) : (
@@ -254,12 +276,12 @@ export default function VehicleTypePage() {
                       )}
                       {/* Etiqueta de destaque ou blindado */}
                       {vehicle.destaque ? (
-                        <figcaption className="absolute -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                        <figcaption className="absolute bg-custom-linear-gradient -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                           Destaque
                         </figcaption>
                       ) : (
                         vehicle.opcionais?.blindado && (
-                          <figcaption className="absolute -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                          <figcaption className="absolute bg-custom-blindado-gradient -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
                             Blindado
                           </figcaption>
                         )
