@@ -45,6 +45,9 @@ router.post('/register', async (req, res) => {
   }
 });
 
+
+
+
 // Rota para login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -104,7 +107,7 @@ router.post('/profile/upload', authenticate, upload.single('profileImage'), asyn
 });
 
 // Rota protegida para listar todos os usuários (Apenas para Administradores)
-router.get('/users', authenticate, authorize(['Administrador']), async (req, res) => {
+router.get('/users', authenticate, authorize(['Administrador', 'Gerente']), async (req, res) => {
   try {
     const users = await User.find().select('-password');
     return res.status(200).json(users);

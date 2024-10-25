@@ -1,34 +1,49 @@
 const express = require('express');
 const router = express.Router();
-const Cliente = require('../models/Clientes'); 
+const Cliente = require('../models/Clientes');
+const User = require('../models/User');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 // Rota para listar todos os clientes
 router.get('/', async (req, res) => {
   try {
-    const clientes = await Cliente.find();
+    // Busca todos os clientes e popula o campo 'responsavelLead' com o nome do usuário responsável
+    const clientes = await Cliente.find().populate('responsavelLead', 'username');
     res.json(clientes);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Rota para criar um novo cliente
+
 router.post('/', async (req, res) => {
-  const { nome, telefone, email, cpf, etapa, fonteLead } = req.body;
-  const novoCliente = new Cliente({
-    nome,
-    telefone,
-    email,
-    cpf,
-    etapa, // "Novo Lead", etc
-    fonteLead
-  });
+  const { nome, telefone, email, estado, cidade, cpf, etapa, fonteLead, responsavelLead } = req.body;
 
   try {
+    // Cria um novo cliente
+    const novoCliente = new Cliente({
+      nome,
+      telefone,
+      email,
+      cpf,
+      etapa, 
+      estado,
+      cidade,
+      fonteLead,
+      responsavelLead
+    });
+
+    // Salva o cliente no banco
     const clienteSalvo = await novoCliente.save();
-    res.status(201).json(clienteSalvo);
+
+    // Popula o campo responsavelLead com o nome do usuário responsável
+    const clienteComResponsavel = await Cliente.findById(clienteSalvo._id).populate('responsavelLead', 'nome');
+
+    // Retorna o cliente salvo com o campo populado
+    res.status(201).json(clienteComResponsavel);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'Erro ao criar cliente' });
   }
 });
 
@@ -40,8 +55,11 @@ router.post('/contato', async (req, res) => {
     email,
     etapa, // "Novo Lead", etc
     fonteLead: 'Mensagem no site',
-    
+
   });
+
+
+
 
   try {
     const clienteSalvo = await novoCliente.save();
@@ -53,7 +71,7 @@ router.post('/contato', async (req, res) => {
 
 router.post('/simulacao', async (req, res) => {
   const { nome, telefone, email, etapa, fonteLead, customId } = req.body;
-  
+
   // Criação de um novo lead com o customId incluído
   const novoCliente = new Cliente({
     nome,
@@ -72,18 +90,18 @@ router.post('/simulacao', async (req, res) => {
   }
 });
 
-  // Rota para mensagens oriundas da página do veículo ([veiculo]/index.js)
+// Rota para mensagens oriundas da página do veículo ([veiculo]/index.js)
 router.post('/mensagem-veiculo', async (req, res) => {
   const { nome, telefone, email, etapa, fonteLead, customId } = req.body;
-  
-  
+
+
   const novoCliente = new Cliente({
     nome,
     telefone,
     email,
-    etapa: etapa || "Novo Lead", 
-    fonteLead: fonteLead || "Pág. Veículo", 
-    customId: customId 
+    etapa: etapa || "Novo Lead",
+    fonteLead: fonteLead || "Pág. Veículo",
+    customId: customId
   });
 
   try {
@@ -110,7 +128,9 @@ router.put('/:id', async (req, res) => {
     cliente.cpf = req.body.cpf || cliente.cpf;
     cliente.etapa = req.body.etapa || cliente.etapa;
     cliente.estado = req.body.estado || cliente.estado;
-    cliente.fonteLead = req.body.fonteLead || cliente.fonteLead;
+    cliente.cidade = req.body.cidade || cliente.cidade;
+    cliente.fonteLead = req.body.fonteLead || cliente.fonteLead,
+    cliente.responsavelLead = req.body.responsavelLead || cliente.responsavelLead
 
     const clienteAtualizado = await cliente.save();
     res.json(clienteAtualizado);
@@ -127,7 +147,7 @@ router.patch('/:id/mover-etapa', async (req, res) => {
     }
 
     // Atualiza a etapa do cliente com a nova etapa enviada no corpo da requisição
-    cliente.etapa = req.body.etapa || cliente.etapa; 
+    cliente.etapa = req.body.etapa || cliente.etapa;
     cliente.dataEtapa = Date.now(); // Atualiza a data de mudança de etapa
 
     const clienteAtualizado = await cliente.save(); // Salva as mudanças no banco de dados
@@ -137,7 +157,39 @@ router.patch('/:id/mover-etapa', async (req, res) => {
   }
 });
 
-router.patch('/:id/update-motivo-perda', async (req, res) => {
+router.patch('/clientes/:id/assign', authenticate, authorize(['Administrador', 'Gerente']), async (req, res) => {
+  const { responsavelLead } = req.body; // ID do usuário responsável
+
+  if (!responsavelLead) {
+    return res.status(400).json({ message: 'ID do responsável é obrigatório' });
+  }
+
+  try {
+    const cliente = await Cliente.findById(req.params.id); // Cliente, em vez de Lead
+    if (!cliente) {
+      return res.status(404).json({ message: 'Cliente não encontrado' });
+    }
+
+    // Verifique se o usuário responsável existe
+    const user = await User.findById(responsavelLead);
+    if (!user) {
+      return res.status(400).json({ message: 'Responsável inválido' });
+    }
+
+    // Atribui o responsável ao cliente
+    cliente.responsavelLead = responsavelLead;
+    await cliente.save();
+
+    return res.status(200).json({ message: 'Responsável atribuído com sucesso', cliente });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao atribuir responsável ao cliente' });
+  }
+});
+
+
+
+router.patch('/:id/update-etapa', async (req, res) => {
   try {
     const cliente = await Cliente.findById(req.params.id);
     if (!cliente) {
@@ -148,6 +200,7 @@ router.patch('/:id/update-motivo-perda', async (req, res) => {
     if (req.body.motivoPerda !== undefined) cliente.motivoPerda = req.body.motivoPerda;
     if (req.body.customId) cliente.customId = req.body.customId;
     if (req.body.ultimaInteracao) cliente.ultimaInteracao = req.body.ultimaInteracao;
+    if (req.body.obteveResposta !== undefined) cliente.obteveResposta = req.body.obteveResposta;
 
     const clienteAtualizado = await cliente.save();
     res.json(clienteAtualizado);
@@ -155,6 +208,7 @@ router.patch('/:id/update-motivo-perda', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 
 // Rota para deletar um cliente específico

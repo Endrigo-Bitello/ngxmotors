@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
@@ -232,124 +232,122 @@ const Home = () => {
                                 <Link
                                     key={vehicle.customId}
                                     href={`/${vehicle.tipo === 'motos' ? 'motos' : 'carros'}/${vehicle.marca.toLowerCase()}/${vehicle.modelo.toLowerCase().replace(/\s+/g, '-')}-${vehicle.customId}`} // Verifica o tipo de veículo
-                                    legacyBehavior
+                                    className="flex flex-col gap-4"
                                 >
-                                    <a className="flex flex-col gap-4">
-                                        {/* Imagem e overlay */}
-                                        <figure className="w-full relative flex overflow-hidden">
-                                            {!vehicle.imagens || vehicle.imagens.length === 0 ? (
-                                                // Elemento de loading
-                                                <div className="flex justify-center items-center absolute inset-0 z-[0]">
-                                                    <div className="relative inline-flex">
-                                                        <div className="w-8 h-8 bg-neutral-500 rounded-full"></div>
-                                                        <div className="w-8 h-8 bg-neutral-500 rounded-full absolute top-0 left-0 animate-ping"></div>
-                                                        <div className="w-8 h-8 bg-neutral-500 rounded-full absolute top-0 left-0 animate-pulse"></div>
-                                                    </div>
+                                    {/* Imagem e overlay */}
+                                    <figure className="w-full relative flex overflow-hidden">
+                                        {!vehicle.imagens || vehicle.imagens.length === 0 ? (
+                                            // Elemento de loading
+                                            <div className="flex justify-center items-center absolute inset-0 z-[0]">
+                                                <div className="relative inline-flex">
+                                                    <div className="w-8 h-8 bg-neutral-500 rounded-full"></div>
+                                                    <div className="w-8 h-8 bg-neutral-500 rounded-full absolute top-0 left-0 animate-ping"></div>
+                                                    <div className="w-8 h-8 bg-neutral-500 rounded-full absolute top-0 left-0 animate-pulse"></div>
                                                 </div>
-                                            ) : null}
-                                            {/* Imagem do veículo */}
-                                            {vehicle.imagens && vehicle.imagens.length > 0 ? (
-                                                <div className="relative h-64 w-full">
-                                                    <Image
-                                                        src={getImagePath(vehicle)}
-                                                        alt={vehicle.modelo}
-                                                        layout="fill"
-                                                        objectFit="cover"
-                                                        className="rounded-sm"
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
-                                                    Sem imagem
-                                                </div>
-                                            )}
-                                            {/* Etiqueta de destaque ou blindado */}
-                                            {vehicle.destaque ? (
-                                                <figcaption className="absolute bg-custom-linear-gradient -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
-                                                    Destaque
+                                            </div>
+                                        ) : null}
+                                        {/* Imagem do veículo */}
+                                        {vehicle.imagens && vehicle.imagens.length > 0 ? (
+                                            <div className="relative h-64 w-full">
+                                                <Image
+                                                    src={getImagePath(vehicle)}
+                                                    alt={vehicle.modelo}
+                                                    layout="fill"
+                                                    objectFit="cover"
+                                                    className="rounded-sm"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+                                                Sem imagem
+                                            </div>
+                                        )}
+                                        {/* Etiqueta de destaque ou blindado */}
+                                        {vehicle.destaque ? (
+                                            <figcaption className="absolute bg-custom-linear-gradient -rotate-45 bg-yellow-500 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                                                Destaque
+                                            </figcaption>
+                                        ) : (
+                                            vehicle.opcionais?.blindado && (
+                                                <figcaption className="absolute bg-custom-blindado-gradient -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
+                                                    Blindado
                                                 </figcaption>
-                                            ) : (
-                                                vehicle.opcionais?.blindado && (
-                                                    <figcaption className="absolute bg-custom-blindado-gradient -rotate-45 bg-slate-900 text-white text-xs font-bold px-10 py-[0.20rem] top-6 -left-9 uppercase">
-                                                        Blindado
-                                                    </figcaption>
-                                                )
-                                            )}
-                                            {vehicle.imagens && vehicle.imagens.length > 0 && (
-                                                <div className="absolute flex gap-1 justify-center items-center bottom-2 right-2 rounded-xl font-bold text-white bg-black/[0.5] text-sm py-[0.10rem] px-2">
-                                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">
-                                                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                                                        <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-                                                        <g id="SVGRepo_iconCarrier">
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M9.77778 21H14.2222C17.3433 21 18.9038 21 20.0248 20.2646C20.51 19.9462 20.9267 19.5371 21.251 19.0607C22 17.9601 22 16.4279 22 13.3636C22 10.2994 22 8.76721 21.251 7.6666C20.9267 7.19014 20.51 6.78104 20.0248 6.46268C19.3044 5.99013 18.4027 5.82123 17.022 5.76086C16.3631 5.76086 15.7959 5.27068 15.6667 4.63636C15.4728 3.68489 14.6219 3 13.6337 3H10.3663C9.37805 3 8.52715 3.68489 8.33333 4.63636C8.20412 5.27068 7.63685 5.76086 6.978 5.76086C5.59733 5.82123 4.69555 5.99013 3.97524 6.46268C3.48995 6.78104 3.07328 7.19014 2.74902 7.6666C2 8.76721 2 10.2994 2 13.3636C2 16.4279 2 17.9601 2.74902 19.0607C3.07328 19.5371 3.48995 19.9462 3.97524 20.2646C5.09624 21 6.65675 21 9.77778 21ZM12 9.27273C9.69881 9.27273 7.83333 11.1043 7.83333 13.3636C7.83333 15.623 9.69881 17.4545 12 17.4545C14.3012 17.4545 16.1667 15.623 16.1667 13.3636C16.1667 11.1043 14.3012 9.27273 12 9.27273ZM12 10.9091C10.6193 10.9091 9.5 12.008 9.5 13.3636C9.5 14.7192 10.6193 15.8182 12 15.8182C13.3807 15.8182 14.5 14.7192 14.5 13.3636C14.5 12.008 13.3807 10.9091 12 10.9091ZM16.7222 10.0909C16.7222 9.63904 17.0953 9.27273 17.5556 9.27273H18.6667C19.1269 9.27273 19.5 9.63904 19.5 10.0909C19.5 10.5428 19.1269 10.9091 18.6667 10.9091H17.5556C17.0953 10.9091 16.7222 10.5428 16.7222 10.0909Z" fill="#ffffff"></path>
-                                                        </g>
-                                                    </svg>
-                                                    <span>{vehicle.imagens.length}</span>
-                                                </div>
-                                            )}
-                                        </figure>
-
-                                        {/* Título com hover laranja */}
-                                        <h3 className="group-hover:text-orange-500 uppercase font-bold text-lg leading-5 text-neutral-700 md:min-h-[80px]">
-                                            {vehicle.marca} {vehicle.modelo} {vehicle.anoFabricacao}
-                                        </h3>
-
-                                        {/* Detalhes adicionais */}
-                                        <div className="flex items-center gap-2 h-[35px]">
-                                            <div className="grow">
-                                                <figure>
-                                                    <Image
-                                                        src={`/icons/${vehicle.marca.toLowerCase().replace(/ /g, '-')}.png`}
-                                                        alt={vehicle.marca}
-                                                        width={40}
-                                                        height={40}
-                                                        className="mr-2"
-                                                    />
-                                                </figure>
-                                            </div>
-                                            <div className="flex justify-end flex-col">
-                                                <div className="text-sm text-right">
-                                                    Ano: <strong>{vehicle.anoFabricacao}/{vehicle.anoModelo}</strong>
-                                                </div>
-                                                <div className="text-sm text-right">
-                                                    Câmbio: <strong>{vehicle.transmissao}</strong>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <hr className="border-b w-full" />
-                                        {/* Quilometragem e Combustível */}
-                                        <div className="flex justify-between items-center gap-2">
-                                            <div className="text-gray-600 text-sm flex gap-1">
+                                            )
+                                        )}
+                                        {vehicle.imagens && vehicle.imagens.length > 0 && (
+                                            <div className="absolute flex gap-1 justify-center items-center bottom-2 right-2 rounded-xl font-bold text-white bg-black/[0.5] text-sm py-[0.10rem] px-2">
                                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">
                                                     <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                                                     <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
                                                     <g id="SVGRepo_iconCarrier">
-                                                        <path d="M19 19L17.5 17.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M19 5L17.5 6.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M5 19L6.5 17.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M5 5L6.5 6.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M2 12H4" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M19.9998 12L21.9998 12" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M12 4.00021L12 2.00021" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                        <path d="M13.7781 14.364C14.9497 13.1924 14.9497 11.2929 13.7781 10.1214C12.6065 8.94978 10.707 8.94978 9.53545 10.1214C9.0898 10.567 8.77857 11.4921 8.56396 12.4675C8.24305 13.926 8.08259 14.6553 8.66339 15.2361C9.24419 15.8169 9.97346 15.6564 11.432 15.3355C12.4073 15.1209 13.3324 14.8096 13.7781 14.364Z" stroke="#000000" strokeWidth="1.5"></path>
-                                                        <path d="M9 21.5422C4.94289 20.2679 2 16.4776 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 16.4776 19.0571 20.2679 15 21.5422" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M9.77778 21H14.2222C17.3433 21 18.9038 21 20.0248 20.2646C20.51 19.9462 20.9267 19.5371 21.251 19.0607C22 17.9601 22 16.4279 22 13.3636C22 10.2994 22 8.76721 21.251 7.6666C20.9267 7.19014 20.51 6.78104 20.0248 6.46268C19.3044 5.99013 18.4027 5.82123 17.022 5.76086C16.3631 5.76086 15.7959 5.27068 15.6667 4.63636C15.4728 3.68489 14.6219 3 13.6337 3H10.3663C9.37805 3 8.52715 3.68489 8.33333 4.63636C8.20412 5.27068 7.63685 5.76086 6.978 5.76086C5.59733 5.82123 4.69555 5.99013 3.97524 6.46268C3.48995 6.78104 3.07328 7.19014 2.74902 7.6666C2 8.76721 2 10.2994 2 13.3636C2 16.4279 2 17.9601 2.74902 19.0607C3.07328 19.5371 3.48995 19.9462 3.97524 20.2646C5.09624 21 6.65675 21 9.77778 21ZM12 9.27273C9.69881 9.27273 7.83333 11.1043 7.83333 13.3636C7.83333 15.623 9.69881 17.4545 12 17.4545C14.3012 17.4545 16.1667 15.623 16.1667 13.3636C16.1667 11.1043 14.3012 9.27273 12 9.27273ZM12 10.9091C10.6193 10.9091 9.5 12.008 9.5 13.3636C9.5 14.7192 10.6193 15.8182 12 15.8182C13.3807 15.8182 14.5 14.7192 14.5 13.3636C14.5 12.008 13.3807 10.9091 12 10.9091ZM16.7222 10.0909C16.7222 9.63904 17.0953 9.27273 17.5556 9.27273H18.6667C19.1269 9.27273 19.5 9.63904 19.5 10.0909C19.5 10.5428 19.1269 10.9091 18.6667 10.9091H17.5556C17.0953 10.9091 16.7222 10.5428 16.7222 10.0909Z" fill="#ffffff"></path>
                                                     </g>
                                                 </svg>
-                                                {vehicle.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km
+                                                <span>{vehicle.imagens.length}</span>
                                             </div>
-                                            <div className="text-gray-600 text-sm flex gap-1">
-                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">
-                                                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                                                    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-                                                    <g id="SVGRepo_iconCarrier">
-                                                        <path d="M15.2683 18.2287C13.2889 20.9067 12.2992 22.2458 11.3758 21.9628C10.4525 21.6798 10.4525 20.0375 10.4525 16.7528L10.4526 16.4433C10.4526 15.2585 10.4526 14.6662 10.074 14.2946L10.054 14.2754C9.6673 13.9117 9.05079 13.9117 7.81775 13.9117C5.59888 13.9117 4.48945 13.9117 4.1145 13.2387C4.10829 13.2276 4.10225 13.2164 4.09639 13.205C3.74244 12.5217 4.3848 11.6526 5.66953 9.91436L8.73167 5.77133C10.711 3.09327 11.7007 1.75425 12.6241 2.03721C13.5474 2.32018 13.5474 3.96249 13.5474 7.24712V7.55682C13.5474 8.74151 13.5474 9.33386 13.926 9.70541L13.946 9.72466C14.3327 10.0884 14.9492 10.0884 16.1822 10.0884C18.4011 10.0884 19.5106 10.0884 19.8855 10.7613C19.8917 10.7724 19.8977 10.7837 19.9036 10.795C20.2576 11.4784 19.6152 12.3475 18.3304 14.0857" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
-                                                    </g>
-                                                </svg>
-                                                {vehicle.combustivel}
+                                        )}
+                                    </figure>
+
+                                    {/* Título com hover laranja */}
+                                    <h3 className="group-hover:text-orange-500 uppercase font-bold text-lg leading-5 text-neutral-700 md:min-h-[80px]">
+                                        {vehicle.marca} {vehicle.modelo} {vehicle.anoFabricacao}
+                                    </h3>
+
+                                    {/* Detalhes adicionais */}
+                                    <div className="flex items-center gap-2 h-[35px]">
+                                        <div className="grow">
+                                            <figure>
+                                                <Image
+                                                    src={`/icons/${vehicle.marca.toLowerCase().replace(/ /g, '-')}.png`}
+                                                    alt={vehicle.marca}
+                                                    width={40}
+                                                    height={40}
+                                                    className="mr-2"
+                                                />
+                                            </figure>
+                                        </div>
+                                        <div className="flex justify-end flex-col">
+                                            <div className="text-sm text-right">
+                                                Ano: <strong>{vehicle.anoFabricacao}/{vehicle.anoModelo}</strong>
+                                            </div>
+                                            <div className="text-sm text-right">
+                                                Câmbio: <strong>{vehicle.transmissao}</strong>
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
+
+                                    <hr className="border-b w-full" />
+                                    {/* Quilometragem e Combustível */}
+                                    <div className="flex justify-between items-center gap-2">
+                                        <div className="text-gray-600 text-sm flex gap-1">
+                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">
+                                                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                                                <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                                                <g id="SVGRepo_iconCarrier">
+                                                    <path d="M19 19L17.5 17.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M19 5L17.5 6.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M5 19L6.5 17.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M5 5L6.5 6.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M2 12H4" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M19.9998 12L21.9998 12" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M12 4.00021L12 2.00021" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                    <path d="M13.7781 14.364C14.9497 13.1924 14.9497 11.2929 13.7781 10.1214C12.6065 8.94978 10.707 8.94978 9.53545 10.1214C9.0898 10.567 8.77857 11.4921 8.56396 12.4675C8.24305 13.926 8.08259 14.6553 8.66339 15.2361C9.24419 15.8169 9.97346 15.6564 11.432 15.3355C12.4073 15.1209 13.3324 14.8096 13.7781 14.364Z" stroke="#000000" strokeWidth="1.5"></path>
+                                                    <path d="M9 21.5422C4.94289 20.2679 2 16.4776 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 16.4776 19.0571 20.2679 15 21.5422" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                </g>
+                                            </svg>
+                                            {vehicle.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km
+                                        </div>
+                                        <div className="text-gray-600 text-sm flex gap-1">
+                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="!w-[18px] !h-[18px]">
+                                                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                                                <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                                                <g id="SVGRepo_iconCarrier">
+                                                    <path d="M15.2683 18.2287C13.2889 20.9067 12.2992 22.2458 11.3758 21.9628C10.4525 21.6798 10.4525 20.0375 10.4525 16.7528L10.4526 16.4433C10.4526 15.2585 10.4526 14.6662 10.074 14.2946L10.054 14.2754C9.6673 13.9117 9.05079 13.9117 7.81775 13.9117C5.59888 13.9117 4.48945 13.9117 4.1145 13.2387C4.10829 13.2276 4.10225 13.2164 4.09639 13.205C3.74244 12.5217 4.3848 11.6526 5.66953 9.91436L8.73167 5.77133C10.711 3.09327 11.7007 1.75425 12.6241 2.03721C13.5474 2.32018 13.5474 3.96249 13.5474 7.24712V7.55682C13.5474 8.74151 13.5474 9.33386 13.926 9.70541L13.946 9.72466C14.3327 10.0884 14.9492 10.0884 16.1822 10.0884C18.4011 10.0884 19.5106 10.0884 19.8855 10.7613C19.8917 10.7724 19.8977 10.7837 19.9036 10.795C20.2576 11.4784 19.6152 12.3475 18.3304 14.0857" stroke="#000000" strokeWidth="1.5" strokeLinecap="round"></path>
+                                                </g>
+                                            </svg>
+                                            {vehicle.combustivel}
+                                        </div>
+                                    </div>
                                 </Link>
 
                                 {/* Preço e Botões de Ação */}
@@ -380,10 +378,8 @@ const Home = () => {
                 {/* Botão para ver estoque completo */}
                 {!showAllVehicles && vehicles.length > 11 && (
                     <div className="flex justify-center mt-8">
-                        <Link href="/estoque" legacyBehavior>
-                            <a className="px-6 py-3 border-2 border-green-600 text-green-600 rounded-md hover:bg-green-600 hover:text-white font-bold transition-all duration-300">
-                                VER ESTOQUE COMPLETO
-                            </a>
+                        <Link href="/estoque" className="px-6 py-3 border-2 border-green-600 text-green-600 rounded-md hover:bg-green-600 hover:text-white font-bold transition-all duration-300">
+                            VER ESTOQUE COMPLETO
                         </Link>
                     </div>
                 )}
@@ -394,10 +390,13 @@ const Home = () => {
                 aria-label={`Converse com nossos atendentes pelo WhatsApp!`}
                 className="fixed bottom-4 right-4 z-50 flex items-center justify-center h-16 w-16 rounded-full bg-green-600 text-white cursor-pointer hover:bg-green-500 transition-transform transform hover:scale-110 shadow-lg animate-bounce"
                 onClick={() => {
-                    window.open(
-                        `https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicleData.marca.toUpperCase()} ${vehicleData.modelo}`,
-                        '_blank'
-                    );
+                    if (vehicles.length > 0) {
+                        const vehicleData = vehicles[0]; // Ajuste para um veículo real
+                        window.open(
+                            `https://wa.me/${settings.whatsappNumber}?text=Quero mais informações sobre o veículo ${vehicleData.marca.toUpperCase()} ${vehicleData.modelo}`,
+                            '_blank'
+                        );
+                    }
                 }}
             >
                 <FaWhatsapp className="text-4xl" />
