@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/Card';
+import Card, { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/Card';
+
 import styles from './VehiclesChart.module.css';
 
 const COLORS = ['#4A90E2', '#E74C3C']; // Cores para Carros e Motos

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/Card';
+import Card, { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/Card';
 import styles from './LeadsChart.module.css';
 
 const COLORS = [
