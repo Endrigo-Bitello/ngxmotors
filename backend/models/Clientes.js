@@ -36,7 +36,7 @@ const clienteSchema = new mongoose.Schema({
     },
     fonteLead: {
         type: String,
-        enum: ['Mensagem no site', 'Pág. Veículo', 'Simulação', 'Instagram', 'Facebook', 'LinkedIn', 'Círculo pessoal', 'Indicação'],
+        enum: ['Mensagem no site', 'Pág. Veículo', 'Simulação', 'Instagram', 'Facebook', 'LinkedIn', 'Círculo pessoal', 'Indicação', 'Indefinido'],
     },
     dataEtapa: {
         type: Date,

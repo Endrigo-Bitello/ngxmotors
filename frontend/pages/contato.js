@@ -6,6 +6,7 @@ import axios from 'axios';
 
 import Navbar from './components/Navbar';
 import Loading from './components/Loading';
+import Footer from './components/Footer';
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
 const Contato = () => {
@@ -113,8 +114,8 @@ const Contato = () => {
               <FaInstagram className="text-pink-500 text-2xl" />
               <div>
                 <h3 className="text-lg font-medium text-gray-700">Instagram</h3>
-                <a href={settings.instagramUrl} className="text-blue-500 hover:underline">
-                  {settings.instagramUrl}
+                <a href={'https://instagram.com/' + settings.instagramUrl} className="text-blue-500 hover:underline">
+                  {'https://instagram.com/' + settings.instagramUrl}
                 </a>
               </div>
             </div>
@@ -123,8 +124,8 @@ const Contato = () => {
               <FaFacebookF className="text-blue-700 text-2xl" />
               <div>
                 <h3 className="text-lg font-medium text-gray-700">Facebook</h3>
-                <a href={settings.facebookUrl} className="text-blue-500 hover:underline">
-                  {settings.facebookUrl}
+                <a href={'https://facebook.com/' + settings.facebookUrl} className="text-blue-500 hover:underline">
+                  {'https://facebook.com/' + settings.facebookUrl}
                 </a>
               </div>
             </div>

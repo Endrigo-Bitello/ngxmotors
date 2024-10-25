@@ -23,35 +23,35 @@ const SettingsSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    default: 'contato@emxsoftwares.com.br',
+    default: 'contato@ngxbr.com',
   },
   name: {
     type: String,
-    default: 'EMX Motors',
+    default: 'NGX Motors',
   },
   instagramUrl: {
     type: String,
-    default: 'https://instagram.com/endrigobitello',
+    default: 'ngxbr',
   },
   facebookUrl: {
     type: String,
-    default: 'https://facebook.com/endrigo.bitello',
+    default: 'ngxbr',
   },
   twitterUrl: {
     type: String,
-    default: 'https://x.com/endrigobit3llo',
+    default: 'ngxbr',
   },
   linkedinUrl: {
     type: String,
-    default: '',
+    default: 'ngxbr',
   },
   tiktokUrl: {
     type: String,
-    default: 'https://tiktok.com/@endrigobitello',
+    default: 'ngxbr',
   },
   openingHours: {
     type: String,
-    default: 'Segunda à Sexta: 9h - 18h, Sábado: 10h - 16h',
+    default: 'Segunda à Sábado: 9h - 18h, Domingo: 10h - 16h',
   },
   whatsappMessage: {
     type: String,
@@ -67,15 +67,15 @@ const SettingsSchema = new mongoose.Schema({
   },
   websiteUrl: {
     type: String,
-    default: 'https://emxsoftwares.com.br',
+    default: 'https://ngxbr.com',
   },
   slogan: {
     type: String,
-    default: 'https://emxsofthouse.com.br',
+    default: 'A nova geração da sua revenda.',
   },
   about: {
     type: String,
-    default: 'A EMX Motors está empenhada em transformar a maneira como as revendas de veículos alcançam seus clientes e aumentam suas vendas pela internet. Com soluções inovadoras e tecnologia de ponta, oferecemos ferramentas que facilitam a gestão de estoque, a visibilidade online e o atendimento aos clientes de forma eficiente e moderna. Nosso objetivo é capacitar revendedores a expandir seus negócios, conectando-os a uma audiência maior e oferecendo uma experiência de compra fluida e otimizada. Acreditamos que a tecnologia pode ser a principal aliada para potencializar as vendas e criar novas oportunidades no mercado automotivo.',
+    default: 'A NGX Motors está empenhada em transformar a maneira como as revendas de veículos alcançam seus clientes e aumentam suas vendas pela internet. Com soluções inovadoras e tecnologia de ponta, oferecemos ferramentas que facilitam a gestão de estoque, a visibilidade online e o atendimento aos clientes de forma eficiente e moderna. Nosso objetivo é capacitar revendedores a expandir seus negócios, conectando-os a uma audiência maior e oferecendo uma experiência de compra fluida e otimizada. Acreditamos que a tecnologia pode ser a principal aliada para potencializar as vendas e criar novas oportunidades no mercado automotivo.',
   },
 });
 

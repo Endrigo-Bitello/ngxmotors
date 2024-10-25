@@ -1,0 +1,100 @@
+.chartContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  margin-top: 40px;
+  padding: 20px 0; /* Para descer o gráfico e evitar o espaço vazio superior */
+}
+
+.chartWrapper {
+  flex: 3;
+  padding-bottom: 20px; /* Adiciona espaçamento inferior ao gráfico */
+}
+
+.reportWrapper {
+  flex: 2;
+  background-color: #f7fafc;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cardHeader {
+  text-align: center;
+  padding: 10px;
+  background-color: #f0f4f8;
+  border-bottom: 2px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 10px;
+}
+
+.cardTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.cardDescription {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #4a5568;
+}
+
+.card {
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.progressBar {
+  background-color: #edf2f7;
+  border-radius: 4px;
+  width: 100%;
+  height: 8px;
+  margin-right: 12px;
+}
+
+.insight {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #e3f7ff;
+  border-left: 4px solid #007acc;
+  border-radius: 12px;
+}
+
+.insight h4 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #007acc;
+}
+
+.reportLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.reportValue {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1a202c;
+}
+
+.reportPercentage {
+  font-size: 0.875rem;
+  color: #718096;
+  text-align: right;
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.progressFill {
+  background-color: #63b3ed;
+  height: 100%;
+  border-radius: 4px;
+}

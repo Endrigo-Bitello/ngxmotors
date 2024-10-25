@@ -33,7 +33,7 @@ const Medias = () => {
       <div className="flex flex-col items-center gap-0">
         {/* Ícone do Instagram */}
         <a
-          href={settings.instagramUrl}
+          href={'https://facebook.com/' + settings.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Acesse Instagram"
@@ -44,7 +44,7 @@ const Medias = () => {
 
         {/* Ícone do Facebook */}
         <a
-          href={settings.facebookUrl}
+          href={'https://facebook.com/' + settings.facebookUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Acesse Facebook"

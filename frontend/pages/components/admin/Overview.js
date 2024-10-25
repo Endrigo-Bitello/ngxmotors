@@ -1,167 +1,49 @@
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import axios from 'axios';
-import Image from 'next/image';
-
-const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
-
-// Componentes auxiliares
-const MetricCard = ({ title, value, color }) => (
-  <div className="bg-white shadow rounded-lg p-4 text-center">
-    <h3 className="text-sm font-semibold text-gray-500">{title}</h3>
-    <p className={`text-4xl font-bold mt-2 ${color}`}>{value}</p>
-  </div>
-);
-
-const VehicleChart = ({ totalCarros, totalMotos }) => {
-  const chartOptions = {
-    chart: {
-      type: 'pie',
-    },
-    labels: ['Carros', 'Motos'],
-    colors: ['#4A90E2', '#E74C3C'],
-    fill: {
-      type: 'gradient',
-    },
-    responsive: [
-      {
-        breakpoint: 768,
-        options: {
-          chart: {
-            width: '100%',
-          },
-        },
-      },
-    ],
-  };
-
-  const chartSeries = [totalCarros, totalMotos];
-
-  return (
-    <div className="bg-white shadow rounded-lg p-4">
-      <h3 className="text-sm font-semibold text-gray-500 text-center mb-4">Proporção Carros para Motos</h3>
-      <div className="flex justify-center">
-        <ApexCharts options={chartOptions} series={chartSeries} type="pie" width={360} />
-      </div>
-    </div>
-  );
-};
-
-const BrandList = ({ title, data, color }) => (
-  <div className="bg-white shadow rounded-lg p-4">
-    <h2 className={`text-lg font-semibold mb-4 ${color}`}>{title}</h2>
-    <div className="space-y-3">
-      {Object.entries(data).map(([marca, quantidade]) => (
-        <div key={marca} className="flex items-center">
-          <Image src={`/icons/${marca.toLowerCase()}.png`} alt={marca} width={30} height={30} className="mr-3" />
-          <p className="text-sm text-gray-700">{marca}</p>
-          <span className="ml-auto text-lg font-bold text-gray-900">{quantidade}</span>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const FinancingSimulation = ({ simulacoes }) => (
-  <div className="bg-white shadow rounded-lg p-4">
-    <h2 className="text-lg font-semibold text-gray-600 mb-4">Últimas Simulações de Financiamento</h2>
-    <div className="space-y-4">
-      {simulacoes.slice(0, 3).map((simulacao, index) => (
-        <div key={index} className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-          <div className="flex justify-between">
-            <div>
-              <p className="text-gray-800 font-semibold">{simulacao.nome}</p>
-              <p className="text-gray-500">
-                Entrada: R$ {simulacao.entrada?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-gray-500">
-                Parcelas: {simulacao.parcelas}x de R${' '}
-                {simulacao.parcelaEstimada?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="text-sm text-gray-400">
-              {new Date(simulacao.createdAt).toLocaleDateString('pt-BR')}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const MessageList = ({ mensagens }) => (
-  <div className="bg-white shadow rounded-lg p-4">
-    <h2 className="text-lg font-semibold text-yellow-600 mb-4">Últimas Mensagens</h2>
-    <div className="space-y-4">
-      {mensagens.slice(0, 3).map((mensagem, index) => (
-        <div key={index} className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-          <div className="flex justify-between">
-            <div>
-              <p className="text-gray-800 font-semibold">De: {mensagem.nome}</p>
-              <p className="text-gray-500">{mensagem.mensagem}</p>
-            </div>
-            <div className="text-sm text-gray-400">
-              {new Date(mensagem.createdAt).toLocaleDateString('pt-BR')}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+import LeadsChart from '../../components/admin/charts/LeadsChart';
+import StepLeadsRadarChart from './charts/StepLeadsRadarChart';
+import VehiclesChart from './charts/VehiclesChart';
+import VehiclesBrandsList from './charts/VehiclesBrandsList'; 
 
 const Overview = () => {
-  const [carrosPorMarca, setCarrosPorMarca] = useState({});
-  const [motosPorMarca, setMotosPorMarca] = useState({});
-  const [totalCarros, setTotalCarros] = useState(0);
-  const [totalMotos, setTotalMotos] = useState(0);
-  const [simulacoesFinanciamento, setSimulacoesFinanciamento] = useState([]);
-  const [mensagensRecebidas, setMensagensRecebidas] = useState([]);
   const [usuario, setUsuario] = useState({});
-  const [leadsAtribuidos, setLeadsAtribuidos] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('veiculos'); 
+  const [selectedChart, setSelectedChart] = useState('proporcaoVeiculos'); 
+  const [simulacoes, setSimulacoes] = useState(0);
+  const [mensagens, setMensagens] = useState(0);
+  const [veiculosTotais, setVeiculosTotais] = useState(0);
+  const [leadsTotais, setLeadsTotais] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Obtém o token do localStorage
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('Token não encontrado. Por favor, faça login.');
         }
 
-        // Configura os cabeçalhos com o token
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
 
-        const [veiculosRes, financiamentosRes, mensagensRes, usuarioRes, leadsRes] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/vehicles`, config),
+        const [usuarioRes, simulacoesRes, mensagensRes, veiculosRes, leadsRes] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`, config),
           axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos`, config),
           axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, config),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`, config), // Substitua pela rota correta
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/vehicles`, config),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes`, config),
         ]);
 
-        const veiculos = veiculosRes.data;
-        const carros = veiculos.filter((veiculo) => veiculo.tipo === 'carros');
-        const motos = veiculos.filter((veiculo) => veiculo.tipo === 'motos');
-
-        const agruparPorMarca = (veiculos) =>
-          veiculos.reduce((acc, veiculo) => {
-            acc[veiculo.marca] = acc[veiculo.marca] ? acc[veiculo.marca] + 1 : 1;
-            return acc;
-          }, {});
-
-        setCarrosPorMarca(agruparPorMarca(carros));
-        setMotosPorMarca(agruparPorMarca(motos));
-        setTotalCarros(carros.length);
-        setTotalMotos(motos.length);
-        setSimulacoesFinanciamento(financiamentosRes.data);
-        setMensagensRecebidas(mensagensRes.data);
         setUsuario(usuarioRes.data);
+        setSimulacoes(simulacoesRes.data.length); // Número de simulações de financiamento
+        setMensagens(mensagensRes.data.length); // Número de mensagens
+        setVeiculosTotais(veiculosRes.data.length); // Número total de veículos
+        setLeadsTotais(leadsRes.data.length); // Número total de leads
+
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
         setError('Ocorreu um erro ao carregar os dados.');
@@ -172,8 +54,6 @@ const Overview = () => {
 
     fetchData();
   }, []);
-
-  const totalVeiculos = totalCarros + totalMotos;
 
   if (loading) {
     return (
@@ -192,32 +72,126 @@ const Overview = () => {
   }
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Bem-vindo, {usuario.nome}!</h1>
-      <p className="text-lg text-gray-600 mb-8">Leads atribuídos a você: {usuario.leadsAtribuidos}</p>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="bg-white shadow-md rounded-lg p-6 w-full text-center">
+        {/* Saudação do usuário */}
+        <h1 className="text-5xl font-extrabold text-gray-800 mb-4">
+          Bem-vindo de volta, {usuario.nome}!
+        </h1>
+        <p className="text-xl text-gray-600 mb-6">
+          Estamos felizes em tê-lo novamente. Aqui está uma rápida visão dos seus leads.
+        </p>
 
-      {/* Seção de métricas principais e gráfico */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 lg:col-span-1 gap-4">
-          <MetricCard title="Veículos Totais" value={totalVeiculos} color="text-gray-800" />
-          <MetricCard title="Carros" value={totalCarros} color="text-blue-600" />
-          <MetricCard title="Motos" value={totalMotos} color="text-red-600" />
-        </div>
-        <div className="lg:col-span-3">
-          <VehicleChart totalCarros={totalCarros} totalMotos={totalMotos} />
+        {/* Leads atribuídos */}
+        <div className="bg-blue-50 p-6 rounded-lg shadow-sm mb-6">
+          <p className="text-3xl font-bold text-900-600">
+            Leads atribuídos à você:
+          </p>
+          <p className="text-4xl font-extrabold text-blue-700">
+            {usuario.leadsAtribuidos}
+          </p>
         </div>
       </div>
 
-      {/* Listagem de Carros e Motos por marca */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <BrandList title="Carros Disponíveis por Marca" data={carrosPorMarca} color="text-blue-600" />
-        <BrandList title="Motos Disponíveis por Marca" data={motosPorMarca} color="text-red-600" />
+      {/* Mini Relatório Geral */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+        <div className="bg-white shadow-md rounded-lg p-6 text-center">
+          <h3 className="text-xl font-bold text-gray-700">Simulações de Financiamento</h3>
+          <p className="text-3xl font-extrabold text-blue-600 mt-4">{simulacoes}</p>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-6 text-center">
+          <h3 className="text-xl font-bold text-gray-700">Mensagens Recebidas</h3>
+          <p className="text-3xl font-extrabold text-green-600 mt-4">{mensagens}</p>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-6 text-center">
+          <h3 className="text-xl font-bold text-gray-700">Veículos Totais</h3>
+          <p className="text-3xl font-extrabold text-purple-600 mt-4">{veiculosTotais}</p>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-6 text-center">
+          <h3 className="text-xl font-bold text-gray-700">Leads Totais</h3>
+          <p className="text-3xl font-extrabold text-orange-600 mt-4">{leadsTotais}</p>
+        </div>
       </div>
 
-      {/* Últimas simulações e mensagens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FinancingSimulation simulacoes={simulacoesFinanciamento} />
-        <MessageList mensagens={mensagensRecebidas} />
+      {/* Botões para escolher Veículos ou Leads */}
+      <div className="flex justify-center mt-8 space-x-4">
+        <button
+          className={`px-8 py-3 rounded-lg shadow-md font-bold ${
+            selectedCategory === 'veiculos' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
+          }`}
+          onClick={() => {
+            setSelectedCategory('veiculos');
+            setSelectedChart('proporcaoVeiculos'); 
+          }}
+        >
+          Veículos
+        </button>
+
+        <button
+          className={`px-8 py-3 rounded-lg shadow-md font-bold ${
+            selectedCategory === 'leads' ? 'bg-orange-600 text-white' : 'bg-white text-gray-600 border'
+          }`}
+          onClick={() => {
+            setSelectedCategory('leads');
+            setSelectedChart('leadsPorOrigem'); 
+          }}
+        >
+          Leads
+        </button>
+      </div>
+
+      {/* Exibir botões para gráficos de Leads */}
+      {selectedCategory === 'leads' && (
+        <div className="flex justify-center mt-8 space-x-4">
+          <button
+            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
+              selectedChart === 'leadsPorOrigem' ? 'bg-orange-600 text-white' : 'bg-white text-gray-600 border'
+            }`}
+            onClick={() => setSelectedChart('leadsPorOrigem')}
+          >
+            Leads por Origem
+          </button>
+
+          <button
+            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
+              selectedChart === 'leadsPorEtapa' ? 'bg-orange-600 text-white' : 'bg-white text-gray-600 border'
+            }`}
+            onClick={() => setSelectedChart('leadsPorEtapa')}
+          >
+            Leads por Etapa
+          </button>
+        </div>
+      )}
+
+      {/* Exibir botões para gráficos de Veículos */}
+      {selectedCategory === 'veiculos' && (
+        <div className="flex justify-center mt-8 space-x-4">
+          <button
+            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
+              selectedChart === 'proporcaoVeiculos' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
+            }`}
+            onClick={() => setSelectedChart('proporcaoVeiculos')}
+          >
+            Proporção de Veículos
+          </button>
+
+          <button
+            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
+              selectedChart === 'veiculosPorMarca' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
+            }`}
+            onClick={() => setSelectedChart('veiculosPorMarca')}
+          >
+            Veículos por Marca
+          </button>
+        </div>
+      )}
+
+      {/* Renderizando o gráfico selecionado */}
+      <div className="mt-12">
+        {selectedChart === 'leadsPorOrigem' && <LeadsChart />}
+        {selectedChart === 'leadsPorEtapa' && <StepLeadsRadarChart />}
+        {selectedChart === 'proporcaoVeiculos' && <VehiclesChart />}
+        {selectedChart === 'veiculosPorMarca' && <VehiclesBrandsList />}
       </div>
     </div>
   );

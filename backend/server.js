@@ -11,6 +11,28 @@ const jwt = require('jsonwebtoken'); // Adicionar JWT para autenticação
 const compression = require('compression');
 const fs = require('fs');
 
+const Settings = require('./models/Settings');
+
+const createSettings = async () => {
+  try {
+    const settingsCount = await Settings.countDocuments();
+
+    
+    if (settingsCount === 0) {
+      console.log('Nenhuma configuração encontrada. Criando configurações padrão...');
+
+      const defaultSettings = new Settings();
+      await defaultSettings.save();
+
+      console.log('Configurações padrão criadas com sucesso.');
+    } else {
+      console.log('Configurações já existem no banco de dados.');
+    }
+  } catch (error) {
+    console.error('Erro ao verificar/criar as configurações padrão:', error);
+  }
+};
+
 dotenv.config();
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -139,4 +161,5 @@ app.listen(PORT, '0.0.0.0', () => {
 
   carregarCarros(); 
   carregarMotos()
+  createSettings();
 });

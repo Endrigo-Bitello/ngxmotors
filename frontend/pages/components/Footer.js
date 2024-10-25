@@ -135,7 +135,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex justify-center space-x-6">
             <a
-              href={settings.facebookUrl}
+              href={'https://facebook.com' + settings.facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-blue-500 transition"
@@ -143,7 +143,7 @@ const Footer = () => {
               <FaFacebook size={24} />
             </a>
             <a
-              href={settings.instagramUrl}
+              href={'https://instagram.com/' + settings.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-pink-500 transition"
@@ -151,7 +151,7 @@ const Footer = () => {
               <FaInstagram size={24} />
             </a>
             <a
-              href={settings.twitterUrl}
+              href={'https://x.com/' + settings.twitterUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-blue-400 transition"
@@ -159,7 +159,7 @@ const Footer = () => {
               <FaTwitter size={24} />
             </a>
             <a
-              href={settings.linkedinUrl}
+              href={'https://linkedin.com/company/' + settings.linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-blue-700 transition"
@@ -167,7 +167,7 @@ const Footer = () => {
               <FaLinkedin size={24} />
             </a>
             <a
-              href={settings.tiktokUrl}
+              href={'https://tiktok.com/@' + settings.tiktokUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-[#EE1D52] transition"

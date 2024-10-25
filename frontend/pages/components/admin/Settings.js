@@ -108,14 +108,12 @@ export default function Settings() {
         <label className="block text-sm font-medium text-gray-700">Instagram</label>
         <div className="relative mt-1">
           {/* Parte fixa da URL */}
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            https://instagram.com/
-          </span>
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">https://instagram.com/</span>
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={instagramUrl.replace('https://instagram.com/', '')} // Exibe apenas o usuário, removendo a parte fixa da URL
-            onChange={(e) => setInstagramUrl(`https://instagram.com/${e.target.value}`)} // Atualiza a URL completa
+            value={instagramUrl} // Exibe apenas o usuário, removendo a parte fixa da URL
+            onChange={(e) => setInstagramUrl(`${e.target.value}`)} // Atualiza a URL completa
             className="block w-full pl-[190px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
             placeholder="Digite o usuário do Instagram"
           />
@@ -129,14 +127,12 @@ export default function Settings() {
         <label className="block text-sm font-medium text-gray-700">TikTok</label>
         <div className="relative mt-1">
           {/* Parte fixa da URL */}
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            https://tiktok.com/@
-          </span>
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">https://tiktok.com/@</span>
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={facebookUrl.replace('https://tiktok.com/', '')} // Exibe apenas o usuário
-            onChange={(e) => setTiktokUrl(`https://tiktok.com/${e.target.value}`)} // Atualiza a URL completa
+            value={tiktokUrl} // Exibe apenas o usuário
+            onChange={(e) => setTiktokUrl(`${e.target.value}`)} // Atualiza a URL completa
             className="block w-full pl-[185px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
             placeholder="Digite o usuário do TikTok"
           />
@@ -154,10 +150,10 @@ export default function Settings() {
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={facebookUrl.replace('https://linkedin.com/', '')} // Exibe apenas o usuário
-            onChange={(e) => setTiktokUrl(`https://tiktok.com/${e.target.value}`)} // Atualiza a URL completa
+            value={linkedinUrl} // Exibe apenas o usuário
+            onChange={(e) => setLinkedinUrl(`${e.target.value}`)} // Atualiza a URL completa
             className="block w-full pl-[185px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
-            placeholder="Digite o usuário do TikTok"
+            placeholder="Digite o usuário do LinkedIn"
           />
         </div>
       </div>
@@ -173,8 +169,8 @@ export default function Settings() {
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={facebookUrl.replace('https://facebook.com/', '')} 
-            onChange={(e) => setFacebookUrl(`https://facebook.com/${e.target.value}`)}
+            value={facebookUrl} 
+            onChange={(e) => setFacebookUrl(`${e.target.value}`)}
             className="block w-full pl-[185px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
             placeholder="Digite o usuário do Facebook"
           />
@@ -187,15 +183,15 @@ export default function Settings() {
         <div className="relative mt-1">
           {/* Parte fixa da URL */}
           <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            https://twitter.com/
+            https://x.com/
           </span>
           {/* Campo para editar apenas o usuário */}
           <input
             type="text"
-            value={twitterUrl.replace('https://linkedin.com/', '')} 
-            onChange={(e) => setLinkedinUrl(`https://linkedin.com/${e.target.value}`)} 
+            value={twitterUrl} 
+            onChange={(e) => setTwitterUrl(`${e.target.value}`)} 
             className="block w-full pl-[155px] pr-4 py-3 border border-gray-300 rounded-lg shadow-sm"
-            placeholder="Digite o usuário do Twitter"
+            placeholder="Digite o usuário do X"
           />
         </div>
       </div>
