@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import axios from 'axios'; // Certifique-se de que o axios está importado
 import { setSEO } from './../utils/seo';
 import Loading from './components/Loading';
+import Footer from './components/Footer';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
