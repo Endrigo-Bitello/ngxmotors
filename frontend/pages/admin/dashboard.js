@@ -10,6 +10,7 @@ import {
     faBank,
     faLightbulb,
     faGear,
+    faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -155,13 +156,16 @@ function Dashboard() {
                     )}
                 </nav>
                 {/* Botão de Logout */}
+
                 <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-2 hover:text-red-500 transition duration-300"
+                    className="flex items-center space-x-1 hover:text-red-500 transition duration-300"
                 >
                     <FontAwesomeIcon icon={faSignOutAlt} className="h-5 w-5" />
                     <span className="font-medium">Sair</span>
                 </button>
+
+
             </header>
 
             {/* Conteúdo principal */}

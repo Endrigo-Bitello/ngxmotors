@@ -117,16 +117,32 @@ const Overview = () => {
   const [totalMotos, setTotalMotos] = useState(0);
   const [simulacoesFinanciamento, setSimulacoesFinanciamento] = useState([]);
   const [mensagensRecebidas, setMensagensRecebidas] = useState([]);
+  const [usuario, setUsuario] = useState({});
+  const [leadsAtribuidos, setLeadsAtribuidos] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [veiculosRes, financiamentosRes, mensagensRes] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/vehicles`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`),
+        // Obtém o token do localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('Token não encontrado. Por favor, faça login.');
+        }
+
+        // Configura os cabeçalhos com o token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const [veiculosRes, financiamentosRes, mensagensRes, usuarioRes, leadsRes] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/vehicles`, config),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos`, config),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, config),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`, config), // Substitua pela rota correta
         ]);
 
         const veiculos = veiculosRes.data;
@@ -145,6 +161,7 @@ const Overview = () => {
         setTotalMotos(motos.length);
         setSimulacoesFinanciamento(financiamentosRes.data);
         setMensagensRecebidas(mensagensRes.data);
+        setUsuario(usuarioRes.data); // Definir o usuário logado
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
         setError('Ocorreu um erro ao carregar os dados.');
@@ -176,7 +193,8 @@ const Overview = () => {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Visão Geral</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Bem-vindo, {usuario.nome}!</h1>
+      <p className="text-lg text-gray-600 mb-8">Leads atribuídos a você: {usuario.leadsAtribuidos}</p>
 
       {/* Seção de métricas principais e gráfico */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">

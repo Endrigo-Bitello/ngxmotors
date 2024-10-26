@@ -43,7 +43,7 @@ const clienteSchema = new mongoose.Schema({
     default: Date.now,
   },
   responsavelLead: {
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     default: null,
   },

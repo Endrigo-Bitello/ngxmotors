@@ -58,9 +58,6 @@ router.post('/contato', async (req, res) => {
 
   });
 
-
-
-
   try {
     const clienteSalvo = await novoCliente.save();
     res.status(201).json(clienteSalvo);
@@ -121,7 +118,10 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Cliente não encontrado' });
     }
 
-    // Atualizar campos
+    const novoResponsavel = req.body.responsavelLead;
+    const antigoResponsavel = cliente.responsavelLead;
+
+    // Atualizar campos do cliente
     cliente.nome = req.body.nome || cliente.nome;
     cliente.telefone = req.body.telefone || cliente.telefone;
     cliente.email = req.body.email || cliente.email;
@@ -129,8 +129,18 @@ router.put('/:id', async (req, res) => {
     cliente.etapa = req.body.etapa || cliente.etapa;
     cliente.estado = req.body.estado || cliente.estado;
     cliente.cidade = req.body.cidade || cliente.cidade;
-    cliente.fonteLead = req.body.fonteLead || cliente.fonteLead,
-    cliente.responsavelLead = req.body.responsavelLead || cliente.responsavelLead
+    cliente.fonteLead = req.body.fonteLead || cliente.fonteLead;
+    cliente.responsavelLead = novoResponsavel || cliente.responsavelLead;
+
+    // Se o responsável foi alterado, incrementar leadsAtribuidos
+    if (novoResponsavel && novoResponsavel !== antigoResponsavel) {
+      // Encontrar o novo responsável e incrementar leadsAtribuidos
+      const responsavel = await User.findById(novoResponsavel);
+      if (responsavel) {
+        responsavel.leadsAtribuidos += 1;
+        await responsavel.save();
+      }
+    }
 
     const clienteAtualizado = await cliente.save();
     res.json(clienteAtualizado);
@@ -138,6 +148,7 @@ router.put('/:id', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 router.patch('/:id/mover-etapa', async (req, res) => {
   try {
@@ -157,33 +168,27 @@ router.patch('/:id/mover-etapa', async (req, res) => {
   }
 });
 
-router.patch('/clientes/:id/assign', authenticate, authorize(['Administrador', 'Gerente']), async (req, res) => {
-  const { responsavelLead } = req.body; // ID do usuário responsável
+router.patch('/:id/assign', async (req, res) => {
+  const { responsavelLead } = req.body; // ID do responsável
 
   if (!responsavelLead) {
     return res.status(400).json({ message: 'ID do responsável é obrigatório' });
   }
 
   try {
-    const cliente = await Cliente.findById(req.params.id); // Cliente, em vez de Lead
+    const cliente = await Cliente.findById(req.params.id);
     if (!cliente) {
       return res.status(404).json({ message: 'Cliente não encontrado' });
-    }
-
-    // Verifique se o usuário responsável existe
-    const user = await User.findById(responsavelLead);
-    if (!user) {
-      return res.status(400).json({ message: 'Responsável inválido' });
     }
 
     // Atribui o responsável ao cliente
     cliente.responsavelLead = responsavelLead;
     await cliente.save();
 
-    return res.status(200).json({ message: 'Responsável atribuído com sucesso', cliente });
+    res.status(200).json({ message: 'Responsável atribuído com sucesso', cliente });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Erro ao atribuir responsável ao cliente' });
+    console.error('Erro ao atribuir responsável:', error);
+    res.status(500).json({ message: 'Erro ao atribuir responsável' });
   }
 });
 

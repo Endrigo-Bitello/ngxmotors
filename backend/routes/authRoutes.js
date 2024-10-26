@@ -77,11 +77,20 @@ router.post('/login', async (req, res) => {
 // Rota para obter o perfil do usuário logado
 router.get('/profile', authenticate, async (req, res) => {
   try {
+    // Busca o usuário pelo ID, excluindo o campo de senha
     const user = await User.findById(req.user.id).select('-password');
+
+    // Verifica se o usuário existe
     if (!user) {
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }
-    return res.status(200).json(user);
+
+    // Retorna o perfil do usuário, incluindo leadsAtribuidos
+    return res.status(200).json({
+      nome: user.username, // supondo que exista o campo nome no schema
+      email: user.email, // supondo que exista o campo email no schema
+      leadsAtribuidos: user.leadsAtribuidos, // novo campo
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Erro ao obter perfil' });
