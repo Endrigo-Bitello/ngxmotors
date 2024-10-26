@@ -117,8 +117,6 @@ app.use('/api', contactRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api', searchRoutes);
 
-
-
 app.get('/api/fipeAPI', (req, res) => {
   const { marca, modelo, ano } = req.query;
 
