@@ -281,25 +281,6 @@ router.delete('/delete-image/:customId/', async (req, res) => {
     }
 });
 
-
-router.delete('/remove-image/:customId/:filename', async (req, res) => {
-    try {
-        const {customId, filename} = req.params;
-        const imagePath = path.join(__dirname, '..', '..', 'frontend', 'public', 'images', 'carros', customId, filename); // Caminho completo da imagem
-
-        // Verifica se a imagem existe
-        if (fs.existsSync(imagePath)) {
-            // Remove a imagem do sistema de arquivos
-            fs.unlinkSync(imagePath);
-            return res.status(200).json({message: 'Imagem removida com sucesso'});
-        } else {
-            return res.status(404).json({message: 'Imagem não encontrada'});
-        }
-    } catch (error) {
-        return res.status(500).json({message: 'Erro ao remover imagem', error});
-    }
-});
-
 router.delete('/customId/:customId', async (req, res) => {
     const {customId} = req.params;
 
