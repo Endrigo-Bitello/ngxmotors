@@ -109,22 +109,62 @@ export default function Details({vehicle, onClose, onSave}) {
 
     const handleSave = async () => {
         try {
-          const route = vehicle.tipo === 'carro' ? 'carros' : 'motos';
-    
-          // Atualiza os dados do veículo no banco de dados
-          await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/${editableVehicle.customId}`, editableVehicle);
-    
-          // Notifica o Stock.js que os veículos foram atualizados
-          if (onSave) {
-            onSave();  // Chama a função que recarrega os veículos
-            onClose();
-          }
-    
-          setIsEditing(false);  // Fecha o modo de edição
+            const route = vehicle.tipo === 'carro' ? 'carros' : 'motos';
+
+            const vehicleImages = editableVehicle.imagens
+
+            // Filtra valores undefined antes de mapear
+            const imageUploads = await Promise.all(vehicleImages.filter(Boolean).map(async (image) => {
+                if (image instanceof File) {
+                    const imageData = new FormData();
+                    imageData.append('image', image);
+
+                    // Enviando rota de upload para carros
+                    const response = await axios.post(
+                        `${process.env.NEXT_PUBLIC_API_URL}/api/${route}/update-images/${editableVehicle.customId}`,
+                        imageData, {
+                            headers: {'Content-Type': 'multipart/form-data'}
+                        }
+                    );
+
+                    if (typeof response.data.imageURL === 'string') {
+                        return response.data.imageURL;
+                    } else {
+                        console.error('Erro: imageURL não é uma string', response.data.imageURL);
+                        return null; // Ou algum valor padrão
+                    }
+                }
+
+                if (typeof image === 'string') {
+                    return image; // Retorna a URL da imagem se não for um File
+                } else {
+                    console.error('Erro: imagem não é um tipo esperado', image);
+                    return null; // Ou algum valor padrão
+                }
+            }));
+
+            // Filtra as imagens para remover valores nulos
+            editableVehicle.imagens = imageUploads.filter(img => img !== null);
+
+            await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/${route}/${editableVehicle.customId}`,
+                editableVehicle
+            );
+
+            // Enviando rota de deletar imagens não existentes
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/${route}/delete-image/${editableVehicle.customId}`)
+
+            // Notifica o Stock.js que os veículos foram atualizados
+            if (onSave) {
+                onSave();  // Chama a função que recarrega os veículos
+                onClose();
+            }
+
+            setIsEditing(false);  // Fecha o modo de edição
         } catch (error) {
-          console.error('Erro ao salvar as alterações:', error);
+            console.error('Erro ao salvar as alterações:', error);
         }
-      };
+    };
 
     // Renderiza cada seção baseada no botão clicado
     const renderSection = () => {
@@ -133,7 +173,10 @@ export default function Details({vehicle, onClose, onSave}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Informações Básicas</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSave();
+                        }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {[
                                     {key: 'marca', label: 'Marca'},
@@ -275,7 +318,10 @@ export default function Details({vehicle, onClose, onSave}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Ficha Técnica</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSave();
+                        }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Campos comuns a ambos os tipos de veículos */}
                                 {[
@@ -538,7 +584,10 @@ export default function Details({vehicle, onClose, onSave}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Documentação e Regularização</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSave();
+                        }}>
                             <div className="space-y-6">
                                 {[
                                     {key: 'placa', label: 'Placa'},
@@ -745,7 +794,10 @@ export default function Details({vehicle, onClose, onSave}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Opcionais do Veículo</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSave();
+                        }}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {opcionais.map((opcional) => (
                                     <div key={opcional.key} className="flex items-center">
@@ -813,7 +865,10 @@ export default function Details({vehicle, onClose, onSave}) {
                 return (
                     <div className="p-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
                         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Valores e Imagens</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSave();
+                        }}>
                             {/* Valor de Compra */}
                             <div className="mb-6">
                                 <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -982,6 +1037,7 @@ export default function Details({vehicle, onClose, onSave}) {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                                         {editableVehicle.imagens.map((image, index) => (
                                             <div key={index} className="relative group">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img
                                                     src={image instanceof File ? URL.createObjectURL(image) : image}
                                                     alt={`Imagem ${index + 1}`}
