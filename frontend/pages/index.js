@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { whatsappWhite } from '../utils/share';
 import CookieConsent from './components/CookieConsent';
 import { FaWhatsapp } from 'react-icons/fa';
+import Demo from './components/Demo';
 
 const GoogleMaps = dynamic(() => import('./components/GoogleMaps'), { ssr: false });
 
@@ -105,6 +106,7 @@ const Home = () => {
     return (
         <div className="bg-gray-100 min-h-screen flex flex-col">
             {/* Navbar */}
+            <Demo />
             <Navbar />
             <Banner />
 

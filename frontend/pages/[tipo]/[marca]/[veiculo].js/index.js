@@ -329,10 +329,7 @@ export default function VehiclePage() {
                                         value: `${vehicleData.potencia} cv`
                                     },
                                     {
-                                        label: vehicleData.customId.startsWith('m') ? 'Cilindrada' : 'Motor',
-                                        value: vehicleData.customId.startsWith('m')
-                                            ? vehicleData.cilindrada
-                                            : vehicleData.motor
+                                        label: vehicleData.customId.startsWith('m') ? 'Cilindrada' : 'Motor', value: vehicleData.customId.startsWith('m') ? vehicleData.cilindrada + ' CC' : vehicleData.motor
                                     },
                                     {
                                         label: 'Torque',

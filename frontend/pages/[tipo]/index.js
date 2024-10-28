@@ -13,7 +13,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { whatsappWhite } from '@/utils/share';
 
-
 export default function VehicleTypePage() {
   const router = useRouter();
   const { tipo } = router.query;
