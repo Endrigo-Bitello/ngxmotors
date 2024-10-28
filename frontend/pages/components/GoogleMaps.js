@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'; // Não esqueça de importar axios
 
 const GoogleMaps = () => {
-  // Obtenha o endereço do ambiente e codifique para URL
-  const address = encodeURIComponent(process.env.NEXT_PUBLIC_GOOGLE_MAPS);
+  const [settings, setSettings] = useState(null);
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/settings/get-settings`);
+      setSettings(data); 
+    } catch (error) {
+      console.error('Erro ao buscar configurações:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  // Verifique se `settings` existe antes de tentar acessar `address`
+  if (!settings) {
+    return <p>Carregando mapa...</p>;
+  }
+
+  const location = encodeURIComponent(settings.address);
 
   // URL do Google Maps para incorporação sem API Key
-  const mapUrl = `https://www.google.com/maps?q=${address}&output=embed`;
+  const mapUrl = `https://www.google.com/maps?q=${location}&output=embed`;
 
   return (
     <div className="w-full h-64 md:h-96 mt-12">
