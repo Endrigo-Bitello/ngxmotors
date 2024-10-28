@@ -93,7 +93,7 @@ export default function Settings() {
       alert('Erro ao atualizar configurações');
     }
   };
-  
+
   const renderFormContent = () => {
     switch (activeTab) {
       case 'informacoes':
@@ -234,6 +234,16 @@ export default function Settings() {
                 onChange={(e) => setName(e.target.value)}
                 className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm"
                 placeholder="Digite o nome do estabelecimento"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm"
+                placeholder="Digite o e-mail do estabelecimento"
               />
             </div>
             <div>
