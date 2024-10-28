@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import Card, { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/Card';
+import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '../ui/Card';
 
 import styles from './VehiclesChart.module.css';
 
@@ -55,19 +55,17 @@ const VehiclesChart = () => {
   const calculatePercentage = (value) => ((value / totalVehicles) * 100).toFixed(2);
 
   return (
-    <Card className={styles.card}>
-      <div className={styles.chartContainer}>
+    <Card className="p-6">
+      <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
         {/* Gráfico de Pizza */}
-        <div className={styles.chartWrapper}>
-          <CardHeader className={styles.cardHeader}>
-            <CardTitle className={styles.cardTitle}>Proporção de Veículos</CardTitle>
-            <CardDescription className={styles.cardDescription}>
-              Quantidade de Carros e Motos
-            </CardDescription>
+        <div className="lg:w-1/2 w-full">
+          <CardHeader>
+            <CardTitle className="text-lg lg:text-2xl font-bold">Proporção de Veículos</CardTitle>
+            <CardDescription className="text-gray-600">Quantidade de Carros e Motos</CardDescription>
           </CardHeader>
 
-          <CardContent className={styles.chart}>
-            <ResponsiveContainer width="100%" height={450}>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Pie
                   data={vehiclesData}
@@ -75,7 +73,7 @@ const VehiclesChart = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={200}
+                  outerRadius={window.innerWidth < 768 ? 80 : 150} // Ajusta o tamanho para mobile
                   label={(entry) => `${entry.name}: ${entry.value}`}
                   labelLine={false}
                 >
@@ -89,34 +87,31 @@ const VehiclesChart = () => {
           </CardContent>
         </div>
 
-        {/* Relatório à direita */}
-        <div className={styles.reportWrapper}>
-          <h3 className="text-xl font-bold text-gray-800 mb-6">Relatório de Veículos</h3>
-
+        {/* Relatório */}
+        <div className="lg:w-1/2 w-full">
+          <h3 className="text-lg lg:text-xl font-bold text-gray-800 mb-4">Relatório de Veículos</h3>
           <div className="space-y-6">
             {vehiclesData.map((entry, index) => (
-              <div key={index} className={styles.reportItem}>
+              <div key={index}>
                 <div className="flex justify-between items-center mb-2">
-                  <span className={styles.reportLabel}>{entry.name}</span>
-                  <span className={styles.reportValue}>{entry.value} veículos</span>
+                  <span className="text-gray-600 font-medium">{entry.name}</span>
+                  <span className="font-bold text-gray-800">{entry.value} veículos</span>
                 </div>
-                <div className={styles.progressContainer}>
-                  <div className={styles.progressBar}>
-                    <div
-                      className={styles.progressFill}
-                      style={{ width: `${calculatePercentage(entry.value)}%` }}
-                    ></div>
-                  </div>
-                  <span className={styles.reportPercentage}>
-                    {calculatePercentage(entry.value)}%
-                  </span>
+                <div className="relative h-2 bg-gray-200 rounded-full">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-blue-500 rounded-full"
+                    style={{ width: `${calculatePercentage(entry.value)}%` }}
+                  ></div>
                 </div>
+                <span className="text-sm text-gray-500 mt-1 block">
+                  {calculatePercentage(entry.value)}%
+                </span>
               </div>
             ))}
           </div>
 
-          <div className={styles.insight}>
-            <h4 className="text-lg font-semibold text-blue-600">Insight</h4>
+          <div className="mt-6 p-4 bg-blue-100 rounded-lg">
+            <h4 className="text-blue-600 text-lg font-semibold">Insight</h4>
             <p className="text-gray-700 mt-2">
               A maior parte dos veículos cadastrados são{' '}
               <strong>{vehiclesData.length > 0 ? vehiclesData[0].name : 'N/A'}</strong>, representando{' '}

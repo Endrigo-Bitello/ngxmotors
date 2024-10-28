@@ -63,51 +63,51 @@ export default function VehiclePage() {
     }, [vehicleData, settings]);
 
 
-// Função para enviar o formulário de contato
-const handleSubmit = async (e) => {
-    e.preventDefault();
+    // Função para enviar o formulário de contato
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    try {
-        // Faz a requisição POST para enviar os dados da mensagem
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, {
-            nome,
-            email,
-            telefone,
-            cpf: '123.456.789-10', // CPF estático, pode ser alterado para ser dinâmico se necessário
-            mensagem,
-            customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
-        });
-
-        // Verifica a resposta da API de mensagem
-        if (res.status === 201) {
-            // Agora, faz o envio do lead com o customId
-            const resLead = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/mensagem-veiculo`, {
+        try {
+            // Faz a requisição POST para enviar os dados da mensagem
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, {
                 nome,
                 email,
                 telefone,
-                etapa: 'Novo Lead', 
-                fonteLead: 'Pág. Veículo', 
-                customId: vehicleData?.customId || '', 
+                cpf: '123.456.789-10', // CPF estático, pode ser alterado para ser dinâmico se necessário
+                mensagem,
+                customId: vehicleData?.customId || '', // Inclui o customId do veículo se disponível
             });
 
-            // Verifica a resposta da API de lead e exibe mensagem de sucesso
-            if (resLead.status === 201) {
-                alert('Mensagem e lead enviados com sucesso!');
+            // Verifica a resposta da API de mensagem
+            if (res.status === 201) {
+                // Agora, faz o envio do lead com o customId
+                const resLead = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes/mensagem-veiculo`, {
+                    nome,
+                    email,
+                    telefone,
+                    etapa: 'Novo Lead',
+                    fonteLead: 'Pág. Veículo',
+                    customId: vehicleData?.customId || '',
+                });
 
-                // Limpa os campos do formulário após o envio
-                setNome('');
-                setEmail('');
-                setTelefone('');
-                setMensagem('');
+                // Verifica a resposta da API de lead e exibe mensagem de sucesso
+                if (resLead.status === 201) {
+                    alert('Mensagem e lead enviados com sucesso!');
+
+                    // Limpa os campos do formulário após o envio
+                    setNome('');
+                    setEmail('');
+                    setTelefone('');
+                    setMensagem('');
+                }
             }
-        }
-    } catch (error) {
-        console.error('Erro ao enviar a mensagem ou criar lead:', error);
+        } catch (error) {
+            console.error('Erro ao enviar a mensagem ou criar lead:', error);
 
-        // Exibe uma mensagem de erro ao usuário
-        alert('Erro ao enviar a mensagem ou criar lead. Por favor, tente novamente.');
-    }
-};
+            // Exibe uma mensagem de erro ao usuário
+            alert('Erro ao enviar a mensagem ou criar lead. Por favor, tente novamente.');
+        }
+    };
 
 
     useEffect(() => {
@@ -281,20 +281,63 @@ const handleSubmit = async (e) => {
                                 <h2 className="text-2xl font-semibold text-gray-900">Características</h2>
                             </div>
                             <ul>
+
                                 {[
                                     { label: 'Marca', value: vehicleData.marca },
                                     { label: 'Ano de Fabricação', value: vehicleData.anoFabricacao },
                                     { label: 'Ano do Modelo', value: vehicleData.anoModelo },
-                                    { label: 'Câmbio', value: vehicleData.transmissao },
-                                    { label: 'Quilometragem', value: `${vehicleData.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km` }, // Quilometragem formatada
-                                    { label: 'Cor', value: vehicleData.cor },
-                                    { label: 'Combustível', value: vehicleData.combustivel },
-                                    { label: 'Portas', value: vehicleData.numeroDePortas },
-                                    { label: 'Categoria', value: vehicleData.tipoDeCarro || 'Não especificada' },
-                                    { label: 'Direção', value: vehicleData.direcao },
-                                    { label: 'Potência', value: `${vehicleData.potencia} cv` },
-                                    { label: 'Motor', value: vehicleData.motor },
-                                    { label: 'Torque', value: `${vehicleData.torque} kgfm` },
+                                    {
+                                        label: 'Categoria',
+                                        value: vehicleData.customId.startsWith('m')
+                                            ? vehicleData.tipoDeMoto || 'Não especificada'
+                                            : vehicleData.tipoDeCarro || 'Não especificada'
+                                    },
+                                    {
+                                        label: 'Câmbio',
+                                        value: vehicleData.transmissao
+                                    },
+                                    {
+                                        label: 'Quilometragem',
+                                        value: `${vehicleData.quilometragem.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Km`
+                                    },
+                                    {
+                                        label: 'Cor',
+                                        value: vehicleData.cor
+                                    },
+                                    {
+                                        label: 'Combustível',
+                                        value: vehicleData.combustivel
+                                    },
+                                    {
+                                        label: vehicleData.customId.startsWith('m') ? 'Marchas' : 'Portas',
+                                        value: vehicleData.customId.startsWith('m')
+                                            ? vehicleData.numeroDeMarchas
+                                            : vehicleData.numeroDePortas
+                                    },
+                                    {
+                                        label: vehicleData.customId.startsWith('m') ? 'Freios' : 'Porta-malas',
+                                        value: vehicleData.customId.startsWith('m')
+                                            ? vehicleData.freios
+                                            : `${vehicleData.capacidadePortaMalas}L`
+                                    },
+                                    {
+                                        label: 'Direção',
+                                        value: vehicleData.direcao
+                                    },
+                                    {
+                                        label: 'Potência',
+                                        value: `${vehicleData.potencia} cv`
+                                    },
+                                    {
+                                        label: vehicleData.customId.startsWith('m') ? 'Cilindrada' : 'Motor',
+                                        value: vehicleData.customId.startsWith('m')
+                                            ? vehicleData.cilindrada
+                                            : vehicleData.motor
+                                    },
+                                    {
+                                        label: 'Torque',
+                                        value: `${vehicleData.torque} kgfm`
+                                    }
                                 ].map((item, index) => (
                                     <li
                                         key={index}

@@ -102,18 +102,32 @@ const NewMotorcycle = () => {
         '650', '700', '750', '800', '850', '900', '950', '1000',
         'Acima de 1.000'];
 
-
     // Estados para os dropdowns
-    const [dropdownOpen, setDropdownOpen] = useState(false); 
-    const [tipoDeMotoOpen, setTipoDeMotoOpen] = useState(false); 
-    const [cilindradaOpen, setCilindradaOpen] = useState(false); 
-    const [transmissaoOpen, setTransmissaoOpen] = useState(false); 
-    const [combustivelOpen, setCombustivelOpen] = useState(false); 
-    const [direcaoOpen, setDirecaoOpen] = useState(false); 
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [tipoDeMotoOpen, setTipoDeMotoOpen] = useState(false);
+    const [cilindradaOpen, setCilindradaOpen] = useState(false);
+    const [transmissaoOpen, setTransmissaoOpen] = useState(false);
+    const [combustivelOpen, setCombustivelOpen] = useState(false);
+    const [direcaoOpen, setDirecaoOpen] = useState(false);
     const [freiosOpen, setFreiosOpen] = useState(false);
-    const [ipvaOpen, setIpvaOpen] = useState(false); 
-    const [dpvatOpen, setDpvatOpen] = useState(false); 
+    const [ipvaOpen, setIpvaOpen] = useState(false);
+    const [dpvatOpen, setDpvatOpen] = useState(false);
     const [showStock, setShowStock] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState(null);
+    const [placaFormat, setPlacaFormat] = useState('');
+
+    const detectPlacaFormat = (placa) => {
+        const mercosulRegex = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
+        const antigoRegex = /^[A-Z]{3}-[0-9]{4}$/;
+
+        if (mercosulRegex.test(placa)) {
+            return 'mercosul';
+        } else if (antigoRegex.test(placa)) {
+            return 'antiga';
+        } else {
+            return '';
+        }
+    };
 
 
     const handleKilometragemChange = (e) => {
@@ -124,56 +138,9 @@ const NewMotorcycle = () => {
         });
     };
 
-    const handlePotenciaChange = (e) => {
-        const value = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-        setFormData({
-            ...formData,
-            potencia: value
-        });
-    };
-
-    const handleTorqueChange = (e) => {
-        const value = e.target.value.replace(/[^0-9,.]/g, ''); // Remove tudo que não for número ou ponto/vírgula
-        setFormData({
-            ...formData,
-            torque: value
-        });
-    };
-
-    const handleCilindradaSelect = (option) => {
-        setFormData({ ...formData, cilindrada: option }); // Atualiza o campo cilindrada
-        setCilindradaOpen(false); // Fecha o dropdown após a seleção
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
-    const [placaFormat, setPlacaFormat] = useState('');
-
-    // Função para detectar o formato da placa
-    const detectPlacaFormat = (placa) => {
-        const mercosulRegex = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
-        const antigoRegex = /^[A-Z]{3}-[0-9]{4}$/;
-
-        if (mercosulRegex.test(placa)) {
-            return 'mercosul';
-        } else if (antigoRegex.test(placa)) {
-            return 'antigo';
-        } else {
-            return '';
-        }
-    };
-
-    // Modifique a função handleChange para detectar o formato da placa ao alterar o valor
     const handleChangePlaca = (e) => {
         const { name, value } = e.target;
 
-        // Detecta o formato da placa se o campo de placa for modificado
         if (name === 'placa') {
             setPlacaFormat(detectPlacaFormat(value));
         }
@@ -184,17 +151,61 @@ const NewMotorcycle = () => {
         });
     };
 
+    const toggleDropdown = (dropdown) => {
+        if (openDropdown === dropdown) {
+            setOpenDropdown(null);
+        } else {
+            setOpenDropdown(dropdown);
+        }
+    };
+
+    const handlePotenciaChange = (e) => {
+        const value = e.target.value.replace(/\D/g, '');
+        setFormData({
+            ...formData,
+            potencia: value
+        });
+    };
+
     const handleCheckboxChange = (e) => {
         const { name, checked } = e.target;
-        const key = name.split('.')[1]; // Pega a chave específica dos opcionais
 
-        setFormData((prevData) => ({
-            ...prevData,
-            opcionais: {
-                ...prevData.opcionais,
-                [key]: checked,
-            }
-        }));
+        if (name.includes('opcionais')) {
+            const key = name.split('.')[1];
+            setFormData((prevData) => ({
+                ...prevData,
+                opcionais: {
+                    ...prevData.opcionais,
+                    [key]: checked,
+                }
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checked,
+            }));
+        }
+    };
+
+    const handleTorqueChange = (e) => {
+        const value = e.target.value.replace(/[^0-9,.]/g, '');
+        setFormData({
+            ...formData,
+            torque: value
+        });
+    };
+
+    const handleCilindradaSelect = (option) => {
+        setFormData({ ...formData, cilindrada: option });
+        setCilindradaOpen(false);
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
     };
 
     const nextStep = () => {
@@ -209,30 +220,31 @@ const NewMotorcycle = () => {
         e.preventDefault();
 
         try {
+            // Primeira requisição: criar o veículo no banco de dados
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/motos`, formData);
-            const customId = response.data.customId; 
+            const customId = response.data.customId;
 
-
+            // Se houver imagens para enviar, faça o upload delas
             if (formData.imagens.length > 0) {
                 const formDataImagens = new FormData();
 
+                // Adiciona as imagens ao FormData
                 Array.from(formData.imagens).forEach((file, index) => {
-                    formDataImagens.append('imagens', file); 
+                    formDataImagens.append('imagens', file);
                 });
 
-            
+                // Segunda requisição: enviar as imagens
                 const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/motos/upload/${customId}`, formDataImagens, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-
             }
 
             setShowStock(true);
 
         } catch (error) {
-            console.error('Erro ao adicionar moto ou enviar imagens:', error.response ? error.response.data : error.message);
+            console.error('Erro ao adicionar carro ou enviar imagens:', error.response ? error.response.data : error.message);
         }
     };
 
@@ -240,29 +252,88 @@ const NewMotorcycle = () => {
         return <Stock />;
     }
 
-    const renderButton = () => (
-        <div className="flex justify-between mt-6">
-            {step > 1 && (
-                <button
-                    type="button"
-                    onClick={prevStep}
-                    className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-all"
-                >
-                    <FaStepBackward className="inline-block mr-2" /> Voltar
-                </button>
-            )}
-            {step < 5 && (
-                <button
-                    type="button"
-                    onClick={nextStep}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
-                >
-                    Próxima Etapa <FaStepForward className="inline-block ml-2" />
-                </button>
-            )}
-        </div>
-    );
 
+    const renderButton = () => {
+        const isStepValid = () => {
+            switch (step) {
+                case 1:
+                    // Campos obrigatórios da etapa 1
+                    return formData.marca &&
+                        formData.modelo &&
+                        formData.tipoDeMoto &&
+                        formData.anoFabricacao &&
+                        formData.anoModelo &&
+                        formData.transmissao &&
+                        formData.cor;
+                case 2:
+                    // Campos obrigatórios da etapa 2
+                    return formData.quilometragem &&
+                        formData.combustivel &&
+                        formData.direcao &&
+                        formData.potencia &&
+                        formData.cilindrada &&
+                        formData.torque &&
+                        formData.numeroDeMarchas &&
+                        formData.freios &&
+                        formData.capacidadeTanque &&
+                        formData.peso;
+                case 3:
+                    // Campos obrigatórios da etapa 3
+                    return formData.placa &&
+                        formData.ipva &&
+                        formData.dpvat;
+                case 4:
+                    // Nenhum campo obrigatório nesta etapa, então retorna true
+                    return true;
+                case 5:
+                    // Campos obrigatórios da etapa 5
+                    return formData.valorCompra &&
+                        formData.valorVenda &&
+                        formData.valorFIPE &&
+                        formData.imagens.length > 0;
+                default:
+                    return true;
+            }
+        };
+
+        return (
+            <div className="flex justify-between mt-6">
+                {step > 1 && (
+                    <button
+                        type="button"
+                        onClick={prevStep}
+                        className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-all"
+                    >
+                        <FaStepBackward className="inline-block mr-2" /> Voltar
+                    </button>
+                )}
+                {step < 5 && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (isStepValid()) {
+                                nextStep();
+                            } else {
+                                // Exibe uma mensagem personalizada ao usuário
+                                alert('Por favor, preencha todos os campos obrigatórios antes de avançar.');
+                            }
+                        }}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+                    >
+                        Próxima Etapa <FaStepForward className="inline-block ml-2" />
+                    </button>
+                )}
+                {step === 5 && (
+                    <button
+                        type="submit"
+                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+                    >
+                        Enviar
+                    </button>
+                )}
+            </div>
+        );
+    };
 
     switch (step) {
         case 1:
@@ -270,42 +341,41 @@ const NewMotorcycle = () => {
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
                     <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Informações Básicas</h2>
                     <form className="space-y-6">
-
-                        {/* Marca (com ícones de marca no dropdown) */}
+                        {/* Marca */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Marca</label>
                             <div className="relative">
                                 <button
                                     type="button"
                                     className="w-full flex items-center justify-between bg-white border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    onClick={() => toggleDropdown('marca')}
                                 >
                                     {formData.marca ? (
                                         <div className="flex items-center">
-                                        <div className="w-6 h-6 mr-3 relative">
-                                            <Image
-                                                src={`/icons/${formData.marca.toLowerCase().replace(/ /g, '-')}.png`}
-                                                alt={formData.marca}
-                                                layout="fill" // Preenche o contêiner pai
-                                                objectFit="contain" // Garante que a imagem mantenha seu conteúdo
-                                                className="mr-3"
-                                            />
+                                            <div className="w-6 h-6 mr-3 relative">
+                                                <Image
+                                                    src={`/icons/${formData.marca.toLowerCase().replace(/ /g, '-')}.png`}
+                                                    alt={formData.marca}
+                                                    layout="fill"
+                                                    objectFit="contain"
+                                                    className="mr-3"
+                                                />
+                                            </div>
+                                            {formData.marca}
                                         </div>
-                                        {formData.marca}
-                                    </div>
                                     ) : (
                                         <span className="text-gray-500">Selecione a marca</span>
                                     )}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
-                                {dropdownOpen && (
+                                {openDropdown === 'marca' && (
                                     <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {marcas.map((marca) => (
                                             <li
                                                 key={marca}
                                                 onClick={() => {
                                                     setFormData({ ...formData, marca });
-                                                    setDropdownOpen(false);
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="flex items-center p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -314,7 +384,7 @@ const NewMotorcycle = () => {
                                                         src={`/icons/${marca.toLowerCase().replace(/ /g, '-')}.png`}
                                                         alt={marca}
                                                         layout="fill"
-                                                        objectFit="contain" 
+                                                        objectFit="contain"
                                                     />
                                                 </div>
                                                 {marca}
@@ -345,7 +415,7 @@ const NewMotorcycle = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => setTipoDeMotoOpen(!tipoDeMotoOpen)}
+                                    onClick={() => toggleDropdown('tipoDeMoto')}
                                 >
                                     {formData.tipoDeMoto ? (
                                         <span>{formData.tipoDeMoto}</span>
@@ -354,14 +424,14 @@ const NewMotorcycle = () => {
                                     )}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
-                                {tipoDeMotoOpen && (
+                                {openDropdown === 'tipoDeMoto' && (
                                     <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {tiposDeMoto.map((tipo) => (
                                             <li
                                                 key={tipo}
                                                 onClick={() => {
                                                     setFormData({ ...formData, tipoDeMoto: tipo });
-                                                    setTipoDeMotoOpen(false);
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -407,7 +477,7 @@ const NewMotorcycle = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => setTransmissaoOpen(!transmissaoOpen)}
+                                    onClick={() => toggleDropdown('transmissao')}
                                 >
                                     {formData.transmissao ? (
                                         <span>{formData.transmissao}</span>
@@ -416,14 +486,14 @@ const NewMotorcycle = () => {
                                     )}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
-                                {transmissaoOpen && (
+                                {openDropdown === 'transmissao' && (
                                     <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {transmissoes.map((transmissao) => (
                                             <li
                                                 key={transmissao}
                                                 onClick={() => {
                                                     setFormData({ ...formData, transmissao });
-                                                    setTransmissaoOpen(false);
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -453,13 +523,11 @@ const NewMotorcycle = () => {
                 </div>
             );
 
-
         case 2:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
                     <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Ficha Técnica</h2>
                     <form className="space-y-6">
-
                         {/* Quilometragem */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Quilometragem</label>
@@ -467,8 +535,8 @@ const NewMotorcycle = () => {
                                 <input
                                     type="text"
                                     name="quilometragem"
-                                    value={formData.quilometragem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} // Formatação com separadores
-                                    onChange={(e) => handleKilometragemChange(e)} // Manipulador personalizado
+                                    value={formData.quilometragem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                                    onChange={(e) => handleKilometragemChange(e)}
                                     placeholder="Digite a quilometragem"
                                     className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 w-full pr-16"
                                 />
@@ -483,7 +551,7 @@ const NewMotorcycle = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => setCombustivelOpen(!combustivelOpen)}
+                                    onClick={() => toggleDropdown('combustivel')}
                                 >
                                     {formData.combustivel ? (
                                         <span>{formData.combustivel}</span>
@@ -492,14 +560,14 @@ const NewMotorcycle = () => {
                                     )}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
-                                {combustivelOpen && (
+                                {openDropdown === 'combustivel' && (
                                     <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {combustiveis.map((combustivel) => (
                                             <li
                                                 key={combustivel}
                                                 onClick={() => {
                                                     setFormData({ ...formData, combustivel });
-                                                    setCombustivelOpen(false);
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -518,7 +586,7 @@ const NewMotorcycle = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => setDirecaoOpen(!direcaoOpen)}
+                                    onClick={() => toggleDropdown('direcao')}
                                 >
                                     {formData.direcao ? (
                                         <span>{formData.direcao}</span>
@@ -527,14 +595,14 @@ const NewMotorcycle = () => {
                                     )}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
-                                {direcaoOpen && (
+                                {openDropdown === 'direcao' && (
                                     <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {direcoes.map((direcao) => (
                                             <li
                                                 key={direcao}
                                                 onClick={() => {
                                                     setFormData({ ...formData, direcao });
-                                                    setDirecaoOpen(false);
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -554,8 +622,8 @@ const NewMotorcycle = () => {
                                     <input
                                         type="text"
                                         name="potencia"
-                                        value={formData.potencia.replace(/\D/g, '')} // Mantém apenas números
-                                        onChange={handlePotenciaChange} // Função personalizada
+                                        value={formData.potencia.replace(/\D/g, '')}
+                                        onChange={handlePotenciaChange}
                                         placeholder="Digite a potência da moto"
                                         className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 w-full pr-16"
                                     />
@@ -567,23 +635,25 @@ const NewMotorcycle = () => {
                                 <label className="text-gray-700 font-medium mb-2">Cilindrada</label>
                                 <button
                                     type="button"
-                                    onClick={() => setCilindradaOpen(!cilindradaOpen)} // Abre/fecha o dropdown
+                                    onClick={() => toggleDropdown('cilindrada')}
                                     className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 flex justify-between items-center"
                                 >
                                     {formData.cilindrada || 'Selecione a cilindrada'}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
 
-                                {/* Dropdown de opções de cilindrada */}
-                                {cilindradaOpen && (
+                                {openDropdown === 'cilindrada' && (
                                     <ul
                                         className="absolute z-20 left-0 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
-                                        style={{ top: '100%', marginTop: '0.5rem' }} // Evita sobreposição e dá espaço entre o botão e o dropdown
+                                        style={{ top: '100%', marginTop: '0.5rem' }}
                                     >
                                         {cilindradaOptions.map((option) => (
                                             <li
                                                 key={option}
-                                                onClick={() => handleCilindradaSelect(option)} // Seleciona a cilindrada
+                                                onClick={() => {
+                                                    handleCilindradaSelect(option);
+                                                    toggleDropdown(null);
+                                                }}
                                                 className="cursor-pointer px-4 py-2 hover:bg-gray-100"
                                             >
                                                 {option}
@@ -601,8 +671,8 @@ const NewMotorcycle = () => {
                                 <input
                                     type="text"
                                     name="torque"
-                                    value={formData.torque.replace(/[^0-9,.]/g, '')} // Mantém apenas números e vírgulas/pontos decimais
-                                    onChange={handleTorqueChange} // Função personalizada
+                                    value={formData.torque.replace(/[^0-9,.]/g, '')}
+                                    onChange={handleTorqueChange}
                                     placeholder="Exemplo: 30 kgfm"
                                     className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 w-full pr-16"
                                 />
@@ -630,7 +700,7 @@ const NewMotorcycle = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => setFreiosOpen(!freiosOpen)}
+                                    onClick={() => toggleDropdown('freios')}
                                 >
                                     {formData.freios ? (
                                         <span>{formData.freios}</span>
@@ -639,14 +709,14 @@ const NewMotorcycle = () => {
                                     )}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
-                                {freiosOpen && (
+                                {openDropdown === 'freios' && (
                                     <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                         {freiosOptions.map((freios) => (
                                             <li
                                                 key={freios}
                                                 onClick={() => {
                                                     setFormData({ ...formData, freios });
-                                                    setFreiosOpen(false);
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -660,7 +730,6 @@ const NewMotorcycle = () => {
 
                         {/* Capacidade do Tanque e Peso */}
                         <div className="grid grid-cols-2 gap-6">
-                            {/* Capacidade do Tanque */}
                             <div className="flex flex-col">
                                 <label className="text-gray-700 font-medium mb-2">Capacidade do Tanque (L)</label>
                                 <div className="relative flex items-center">
@@ -676,7 +745,6 @@ const NewMotorcycle = () => {
                                 </div>
                             </div>
 
-                            {/* Peso */}
                             <div className="flex flex-col">
                                 <label className="text-gray-700 font-medium mb-2">Peso (kg)</label>
                                 <div className="relative flex items-center">
@@ -697,6 +765,7 @@ const NewMotorcycle = () => {
                     </form>
                 </div>
             );
+
 
         case 3:
             return (
@@ -939,6 +1008,137 @@ const NewMotorcycle = () => {
                 </div>
             );
 
+
+        case 3:
+            return (
+                <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
+                    <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Documentação e Regularização</h2>
+                    <form className="space-y-6">
+                        {/* Placa */}
+                        <div className="flex flex-col">
+                            <label className="text-gray-700 font-medium mb-2">Placa</label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="placa"
+                                    value={formData.placa}
+                                    onChange={handleChangePlaca}
+                                    placeholder="Digite a placa"
+                                    className="p-3 pr-12 w-full bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    {/* Ícone da placa */}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="24px"
+                                        width="40px"
+                                        viewBox="0 0 512 512"
+                                        className="text-gray-400"
+                                    >
+                                        <path
+                                            style={{ fill: '#F1F1F1' }}
+                                            d="M483.46,381.459H28.54c-15.762,0-28.54-12.778-28.54-28.54V159.081
+                       c0-15.762,12.778-28.54,28.54-28.54H483.46c15.762,0,28.54,12.778,28.54,28.54v193.838
+                       C512,368.681,499.222,381.459,483.46,381.459z"
+                                        />
+                                        <path
+                                            style={{ fill: '#D7D7D7' }}
+                                            d="M483.46,130.541H256v250.917h227.46c15.762,0,28.54-12.778,28.54-28.54V159.081
+                       C512,143.319,499.222,130.541,483.46,130.541z"
+                                        />
+                                        <path
+                                            style={{ fill: '#67B5F8' }}
+                                            d="M512,159.081c0-15.762-12.778-28.54-28.54-28.54H28.54c-15.762,0-28.54,12.778-28.54,28.54v27.354
+                       h512V159.081z"
+                                        />
+                                        <path
+                                            style={{ fill: '#3D6DFA' }}
+                                            d="M512,159.081c0-15.762-12.778-28.54-28.54-28.54H256v55.894h256V159.081z"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            {/* Mensagem sobre o formato da placa */}
+                            {formData.placa && (
+                                <span className="text-gray-500 mt-1">
+                                    {placaFormat === 'mercosul'
+                                        ? 'Formato da placa: Mercosul'
+                                        : placaFormat === 'antigo'
+                                            ? 'Formato da placa: Antigo'
+                                            : null}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* IPVA */}
+                        <div className="flex flex-col">
+                            <label className="text-gray-700 font-medium mb-2">IPVA</label>
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    className={`w-full bg-white flex items-center p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300 
+                                ${formData.ipva === 'Pago' ? 'border border-green-500' : formData.ipva === 'Pendente' ? 'border border-yellow-500' : 'border border-gray-300'}`}
+                                    onClick={() => toggleDropdown('ipva')}
+                                >
+                                    {formData.ipva ? <span>{formData.ipva}</span> : <span className="text-gray-500">Selecione o status do IPVA</span>}
+                                </button>
+                                {openDropdown === 'ipva' && (
+                                    <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        {ipvaOptions.map((ipva) => (
+                                            <li
+                                                key={ipva}
+                                                onClick={() => {
+                                                    setFormData({ ...formData, ipva });
+                                                    toggleDropdown(null);
+                                                }}
+                                                className="p-3 hover:bg-gray-100 cursor-pointer"
+                                            >
+                                                {ipva}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* DPVAT */}
+                        <div className="flex flex-col">
+                            <label className="text-gray-700 font-medium mb-2">DPVAT</label>
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    className={`w-full bg-white flex items-center p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300 
+                                ${formData.dpvat === 'Pago' ? 'border border-green-500' : formData.dpvat === 'Pendente' ? 'border border-yellow-500' : 'border border-gray-300'}`}
+                                    onClick={() => toggleDropdown('dpvat')}
+                                >
+                                    {formData.dpvat ? <span>{formData.dpvat}</span> : <span className="text-gray-500">Selecione o status do DPVAT</span>}
+                                </button>
+                                {openDropdown === 'dpvat' && (
+                                    <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        {dpvatOptions.map((dpvat) => (
+                                            <li
+                                                key={dpvat}
+                                                onClick={() => {
+                                                    setFormData({ ...formData, dpvat });
+                                                    toggleDropdown(null);
+                                                }}
+                                                className="p-3 hover:bg-gray-100 cursor-pointer"
+                                            >
+                                                {dpvat}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+
+                        {renderButton()} {/* Próxima Etapa */}
+                    </form>
+                </div>
+            );
+
+
         case 4:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
@@ -956,7 +1156,6 @@ const NewMotorcycle = () => {
                                 { key: 'controleTracao', label: 'Controle de Tração' },
                                 { key: 'controleEstabilidade', label: 'Controle de Estabilidade' },
                                 { key: 'alarme', label: 'Alarme' }
-
                             ].map(opcional => (
                                 <div className="flex items-center" key={opcional.key}>
                                     <input
@@ -1052,7 +1251,6 @@ const NewMotorcycle = () => {
                         </div>
                     </div>
 
-                    {/* Botão para próxima etapa */}
                     {renderButton()} {/* Próxima Etapa */}
                 </div>
             );
@@ -1070,7 +1268,6 @@ const NewMotorcycle = () => {
                                 Valor de Compra (R$)
                                 <span className="ml-2 text-gray-500 relative group">
                                     <HiOutlineQuestionMarkCircle className="text-xl" />
-                                    {/* Tooltip */}
                                     <div className="absolute left-0 -top-12 w-56 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         Este é o valor pelo qual a moto foi adquirida.
                                     </div>
@@ -1103,7 +1300,6 @@ const NewMotorcycle = () => {
                                 Valor de Venda (R$)
                                 <span className="ml-2 text-gray-500 relative group">
                                     <HiOutlineQuestionMarkCircle className="text-xl" />
-                                    {/* Tooltip */}
                                     <div className="absolute left-0 -top-12 w-56 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         Este é o valor pelo qual a moto será vendida.
                                     </div>
@@ -1212,7 +1408,7 @@ const NewMotorcycle = () => {
                                 type="button"
                                 onClick={prevStep}
                                 className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-all"
-                                FaStepForward >
+                            >
                                 Voltar
                             </button>
                             <button
@@ -1226,11 +1422,8 @@ const NewMotorcycle = () => {
                 </div>
             );
 
+    };
 
-        default:
-            return null;
-    }
 };
 
 export default NewMotorcycle;
-

@@ -10,6 +10,8 @@ import {
     faBank,
     faLightbulb,
     faGear,
+    faBars,
+    faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -32,6 +34,7 @@ const Settings = dynamic(() => import('../components/admin/Settings'));
 function Dashboard() {
     const [view, setView] = useState('overview');
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const router = useRouter();
     const [settings, setSettings] = useState(null);
 
@@ -60,6 +63,11 @@ function Dashboard() {
         localStorage.removeItem('token');
         router.push('/admin/login');
     };
+
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
 
     // Função para verificar a expiração do token
     const checkTokenExpiration = () => {
@@ -130,10 +138,27 @@ function Dashboard() {
                     <Image src="/logo-light.png" alt="Logo" width={120} height={40} />
                 </div>
                 <nav className="flex space-x-8 relative">
-                    {navigationItems.map((item) =>
+                    {[
+                        { name: 'Visão Geral', view: 'overview', icon: faHome },
+                        {
+                            name: 'Estoque',
+                            items: [
+                                { name: 'Veículos', view: 'stock', icon: faClipboardList },
+                                { name: 'Adicionar Veículo', view: 'newvehicle', icon: faPlusCircle },
+                            ],
+                        },
+                        {
+                            name: 'Clientes',
+                            items: [
+                                { name: 'Mensagens', view: 'mensagens', icon: faMessage },
+                                { name: 'Simulações', view: 'financiamentos', icon: faBank },
+                            ],
+                        },
+                        { name: 'Consultar Fipe', view: 'consultafipe', icon: faSearch },
+                        { name: 'Configurações', view: 'settings', icon: faGear },
+                    ].map((item) =>
                         item.items ? (
                             <div key={item.name} className="relative">
-                                {/* Botão principal que abre o dropdown */}
                                 <button
                                     onClick={() => toggleDropdown(item.name)}
                                     className="flex items-center space-x-3 hover:text-blue-500 transition duration-300"
@@ -181,8 +206,6 @@ function Dashboard() {
                         )
                     )}
                 </nav>
-                {/* Botão de Logout */}
-
                 <button
                     onClick={handleLogout}
                     className="flex items-center space-x-1 hover:text-red-500 transition duration-300"
@@ -192,10 +215,152 @@ function Dashboard() {
                 </button>
             </header>
 
+            {/* Navbar para Mobile */}
+            <header className="md:hidden flex items-center justify-between bg-zinc-900 text-white px-4 py-3 sticky top-0 z-50">
+                <div className="flex items-center">
+                    <Image src="/logo-light.png" alt="Logo" width={120} height={40} />
+                </div>
+                <button onClick={toggleSidebar} className="text-white focus:outline-none">
+                    <FontAwesomeIcon icon={sidebarOpen ? faTimes : faBars} className="h-6 w-6" />
+                </button>
+            </header>
+
+            {/* Sidebar para Mobile */}
+            {sidebarOpen && (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50" onClick={toggleSidebar}>
+        <div
+            className="fixed top-0 left-0 w-64 bg-zinc-900 text-white h-full p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <nav className="space-y-4">
+                {/* Visão Geral */}
+                <button
+                    onClick={() => {
+                        setView('overview');
+                        toggleSidebar();
+                    }}
+                    className={`flex items-center space-x-3 hover:text-blue-500 transition duration-300 ${view === 'overview' ? 'text-blue-500' : 'text-gray-400'}`}
+                >
+                    <FontAwesomeIcon icon={faHome} className="h-5 w-5" />
+                    <span>Visão Geral</span>
+                </button>
+
+                {/* Estoque com dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => toggleDropdown('Estoque')}
+                        className="flex items-center space-x-3 hover:text-blue-500 transition duration-300 text-gray-400"
+                    >
+                        <FontAwesomeIcon icon={faClipboardList} className="h-5 w-5" />
+                        <span>Estoque</span>
+                        <FontAwesomeIcon
+                            icon={faChevronDown}
+                            className={`ml-2 h-4 w-4 transition-transform ${openDropdown === 'Estoque' ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+
+                    {openDropdown === 'Estoque' && (
+                        <div className="pl-6 mt-2 space-y-2">
+                            <button
+                                onClick={() => {
+                                    setView('stock');
+                                    toggleSidebar();
+                                }}
+                                className={`block text-sm hover:text-blue-500 ${view === 'stock' ? 'text-blue-500' : 'text-gray-400'}`}
+                            >
+                                Veículos
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setView('newvehicle');
+                                    toggleSidebar();
+                                }}
+                                className="block text-sm text-gray-400 hover:text-blue-500"
+                            >
+                                Adicionar Veículo
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Clientes com dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => toggleDropdown('Clientes')}
+                        className="flex items-center space-x-3 hover:text-blue-500 transition duration-300 text-gray-400"
+                    >
+                        <FontAwesomeIcon icon={faMessage} className="h-5 w-5" />
+                        <span>Clientes</span>
+                        <FontAwesomeIcon
+                            icon={faChevronDown}
+                            className={`ml-2 h-4 w-4 transition-transform ${openDropdown === 'Clientes' ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+
+                    {openDropdown === 'Clientes' && (
+                        <div className="pl-6 mt-2 space-y-2">
+                            <button
+                                onClick={() => {
+                                    setView('mensagens');
+                                    toggleSidebar();
+                                }}
+                                className={`block text-sm hover:text-blue-500 ${view === 'mensagens' ? 'text-blue-500' : 'text-gray-400'}`}
+                            >
+                                Mensagens
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setView('financiamentos');
+                                    toggleSidebar();
+                                }}
+                                className={`block text-sm hover:text-blue-500 ${view === 'financiamentos' ? 'text-blue-500' : 'text-gray-400'}`}
+                            >
+                                Simulações
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Consulta FIPE */}
+                <button
+                    onClick={() => {
+                        setView('consultafipe');
+                        toggleSidebar();
+                    }}
+                    className={`flex items-center space-x-3 hover:text-blue-500 transition duration-300 ${view === 'consultafipe' ? 'text-blue-500' : 'text-gray-400'}`}
+                >
+                    <FontAwesomeIcon icon={faSearch} className="h-5 w-5" />
+                    <span>Consulta FIPE</span>
+                </button>
+
+                {/* Configurações */}
+                <button
+                    onClick={() => {
+                        setView('settings');
+                        toggleSidebar();
+                    }}
+                    className={`flex items-center space-x-3 hover:text-blue-500 transition duration-300 ${view === 'settings' ? 'text-blue-500' : 'text-gray-400'}`}
+                >
+                    <FontAwesomeIcon icon={faGear} className="h-5 w-5" />
+                    <span>Configurações</span>
+                </button>
+
+                {/* Sair */}
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-3 text-red-500 hover:text-red-700 transition duration-300"
+                >
+                    <FontAwesomeIcon icon={faSignOutAlt} className="h-5 w-5" />
+                    <span>Sair</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+)}
+
             {/* Conteúdo principal */}
             <main className="flex-1 p-8">
                 {view === 'overview' && <Overview />}
-                {view === 'kanban' && <Kanban />}
                 {view === 'stock' && <Stock />}
                 {view === 'newvehicle' && <AddVehicle />}
                 {view === 'mensagens' && <Mensagens />}
@@ -203,59 +368,9 @@ function Dashboard() {
                 {view === 'consultafipe' && <ConsultaFipe />}
                 {view === 'settings' && <Settings />}
             </main>
-
-            {/* Navbar inferior para dispositivos móveis */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-gray-700 shadow-lg flex justify-around py-2">
-                <button
-                    onClick={() => setView('overview')}
-                    className={`text-center transition-transform transform hover:scale-110 ${view === 'overview' ? 'text-blue-500' : 'text-gray-400'
-                        }`}
-                >
-                    <FontAwesomeIcon icon={faHome} className="h-6 w-6" />
-                    <p className="text-xs">Visão Geral</p>
-                </button>
-                <button
-                    onClick={() => setView('stock')}
-                    className={`text-center transition-transform transform hover:scale-110 ${view === 'stock' ? 'text-blue-500' : 'text-gray-400'
-                        }`}
-                >
-                    <FontAwesomeIcon icon={faClipboardList} className="h-6 w-6" />
-                    <p className="text-xs">Estoque</p>
-                </button>
-                <button
-                    onClick={() => setView('financiamentos')}
-                    className={`text-center transition-transform transform hover:scale-110 ${view === 'financiamentos' ? 'text-blue-500' : 'text-gray-400'
-                        }`}
-                >
-                    <FontAwesomeIcon icon={faBank} className="h-6 w-6" />
-                    <p className="text-xs">Simulações</p>
-                </button>
-                <button
-                    onClick={() => setView('mensagens')}
-                    className={`text-center transition-transform transform hover:scale-110 ${view === 'mensagens' ? 'text-blue-500' : 'text-gray-400'
-                        }`}
-                >
-                    <FontAwesomeIcon icon={faMessage} className="h-6 w-6" />
-                    <p className="text-xs">Mensagens</p>
-                </button>
-                <button
-                    onClick={() => setView('consultafipe')}
-                    className={`text-center transition-transform transform hover:scale-110 ${view === 'consultafipe' ? 'text-blue-500' : 'text-gray-400'
-                        }`}
-                >
-                    <FontAwesomeIcon icon={faSearch} className="h-6 w-6" />
-                    <p className="text-xs">Consulta FIPE</p>
-                </button>
-            </div>
-
-            {/* Footer */}
-            <footer className="hidden md:block bg-zinc-900 text-gray-400 text-sm py-4 text-center">
-                <p>Desenvolvido com ❤️ para <strong>{settings.name}</strong></p>
-                <p className="mt-2 italic text-gray-500">EMX Motors vAlpha 1.0.0</p>
-            </footer>
         </div>
     );
 }
 
 // Exporta com proteção da rota
-export default withAuth(Dashboard); // Protege a rota com autenticação
+export default withAuth(Dashboard);

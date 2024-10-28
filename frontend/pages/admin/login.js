@@ -54,15 +54,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200">
-      <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
         <div className="text-center mb-8">
           <Image
             src="/logo.png"
             alt="Logo"
             width={150}
             height={0}
-            className="mx-auto"
+            className="mx-auto max-w-xs"
             priority={true}
           />
           <h1 className="text-2xl font-bold mt-4 text-gray-800">
@@ -107,7 +107,10 @@ export default function LoginPage() {
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <div className="flex justify-center">
-            <button type="submit" className="button">
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors duration-200"
+            >
               ENTRAR
             </button>
           </div>

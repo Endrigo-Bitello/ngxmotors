@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './VehiclesBrandsList.module.css'; // Importando o CSS
 
 const VehiclesBrandsList = () => {
   const [carBrands, setCarBrands] = useState([]);
@@ -51,18 +50,18 @@ const VehiclesBrandsList = () => {
 
   const renderBrandList = (brands, vehicleType) => {
     return (
-      <ul className={styles.brandList}>
+      <ul className="space-y-4">
         {brands.map(([marca, quantidade]) => (
-          <li key={marca} className={styles.brandItem}>
-            <div className={styles.brandInfo}>
+          <li key={marca} className="flex justify-between items-center bg-white shadow-md p-4 rounded-lg">
+            <div className="flex items-center space-x-4">
               <img
                 src={`/icons/${marca.toLowerCase().replace(/ /g, '-')}.png`}
                 alt={marca}
-                className={styles.brandIcon}
+                className="h-12 w-12 object-contain"
               />
-              <span className={styles.brandName}>{marca}</span>
+              <span className="text-gray-800 font-medium">{marca}</span>
             </div>
-            <span className={vehicleType === 'carro' ? styles.carCount : styles.motoCount}>
+            <span className={vehicleType === 'carro' ? 'text-blue-500' : 'text-red-500'}>
               {quantidade} {vehicleType === 'carro'
                 ? quantidade > 1 ? 'carros' : 'carro'
                 : quantidade > 1 ? 'motos' : 'moto'}
@@ -74,25 +73,27 @@ const VehiclesBrandsList = () => {
   };
 
   return (
-    <div className={styles.container}>
-      {/* Relatório de Carros */}
-      <div className={styles.reportWrapper}>
-        <h2 className={styles.reportTitle}>Carros por Marca</h2>
-        {carBrands.length > 0 ? (
-          renderBrandList(carBrands, 'carro')
-        ) : (
-          <p className={styles.emptyMessage}>Não há carros cadastrados no momento.</p>
-        )}
-      </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Relatório de Carros */}
+        <div className="bg-gray-50 p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Carros por Marca</h2>
+          {carBrands.length > 0 ? (
+            renderBrandList(carBrands, 'carro')
+          ) : (
+            <p className="text-gray-500">Não há carros cadastrados no momento.</p>
+          )}
+        </div>
 
-      {/* Relatório de Motos */}
-      <div className={styles.reportWrapper}>
-        <h2 className={styles.reportTitle}>Motos por Marca</h2>
-        {motoBrands.length > 0 ? (
-          renderBrandList(motoBrands, 'moto')
-        ) : (
-          <p className={styles.emptyMessage}>Não há motos cadastradas no momento.</p>
-        )}
+        {/* Relatório de Motos */}
+        <div className="bg-gray-50 p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Motos por Marca</h2>
+          {motoBrands.length > 0 ? (
+            renderBrandList(motoBrands, 'moto')
+          ) : (
+            <p className="text-gray-500">Não há motos cadastradas no momento.</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -113,6 +113,75 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+router.post('/update-images/:customId', upload.single('image'), async (req, res) => {
+    try {
+        const {customId} = req.params;
+        const file = req.file;
+
+        if (!file)
+            return res.status(400).json({message: 'Nenhuma imagem enviada'});
+
+        const imagePath = file.path;
+
+        /* Lidando com a URL da imagem */
+        const imageURL = `/imagens/motos/${customId}/${imagePath.split('\\').pop()}`;
+
+        /* Atualizando o carro com a nova imagem */
+        await Motos.findOneAndUpdate(
+            {customId: customId},
+            {$push: {imagens: imageURL}},
+            {new: true}
+        );
+
+        const dir = imagePath.substring(0, imagePath.lastIndexOf('\\'));
+
+        if (!fs.existsSync(dir))
+            fs.mkdirSync(dir, {recursive: true});
+
+        return res.status(200).json({message: 'Imagem carregada com sucesso', imageURL});
+    } catch (error) {
+        return res.status(500).json({message: 'Erro ao carregar imagem', error});
+    }
+});
+
+
+router.delete('/delete-image/:customId/', async (req, res) => {
+    try {
+        const {customId} = req.params;
+
+        const imagesDir = path.resolve(__dirname, '..', '..', 'frontend', 'public', 'imagens', 'motos', customId);
+
+        if (!fs.existsSync(imagesDir))
+            return res.status(404).json({message: 'Diretório de imagens não encontrado'});
+
+        const files = fs.readdirSync(imagesDir);
+
+        const imageFiles = files.filter(file => {
+            return /\.(jpg|jpeg|png|gif|webp)$/.test(file.toLowerCase());
+        });
+
+        const vehicle = await Motos.findOne({customId: customId})
+
+        if (vehicle) {
+            const vehicleImages = vehicle.imagens
+
+            for (const file of imageFiles) {
+                const imagePath = path.join(imagesDir, file);
+
+                const imageURL = `/imagens/motos/${customId}/${imagePath.split('\\').pop()}`;
+
+                if (!vehicleImages.includes(imageURL))
+                    fs.unlinkSync(imagePath)
+            }
+        }
+
+        return res.status(200).json({message: 'Imagens removidas com sucesso'});
+    } catch (error) {
+        return res.status(500).json({message: 'Erro ao remover imagens', error});
+    }
+});
+
 // POST - Enviar imagens para a pasta e atualizar o MongoDB
 router.post('/upload/:customId', upload.array('imagens', 30), async (req, res) => {
     const { customId } = req.params;

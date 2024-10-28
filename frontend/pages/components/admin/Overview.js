@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import LeadsChart from '../../components/admin/charts/LeadsChart';
-import StepLeadsRadarChart from './charts/StepLeadsRadarChart';
 import VehiclesChart from './charts/VehiclesChart';
-import VehiclesBrandsList from './charts/VehiclesBrandsList'; 
+import VehiclesBrandsList from './charts/VehiclesBrandsList';
 
 const Overview = () => {
   const [usuario, setUsuario] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('veiculos'); 
-  const [selectedChart, setSelectedChart] = useState('proporcaoVeiculos'); 
+  const [selectedCategory, setSelectedCategory] = useState('veiculos');
+  const [selectedChart, setSelectedChart] = useState('proporcaoVeiculos');
   const [simulacoes, setSimulacoes] = useState(0);
   const [mensagens, setMensagens] = useState(0);
   const [veiculosTotais, setVeiculosTotais] = useState(0);
-  const [leadsTotais, setLeadsTotais] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,19 +27,17 @@ const Overview = () => {
           },
         };
 
-        const [usuarioRes, simulacoesRes, mensagensRes, veiculosRes, leadsRes] = await Promise.all([
+        const [usuarioRes, simulacoesRes, mensagensRes, veiculosRes] = await Promise.all([
           axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`, config),
           axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/financiamentos`, config),
           axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mensagens`, config),
           axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/vehicles`, config),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/clientes`, config),
         ]);
 
         setUsuario(usuarioRes.data);
         setSimulacoes(simulacoesRes.data.length); // Número de simulações de financiamento
         setMensagens(mensagensRes.data.length); // Número de mensagens
         setVeiculosTotais(veiculosRes.data.length); // Número total de veículos
-        setLeadsTotais(leadsRes.data.length); // Número total de leads
 
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
@@ -73,112 +68,63 @@ const Overview = () => {
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="bg-white shadow-md rounded-lg p-6 w-full text-center">
+      <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 w-full text-center">
         {/* Saudação do usuário */}
-        <h1 className="text-5xl font-extrabold text-gray-800 mb-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-800 mb-4">
           Bem-vindo de volta, {usuario.nome}!
         </h1>
-        <p className="text-xl text-gray-600 mb-6">
-          Estamos felizes em tê-lo novamente. Aqui está uma rápida visão dos seus leads.
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
+          Estamos felizes em tê-lo novamente. Aqui está uma visão geral da sua revenda.
         </p>
-
-        {/* Leads atribuídos */}
-        <div className="bg-blue-50 p-6 rounded-lg shadow-sm mb-6">
-          <p className="text-3xl font-bold text-900-600">
-            Leads atribuídos à você:
-          </p>
-          <p className="text-4xl font-extrabold text-blue-700">
-            {usuario.leadsAtribuidos}
-          </p>
-        </div>
       </div>
 
       {/* Mini Relatório Geral */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-        <div className="bg-white shadow-md rounded-lg p-6 text-center">
-          <h3 className="text-xl font-bold text-gray-700">Simulações de Financiamento</h3>
-          <p className="text-3xl font-extrabold text-blue-600 mt-4">{simulacoes}</p>
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-6 text-center">
-          <h3 className="text-xl font-bold text-gray-700">Mensagens Recebidas</h3>
-          <p className="text-3xl font-extrabold text-green-600 mt-4">{mensagens}</p>
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-6 text-center">
-          <h3 className="text-xl font-bold text-gray-700">Veículos Totais</h3>
-          <p className="text-3xl font-extrabold text-purple-600 mt-4">{veiculosTotais}</p>
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-6 text-center">
-          <h3 className="text-xl font-bold text-gray-700">Leads Totais</h3>
-          <p className="text-3xl font-extrabold text-orange-600 mt-4">{leadsTotais}</p>
+      <div className="flex justify-center mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl">
+          <div className="bg-white shadow-md rounded-lg p-6 text-center">
+            <h3 className="text-xl font-bold text-gray-700">Simulações</h3>
+            <p className="text-3xl font-extrabold text-blue-600 mt-4">{simulacoes}</p>
+          </div>
+          <div className="bg-white shadow-md rounded-lg p-6 text-center">
+            <h3 className="text-xl font-bold text-gray-700">Mensagens Recebidas</h3>
+            <p className="text-3xl font-extrabold text-green-600 mt-4">{mensagens}</p>
+          </div>
+          <div className="bg-white shadow-md rounded-lg p-6 text-center">
+            <h3 className="text-xl font-bold text-gray-700">Veículos Totais</h3>
+            <p className="text-3xl font-extrabold text-purple-600 mt-4">{veiculosTotais}</p>
+          </div>
         </div>
       </div>
 
-      {/* Botões para escolher Veículos ou Leads */}
+
+      {/* Botões para escolher gráficos de Veículos */}
       <div className="flex justify-center mt-8 space-x-4">
         <button
-          className={`px-8 py-3 rounded-lg shadow-md font-bold ${
-            selectedCategory === 'veiculos' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
-          }`}
+          className={`px-8 py-3 rounded-lg shadow-md font-bold ${selectedCategory === 'veiculos' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
+            }`}
           onClick={() => {
             setSelectedCategory('veiculos');
-            setSelectedChart('proporcaoVeiculos'); 
+            setSelectedChart('proporcaoVeiculos');
           }}
         >
           Veículos
         </button>
-
-        <button
-          className={`px-8 py-3 rounded-lg shadow-md font-bold ${
-            selectedCategory === 'leads' ? 'bg-orange-600 text-white' : 'bg-white text-gray-600 border'
-          }`}
-          onClick={() => {
-            setSelectedCategory('leads');
-            setSelectedChart('leadsPorOrigem'); 
-          }}
-        >
-          Leads
-        </button>
       </div>
-
-      {/* Exibir botões para gráficos de Leads */}
-      {selectedCategory === 'leads' && (
-        <div className="flex justify-center mt-8 space-x-4">
-          <button
-            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
-              selectedChart === 'leadsPorOrigem' ? 'bg-orange-600 text-white' : 'bg-white text-gray-600 border'
-            }`}
-            onClick={() => setSelectedChart('leadsPorOrigem')}
-          >
-            Leads por Origem
-          </button>
-
-          <button
-            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
-              selectedChart === 'leadsPorEtapa' ? 'bg-orange-600 text-white' : 'bg-white text-gray-600 border'
-            }`}
-            onClick={() => setSelectedChart('leadsPorEtapa')}
-          >
-            Leads por Etapa
-          </button>
-        </div>
-      )}
 
       {/* Exibir botões para gráficos de Veículos */}
       {selectedCategory === 'veiculos' && (
         <div className="flex justify-center mt-8 space-x-4">
           <button
-            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
-              selectedChart === 'proporcaoVeiculos' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
-            }`}
+            className={`px-6 py-2 rounded-lg shadow-md font-bold ${selectedChart === 'proporcaoVeiculos' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
+              }`}
             onClick={() => setSelectedChart('proporcaoVeiculos')}
           >
             Proporção de Veículos
           </button>
 
           <button
-            className={`px-6 py-2 rounded-lg shadow-md font-bold ${
-              selectedChart === 'veiculosPorMarca' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
-            }`}
+            className={`px-6 py-2 rounded-lg shadow-md font-bold ${selectedChart === 'veiculosPorMarca' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border'
+              }`}
             onClick={() => setSelectedChart('veiculosPorMarca')}
           >
             Veículos por Marca
@@ -188,8 +134,6 @@ const Overview = () => {
 
       {/* Renderizando o gráfico selecionado */}
       <div className="mt-12">
-        {selectedChart === 'leadsPorOrigem' && <LeadsChart />}
-        {selectedChart === 'leadsPorEtapa' && <StepLeadsRadarChart />}
         {selectedChart === 'proporcaoVeiculos' && <VehiclesChart />}
         {selectedChart === 'veiculosPorMarca' && <VehiclesBrandsList />}
       </div>

@@ -4,7 +4,6 @@ import path from 'path';
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     // Verifique se os dados estão sendo recebidos corretamente
-    console.log(req.body);
 
     // Pegando todos os campos que podem ser enviados
     const {

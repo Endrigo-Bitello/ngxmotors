@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { FaImages, FaStepBackward, FaStepForward, FaChevronDown, FaTimes, FaCouch, FaCar, FaLock, FaWrench, FaQuestionCircle } from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi';
 
-
-
 import axios from 'axios';
 import Image from 'next/image';
 import Stock from './Stock';
@@ -133,14 +131,11 @@ const NewCar = () => {
     const [showStock, setShowStock] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
 
-
-
     const toggleDropdown = (dropdown) => {
-        // Se o dropdown clicado já estiver aberto, fecha-o. Caso contrário, abre-o.
         if (openDropdown === dropdown) {
-            setOpenDropdown(null); // Fecha o dropdown
+            setOpenDropdown(null);
         } else {
-            setOpenDropdown(dropdown); // Abre o dropdown e fecha os outros
+            setOpenDropdown(dropdown);
         }
     };
 
@@ -149,16 +144,14 @@ const NewCar = () => {
         setMotorOpen(false);
     };
 
-
     const handleKilometragemChange = (e) => {
-        let value = e.target.value.replace(/\D/g, ''); // Remove qualquer caractere não numérico
-        if (value > 500000) value = 500000; // Limita o valor a 500.000
+        let value = e.target.value.replace(/\D/g, '');
+        if (value > 500000) value = 500000;
         setFormData({ ...formData, quilometragem: value });
     };
 
     const [placaFormat, setPlacaFormat] = useState('');
 
-    // Função para detectar o formato da placa
     const detectPlacaFormat = (placa) => {
         const mercosulRegex = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
         const antigoRegex = /^[A-Z]{3}-[0-9]{4}$/;
@@ -172,11 +165,9 @@ const NewCar = () => {
         }
     };
 
-    // Modifique a função handleChange para detectar o formato da placa ao alterar o valor
     const handleChangePlaca = (e) => {
         const { name, value } = e.target;
 
-        // Detecta o formato da placa se o campo de placa for modificado
         if (name === 'placa') {
             setPlacaFormat(detectPlacaFormat(value));
         }
@@ -188,7 +179,7 @@ const NewCar = () => {
     };
 
     const handlePotenciaChange = (e) => {
-        const value = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+        const value = e.target.value.replace(/\D/g, '');
         setFormData({
             ...formData,
             potencia: value
@@ -196,7 +187,7 @@ const NewCar = () => {
     };
 
     const handleTorqueChange = (e) => {
-        const value = e.target.value.replace(/[^0-9,.]/g, ''); // Remove tudo que não for número ou ponto/vírgula
+        const value = e.target.value.replace(/[^0-9,.]/g, '');
         setFormData({
             ...formData,
             torque: value
@@ -214,9 +205,8 @@ const NewCar = () => {
     const handleCheckboxChange = (e) => {
         const { name, checked } = e.target;
 
-        // Verifica se o nome faz parte de 'opcionais'
         if (name.includes('opcionais')) {
-            const key = name.split('.')[1]; // Pega a chave específica dos opcionais
+            const key = name.split('.')[1];
             setFormData((prevData) => ({
                 ...prevData,
                 opcionais: {
@@ -225,7 +215,6 @@ const NewCar = () => {
                 }
             }));
         } else {
-            // Caso não seja 'opcionais', altera diretamente o campo no formData
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: checked,
@@ -247,7 +236,7 @@ const NewCar = () => {
         try {
             // Primeira requisição: criar o veículo no banco de dados
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/carros`, formData);
-            const customId = response.data.customId; // Supondo que o backend retorne o customId
+            const customId = response.data.customId;
 
             // Se houver imagens para enviar, faça o upload delas
             if (formData.imagens.length > 0) {
@@ -255,7 +244,7 @@ const NewCar = () => {
 
                 // Adiciona as imagens ao FormData
                 Array.from(formData.imagens).forEach((file, index) => {
-                    formDataImagens.append('imagens', file); // 'imagens' é a chave usada para múltiplos arquivos
+                    formDataImagens.append('imagens', file);
                 });
 
                 // Segunda requisição: enviar as imagens
@@ -279,20 +268,25 @@ const NewCar = () => {
 
     const renderButton = () => {
         const isStepValid = () => {
-
-            // Etapa 1
-            return formData.marca &&
-                formData.modelo &&
-                formData.tipoDeCarro &&
-                formData.anoFabricacao &&
-                formData.anoModelo &&
-                formData.transmissao &&
-                formData.cor;
+            switch (step) {
+                case 1:
+                    return formData.marca && formData.modelo && formData.tipoDeCarro &&
+                        formData.anoFabricacao && formData.anoModelo && formData.transmissao && formData.cor;
+                case 2:
+                    return formData.quilometragem && formData.combustivel && formData.direcao &&
+                        formData.potencia && formData.motor && formData.torque && formData.numeroDePortas && formData.tracao && formData.freios;
+                case 3:
+                    return formData.placa;
+                case 4:
+                    return true;
+                case 5:
+                    return formData.valorCompra && formData.valorVenda && formData.valorFIPE && formData.imagens.length > 0;
+                default:
+                    return false;
+            }
         };
 
         return (
-
-
             <div className="flex justify-between mt-6">
                 {step > 1 && (
                     <button
@@ -310,7 +304,15 @@ const NewCar = () => {
                             if (isStepValid()) {
                                 nextStep();
                             } else {
-                                alert('Preencha todos os campos obrigatórios antes de prosseguir.');
+                                // Mensagem personalizada ao invés de alert padrão do navegador
+                                const stepMessages = {
+                                    1: 'Preencha todos os campos obrigatórios da etapa "Informações Básicas".',
+                                    2: 'Preencha todos os campos obrigatórios da etapa "Ficha Técnica".',
+                                    3: 'Preencha todos os campos obrigatórios da etapa "Documentação e Regularização".',
+                                    4: 'Selecione ao menos um opcional.',
+                                    5: 'Preencha todos os campos obrigatórios e faça o upload de imagens.'
+                                };
+                                alert(stepMessages[step]);
                             }
                         }}
                         className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
@@ -322,22 +324,19 @@ const NewCar = () => {
         );
     };
 
-    // Layout para cada etapa
     switch (step) {
         case 1:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
                     <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Informações Básicas</h2>
                     <form className="space-y-6">
-
-                        {/* Marca (com ícones de marca no dropdown) */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Marca</label>
                             <div className="relative">
                                 <button
                                     type="button"
                                     className="w-full flex items-center justify-between bg-white border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => toggleDropdown('marca')} // Controla o dropdown de marca
+                                    onClick={() => toggleDropdown('marca')}
                                 >
                                     {formData.marca ? (
                                         <div className="flex items-center">
@@ -345,9 +344,8 @@ const NewCar = () => {
                                                 <Image
                                                     src={`/icons/${formData.marca.toLowerCase().replace(/ /g, '-')}.png`}
                                                     alt={formData.marca}
-                                                    layout="fill" // Preenche o contêiner pai
-                                                    objectFit="contain" // Garante que a imagem mantenha seu conteúdo
-                                                    className="mr-3"
+                                                    layout="fill"
+                                                    objectFit="contain"
                                                 />
                                             </div>
                                             {formData.marca}
@@ -364,7 +362,7 @@ const NewCar = () => {
                                                 key={marca}
                                                 onClick={() => {
                                                     setFormData({ ...formData, marca });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="flex items-center p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -372,8 +370,8 @@ const NewCar = () => {
                                                     <Image
                                                         src={`/icons/${marca.toLowerCase().replace(/ /g, '-')}.png`}
                                                         alt={marca}
-                                                        layout="fill" // Preenche o contêiner pai
-                                                        objectFit="contain" // Mantém o conteúdo dentro do contêiner sem distorção
+                                                        layout="fill"
+                                                        objectFit="contain"
                                                     />
                                                 </div>
                                                 {marca}
@@ -384,7 +382,6 @@ const NewCar = () => {
                             </div>
                         </div>
 
-                        {/* Modelo */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Modelo</label>
                             <input
@@ -397,14 +394,13 @@ const NewCar = () => {
                             />
                         </div>
 
-                        {/* Tipo de Carro */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Tipo de Carro</label>
                             <div className="relative">
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => toggleDropdown('tipoDeCarro')} // Controla o dropdown de tipo de carro
+                                    onClick={() => toggleDropdown('tipoDeCarro')}
                                 >
                                     {formData.tipoDeCarro ? (
                                         <span>{formData.tipoDeCarro}</span>
@@ -420,7 +416,7 @@ const NewCar = () => {
                                                 key={tipo}
                                                 onClick={() => {
                                                     setFormData({ ...formData, tipoDeCarro: tipo });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -432,7 +428,6 @@ const NewCar = () => {
                             </div>
                         </div>
 
-                        {/* Ano de Fabricação e Ano do Modelo */}
                         <div className="grid grid-cols-2 gap-6">
                             <div className="flex flex-col">
                                 <label className="text-gray-700 font-medium mb-2">Ano de Fabricação</label>
@@ -459,14 +454,13 @@ const NewCar = () => {
                             </div>
                         </div>
 
-                        {/* Transmissão */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Transmissão</label>
                             <div className="relative">
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => toggleDropdown('transmissao')} // Controla o dropdown de transmissão
+                                    onClick={() => toggleDropdown('transmissao')}
                                 >
                                     {formData.transmissao ? (
                                         <span>{formData.transmissao}</span>
@@ -482,7 +476,7 @@ const NewCar = () => {
                                                 key={transmissao}
                                                 onClick={() => {
                                                     setFormData({ ...formData, transmissao });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -494,7 +488,6 @@ const NewCar = () => {
                             </div>
                         </div>
 
-                        {/* Cor */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Cor</label>
                             <input
@@ -507,11 +500,10 @@ const NewCar = () => {
                             />
                         </div>
 
-                        {renderButton()} {/* Próxima Etapa */}
+                        {renderButton()}
                     </form>
                 </div>
             );
-
         case 2:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
@@ -525,8 +517,8 @@ const NewCar = () => {
                                 <input
                                     type="text"
                                     name="quilometragem"
-                                    value={formData.quilometragem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} // Formatação com separadores
-                                    onChange={(e) => handleKilometragemChange(e)} // Manipulador personalizado
+                                    value={formData.quilometragem.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                                    onChange={(e) => handleKilometragemChange(e)}
                                     placeholder="Digite a quilometragem"
                                     className={`p-3 bg-white border ${formData.quilometragem > 500000 ? 'border-red-600' : 'border-gray-300'} rounded-lg shadow-sm focus:ring focus:ring-blue-300 w-full pr-16`}
                                 />
@@ -539,7 +531,6 @@ const NewCar = () => {
                             )}
                         </div>
 
-
                         {/* Combustível */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">Combustível</label>
@@ -547,7 +538,7 @@ const NewCar = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => toggleDropdown('combustivel')} // Controla o dropdown de combustível
+                                    onClick={() => toggleDropdown('combustivel')}
                                 >
                                     {formData.combustivel ? (
                                         <span>{formData.combustivel}</span>
@@ -563,7 +554,7 @@ const NewCar = () => {
                                                 key={combustivel}
                                                 onClick={() => {
                                                     setFormData({ ...formData, combustivel });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -582,7 +573,7 @@ const NewCar = () => {
                                 <button
                                     type="button"
                                     className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                    onClick={() => toggleDropdown('direcao')} // Controla o dropdown de direção
+                                    onClick={() => toggleDropdown('direcao')}
                                 >
                                     {formData.direcao ? (
                                         <span>{formData.direcao}</span>
@@ -598,7 +589,7 @@ const NewCar = () => {
                                                 key={direcao}
                                                 onClick={() => {
                                                     setFormData({ ...formData, direcao });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -618,33 +609,31 @@ const NewCar = () => {
                                     <input
                                         type="text"
                                         name="potencia"
-                                        value={formData.potencia.replace(/\D/g, '')} // Mantém apenas números
-                                        onChange={handlePotenciaChange} // Função personalizada
+                                        value={formData.potencia.replace(/\D/g, '')}
+                                        onChange={handlePotenciaChange}
                                         placeholder="Digite a potência do carro"
                                         className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 w-full pr-16"
                                     />
                                     <span className="absolute right-4 text-gray-500">CV</span>
                                 </div>
                             </div>
+
                             <div className="relative flex flex-col">
-                                <label className="text-gray-700 font-medium mb-2 z-9">Motor</label> {/* Aumentando o z-index da label */}
+                                <label className="text-gray-700 font-medium mb-2">Motor</label>
                                 <button
                                     type="button"
-                                    onClick={() => toggleDropdown('motor')} // Controla o dropdown de motor
+                                    onClick={() => toggleDropdown('motor')}
                                     className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 flex justify-between items-center"
                                 >
                                     {formData.motor || 'Selecione o motor'}
                                     <FaChevronDown className="text-gray-400" />
                                 </button>
                                 {openDropdown === 'motor' && (
-                                    <ul
-                                        className="absolute z-20 left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
-                                        style={{ top: '100%', marginTop: '0.25rem' }} // Garante que o dropdown fique abaixo do botão
-                                    >
+                                    <ul className="absolute z-20 left-0 top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                                         {motorOptions.map((option) => (
                                             <li
                                                 key={option}
-                                                onClick={() => handleMotorSelect(option)} // Seleciona o motor
+                                                onClick={() => handleMotorSelect(option)}
                                                 className="cursor-pointer px-4 py-2 hover:bg-gray-100"
                                             >
                                                 {option}
@@ -653,7 +642,6 @@ const NewCar = () => {
                                     </ul>
                                 )}
                             </div>
-
                         </div>
 
 
@@ -664,8 +652,8 @@ const NewCar = () => {
                                 <input
                                     type="text"
                                     name="torque"
-                                    value={formData.torque.replace(/[^0-9,.]/g, '')} // Mantém apenas números e vírgulas/pontos decimais
-                                    onChange={handleTorqueChange} // Função personalizada
+                                    value={formData.torque.replace(/[^0-9,.]/g, '')}
+                                    onChange={handleTorqueChange}
                                     placeholder="Exemplo: 30 kgfm"
                                     className="p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 w-full pr-16"
                                 />
@@ -693,7 +681,7 @@ const NewCar = () => {
                                     <button
                                         type="button"
                                         className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                        onClick={() => toggleDropdown('tracao')} // Controla o dropdown de tração
+                                        onClick={() => toggleDropdown('tracao')}
                                     >
                                         {formData.tracao ? (
                                             <span>{formData.tracao}</span>
@@ -709,7 +697,7 @@ const NewCar = () => {
                                                     key={tracao}
                                                     onClick={() => {
                                                         setFormData({ ...formData, tracao });
-                                                        toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                        toggleDropdown(null);
                                                     }}
                                                     className="p-3 hover:bg-gray-100 cursor-pointer"
                                                 >
@@ -730,7 +718,7 @@ const NewCar = () => {
                                     <button
                                         type="button"
                                         className="w-full bg-white flex items-center justify-between border border-gray-300 p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                                        onClick={() => toggleDropdown('freios')} // Controla o dropdown de freios
+                                        onClick={() => toggleDropdown('freios')}
                                     >
                                         {formData.freios ? (
                                             <span>{formData.freios}</span>
@@ -746,7 +734,7 @@ const NewCar = () => {
                                                     key={freios}
                                                     onClick={() => {
                                                         setFormData({ ...formData, freios });
-                                                        toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                        toggleDropdown(null);
                                                     }}
                                                     className="p-3 hover:bg-gray-100 cursor-pointer"
                                                 >
@@ -777,10 +765,7 @@ const NewCar = () => {
                         {renderButton()} {/* Próxima Etapa */}
                     </form>
                 </div>
-            );
-
-
-        case 3:
+            ); case 3:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
                     <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">Documentação e Regularização</h2>
@@ -794,12 +779,10 @@ const NewCar = () => {
                                     type="text"
                                     name="placa"
                                     value={formData.placa}
-                                    onChange={handleChange}
+                                    onChange={handleChangePlaca}
                                     placeholder="Digite a placa"
                                     className="p-3 pr-12 w-full bg-white border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
                                 />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                </div>
                             </div>
                             {formData.placa && (
                                 <span className="text-gray-500 mt-1">
@@ -819,10 +802,10 @@ const NewCar = () => {
                                 placeholder="Digite o número do chassi"
                                 maxLength={17} // Limita o input a 17 caracteres
                                 className={`p-3 w-full bg-white border 
-            ${!formData.chassi ? 'border-gray-300' :
+                                    ${!formData.chassi ? 'border-gray-300' :
                                         formData.chassi.length < 17 ? 'border-red-600' :
                                             'border-green-500'} 
-             rounded-lg shadow-sm focus:ring focus:ring-blue-300`}
+                                    rounded-lg shadow-sm focus:ring focus:ring-blue-300`}
                             />
                             {formData.chassi && (
                                 <span className="text-gray-500 mt-1">
@@ -832,7 +815,6 @@ const NewCar = () => {
                                 </span>
                             )}
                         </div>
-
 
                         <div className="grid grid-cols-2 gap-6">
                             {/* RENAVAM */}
@@ -844,12 +826,12 @@ const NewCar = () => {
                                     value={formData.renavam}
                                     onChange={handleChange}
                                     placeholder="Digite o RENAVAM"
-                                    maxLength={11} // Limita a entrada a 11 dígitos
+                                    maxLength={11}
                                     className={`p-3 bg-white border 
-                ${!formData.renavam ? 'border-gray-300' :
+                                        ${!formData.renavam ? 'border-gray-300' :
                                             formData.renavam.length < 11 ? 'border-red-600' :
                                                 'border-green-500'} 
-                 rounded-lg shadow-sm focus:ring focus:ring-blue-300`}
+                                        rounded-lg shadow-sm focus:ring focus:ring-blue-300`}
                                 />
                                 {formData.renavam && (
                                     <span className="text-gray-500 mt-1">
@@ -869,12 +851,12 @@ const NewCar = () => {
                                     value={formData.crlv}
                                     onChange={handleChange}
                                     placeholder="Digite o CRLV"
-                                    maxLength={12} // Limita a entrada a 12 dígitos
+                                    maxLength={12}
                                     className={`p-3 bg-white border 
-                ${!formData.crlv ? 'border-gray-300' :
+                                        ${!formData.crlv ? 'border-gray-300' :
                                             formData.crlv.length < 12 ? 'border-red-600' :
                                                 'border-green-500'} 
-                 rounded-lg shadow-sm focus:ring focus:ring-blue-300`}
+                                        rounded-lg shadow-sm focus:ring focus:ring-blue-300`}
                                 />
                                 {formData.crlv && (
                                     <span className="text-gray-500 mt-1">
@@ -886,7 +868,6 @@ const NewCar = () => {
                             </div>
                         </div>
 
-
                         {/* IPVA */}
                         <div className="flex flex-col">
                             <label className="text-gray-700 font-medium mb-2">IPVA</label>
@@ -894,8 +875,8 @@ const NewCar = () => {
                                 <button
                                     type="button"
                                     className={`w-full bg-white flex items-center p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300 
-            ${formData.ipva === 'Pago' ? 'border border-green-500' : formData.ipva === 'Pendente' ? 'border border-yellow-500' : 'border border-gray-300'}`}
-                                    onClick={() => toggleDropdown('ipva')} // Controla o dropdown do IPVA
+                                        ${formData.ipva === 'Pago' ? 'border border-green-500' : formData.ipva === 'Pendente' ? 'border border-yellow-500' : 'border border-gray-300'}`}
+                                    onClick={() => toggleDropdown('ipva')}
                                 >
                                     {formData.ipva ? <span>{formData.ipva}</span> : <span className="text-gray-500">Selecione o status do IPVA</span>}
                                 </button>
@@ -906,7 +887,7 @@ const NewCar = () => {
                                                 key={ipva}
                                                 onClick={() => {
                                                     setFormData({ ...formData, ipva });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -925,8 +906,8 @@ const NewCar = () => {
                                 <button
                                     type="button"
                                     className={`w-full bg-white flex items-center p-3 rounded-lg shadow-sm focus:ring focus:ring-blue-300 
-            ${formData.dpvat === 'Pago' ? 'border border-green-500' : formData.dpvat === 'Pendente' ? 'border border-yellow-500' : 'border border-gray-300'}`}
-                                    onClick={() => toggleDropdown('dpvat')} // Controla o dropdown do DPVAT
+                                        ${formData.dpvat === 'Pago' ? 'border border-green-500' : formData.dpvat === 'Pendente' ? 'border border-yellow-500' : 'border border-gray-300'}`}
+                                    onClick={() => toggleDropdown('dpvat')}
                                 >
                                     {formData.dpvat ? <span>{formData.dpvat}</span> : <span className="text-gray-500">Selecione o status do DPVAT</span>}
                                 </button>
@@ -937,7 +918,7 @@ const NewCar = () => {
                                                 key={dpvat}
                                                 onClick={() => {
                                                     setFormData({ ...formData, dpvat });
-                                                    toggleDropdown(null); // Fecha o dropdown após selecionar
+                                                    toggleDropdown(null);
                                                 }}
                                                 className="p-3 hover:bg-gray-100 cursor-pointer"
                                             >
@@ -948,7 +929,6 @@ const NewCar = () => {
                                 )}
                             </div>
                         </div>
-
 
                         {/* Com Multas e Veículo de Leilão */}
                         <div className="grid grid-cols-2 gap-6">
@@ -983,14 +963,10 @@ const NewCar = () => {
                             </div>
                         </div>
 
-
-
                         {renderButton()}
                     </form>
                 </div>
             );
-
-
         case 4:
             return (
                 <div className="p-8 bg-gray-50 rounded-lg shadow-md max-w-3xl mx-auto">
@@ -1275,6 +1251,8 @@ const NewCar = () => {
                 </div>
             );
     };
-}
+};
 
 export default NewCar;
+
+
