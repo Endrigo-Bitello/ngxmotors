@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FaChevronDown, FaCouch, FaImages, FaLock, FaMotorcycle, FaStepBackward, FaStepForward, FaTimes, FaWrench } from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from 'react-icons/hi';
 import Image from 'next/image';
-import Stock from './Stock';
+import AddVehicle from './AddVehicle';
 
 const NewMotorcycle = () => {
     const [step, setStep] = useState(1);
@@ -242,6 +242,7 @@ const NewMotorcycle = () => {
             }
 
             setShowStock(true);
+            alert('Veículo adicionado com sucesso!');
 
         } catch (error) {
             console.error('Erro ao adicionar carro ou enviar imagens:', error.response ? error.response.data : error.message);
@@ -249,7 +250,7 @@ const NewMotorcycle = () => {
     };
 
     if (showStock) {
-        return <Stock />;
+        return <AddVehicle />;
     }
 
 

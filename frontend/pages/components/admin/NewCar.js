@@ -4,7 +4,7 @@ import { HiOutlineQuestionMarkCircle } from 'react-icons/hi';
 
 import axios from 'axios';
 import Image from 'next/image';
-import Stock from './Stock';
+import AddVehicle from './AddVehicle';
 
 const NewCar = () => {
     const [step, setStep] = useState(1);
@@ -256,6 +256,7 @@ const NewCar = () => {
             }
 
             setShowStock(true);
+            alert('Veículo adicionado com sucesso!');
 
         } catch (error) {
             console.error('Erro ao adicionar carro ou enviar imagens:', error.response ? error.response.data : error.message);
@@ -263,7 +264,7 @@ const NewCar = () => {
     };
 
     if (showStock) {
-        return <Stock />;
+        return <AddVehicle />;
     }
 
     const renderButton = () => {
@@ -633,7 +634,10 @@ const NewCar = () => {
                                         {motorOptions.map((option) => (
                                             <li
                                                 key={option}
-                                                onClick={() => handleMotorSelect(option)}
+                                                onClick={() => {
+                                                    handleMotorSelect(option);
+                                                    toggleDropdown(null); }
+                                                }
                                                 className="cursor-pointer px-4 py-2 hover:bg-gray-100"
                                             >
                                                 {option}
