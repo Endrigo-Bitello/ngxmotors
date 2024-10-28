@@ -54,7 +54,7 @@ const PoliticaDePrivacidade = () => {
             <section className="mb-10">
               <h2 className="text-2xl font-bold mb-4 text-gray-800">Informações Recolhidas</h2>
               <p className="text-lg text-gray-700 mb-4">
-                <strong>Dados fornecidos pelo usuário:</strong> coletamos informações de identificação pessoal, como nome, e-mail e telefone, por meio do preenchimento dos formulários para proposta dos carros, assinatura para recebimento da newsletter e login para receber as notícias do EMX. Ocasionalmente, a solicitação de algumas informações pode ser feita por meio de contato direto da empresa {settings.name} com os usuários via e-mail, mídias sociais ou telefone.
+                <strong>Dados fornecidos pelo usuário:</strong> coletamos informações de identificação pessoal, como nome, e-mail e telefone, por meio do preenchimento dos formulários para proposta dos carros, assinatura para recebimento da newsletter e login para receber as notícias de {settings.name}. Ocasionalmente, a solicitação de algumas informações pode ser feita por meio de contato direto da empresa {settings.name} com os usuários via e-mail, mídias sociais ou telefone.
               </p>
               <p className="text-lg text-gray-700 mb-4">
                 <strong>Dados de navegação no site:</strong> quando você visita nosso site, é inserido um ‘cookie’ no seu navegador por meio do software Google Analytics. São coletadas informações como endereço IP, localização geográfica, fonte de referência, tipo de navegador, duração da visita, páginas visitadas e a quantidade de vezes que você retorna ao nosso endereço.

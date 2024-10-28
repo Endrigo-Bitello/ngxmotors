@@ -182,7 +182,7 @@ const Footer = () => {
       <div className="bg-gray-800 p-6 text-center text-gray-400 text-sm">
         <p>© 2024 {settings.name}. Todos os direitos reservados.</p>
         <p>
-          Desenvolvido por <span className="text-white font-semibold">EMX Softwares</span>
+          Desenvolvido por <span className="text-white font-semibold">NGX Brasil</span>
         </p>
       </div>
     </footer>

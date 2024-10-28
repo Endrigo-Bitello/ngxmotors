@@ -156,8 +156,8 @@ app.get('/', (req, res) => {
 
 // Iniciar o servidor
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[EMX Tecnologia] Sistema iniciado com sucesso`);
-  console.log(`[EMX Tecnologia] Servidor rodando na porta: ${PORT}`);
+  console.log(`[NGX Brasil] Sistema iniciado com sucesso`);
+  console.log(`[NGX Brasil] Servidor rodando na porta: ${PORT}`);
 
   carregarCarros(); 
   carregarMotos()
