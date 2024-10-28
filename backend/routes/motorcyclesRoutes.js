@@ -183,7 +183,7 @@ router.delete('/delete-image/:customId/', async (req, res) => {
 });
 
 // POST - Enviar imagens para a pasta e atualizar o MongoDB
-router.post('/upload/:customId', upload.array('imagens', 30), async (req, res) => {
+router.post('/upload/:customId', upload.array('imagens', 50), async (req, res) => {
     const { customId } = req.params;
 
     try {

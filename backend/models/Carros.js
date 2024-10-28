@@ -67,7 +67,7 @@ const carroSchema = new mongoose.Schema({
     capacidadePortaMalas: {type: Number, required: true},
 
     placa: {type: String, required: true},
-    chassi: {type: String, required: true},
+    chassi: {type: String, required: false},
     renavam: {type: String, required: false},
     crlv: {type: String, required: false},
     ipva: {type: String, enum: ['Pago', 'Pendente'], required: true},

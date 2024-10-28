@@ -343,6 +343,29 @@ router.get('/marca/:marca', async (req, res) => {
     }
 });
 
+router.post('/upload/:customId', upload.array('imagens', 50), async (req, res) => {
+    const { customId } = req.params;
+
+    try {
+        // Pegue os caminhos das imagens salvas
+        const imagePaths = req.files.map(file => `/imagens/carros/${customId}/${file.filename}`);
+
+        // Atualize o documento MongoDB com os caminhos das imagens
+        const carroAtualizado = await Carros.findOneAndUpdate(
+            { customId: customId },
+            { imagens: imagePaths },
+            { new: true } // Retorna o documento atualizado
+        );
+
+        res.status(200).json({
+            message: 'Imagens enviadas com sucesso',
+            carro: carroAtualizado
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao salvar as imagens', error: error.message });
+    }
+});
+
 
 // GET - Buscar um carro por customId
 router.get('/:customId', async (req, res) => {
